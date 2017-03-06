@@ -45,8 +45,27 @@ class Encoder(object):
                  It can be context-level representation, word-level representation,
                  or both.
         """
+        # Create forward and backward cells
+        cell_fw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
+        cell_bw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
 
-        return
+        # TODO: Figure out what to do with masks
+        # inputs: shape (batch_size, length, embedding_size)
+        outputs, output_states = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
+                                                                 cell_bw=cell_bw,
+                                                                 inputs=inputs,
+                                                                 #sequence_length
+                                                                 initial_state_fw=encoder_state_input,
+                                                                 initial_state_bw=encoder_state_input,
+                                                                 dtype=tf.float32)
+        output_fw, output_bw = outputs
+        logging.debug('Shape of encoder BiRNN forward output is %d' % str(tf.shape(output_fw)))
+
+        # Concatenate two end hidden vectors for the final encoded
+        # representation of inputs
+        encoded_inputs = tf.concat(0, [output_fw, output_bw])
+        logging.debug('Shape of concatenated BiRNN encoder output is %d' % str(tf.shape(encoded_inputs)))
+        return encoded_inputs
 
 
 class Decoder(object):
