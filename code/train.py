@@ -7,7 +7,7 @@ import json
 
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Decoder
+from qa_model import Encoder, QASystem, Mixer, Decoder
 from os.path import join as pjoin
 from data_util import load_glove_embeddings, load_dataset
 
@@ -106,9 +106,10 @@ def main(_):
     return 
 
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
+    mixer = Mixer()
     decoder = Decoder(output_size=FLAGS.output_size)
 
-    qa = QASystem(encoder, decoder)
+    qa = QASystem(encoder, mixer, decoder)
 
     if not os.path.exists(FLAGS.log_dir):
         os.makedirs(FLAGS.log_dir)
