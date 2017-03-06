@@ -204,6 +204,7 @@ class QASystem(object):
         # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWER.
         s_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
 
+
     def setup_loss(self):
         """
         Set up your loss computation here
