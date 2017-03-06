@@ -89,21 +89,6 @@ def main(_):
 
     embeddings = load_glove_embeddings(embed_path)
 
-    train_set = dataset['training']
-    valid_set = dataset['validation']
-
-    print(train_set["question"])
-    print("")
-    print(train_set["context"])
-    print("")
-    print(train_set["label"])
-
-    print(valid_set["question"])
-    print("")
-    print(valid_set["context"])
-    print("")
-    print(valid_set["label"])
-    return 
 
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
     mixer = Mixer()
