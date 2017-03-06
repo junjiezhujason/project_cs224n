@@ -51,9 +51,12 @@ def load_dataset(source_dir, data_mode):
 
         c_ids_path = data_pfx + ".ids.context"
         q_ids_path = data_pfx + ".ids.question"
+        label_path = data_pfx + ".span"
         data_dict["question"] = []
         data_dict["context"] = []
+        data_dict["label"] = []
 
+        # load question data
         max_q_len = 0
         with gfile.GFile(q_ids_path, mode="rb") as data_file:
             counter = 0
@@ -72,6 +75,7 @@ def load_dataset(source_dir, data_mode):
         logger.info("read %d questions in total" % counter)
         logger.info("maximum question length %d" % max_q_len)
 
+        # load context data
         max_c_len = 0
         with gfile.GFile(c_ids_path, mode="rb") as data_file:
             counter = 0
@@ -86,6 +90,20 @@ def load_dataset(source_dir, data_mode):
                     break
         logger.info("read %d contexts in total" % counter)
         logger.info("maximum context length %d" % max_c_len)
+
+        # load labels
+        with gfile.GFile(label_path, mode="rb") as data_file:
+            counter = 0
+            for line in data_file:
+                counter += 1
+                label = map(int,line.strip().split(" "))
+
+                data_dict["label"].append(label)
+
+                if counter % 10000 == 0:
+                    logger.info("read %d context lines" % counter)
+                if data_mode=="tiny" and counter==max_entry:
+                    break
 
     dataset = {"training":train, "validation":valid}
         

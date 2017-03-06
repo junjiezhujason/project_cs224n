@@ -11,6 +11,8 @@ import tensorflow as tf
 from tensorflow.python.ops import variable_scope as vs
 
 from evaluate import exact_match_score, f1_score
+from util import Progbar, minibatches
+
 
 logging.basicConfig(level=logging.INFO)
 
@@ -245,6 +247,42 @@ class QASystem(object):
 
         return f1, em
 
+
+    def train_on_batch(self, sess, question_batch, context_batch, labels_batch):
+        feed = self.create_feed_dict(question_batch, context_batch, labels_batch=labels_batch)
+        print("created feed dict")
+        loss = 0.00 # TODO: remove later
+        # _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
+        # return loss
+        return loss
+
+    def run_epoch(self, sess, train_set, valid_set):
+        train_examples = [train_set["question"], train_set["context"], train_set["label"]]
+        n_train_examples = len(train_set["labels"])
+        prog = Progbar(target=1 + int(n_train_example / self.config.batch_size))
+        for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
+            loss = self.train_on_batch(sess, *batch)
+            # prog.update(i + 1, [("train loss", loss)])
+            # if self.report: self.report.log_train_loss(loss)
+        print("")
+
+        #logger.info("Evaluating on training data")
+        #token_cm, entity_scores = self.evaluate(sess, train_examples, train_examples_raw)
+        #logger.debug("Token-level confusion matrix:\n" + token_cm.as_table())
+        #logger.debug("Token-level scores:\n" + token_cm.summary())
+        #logger.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
+
+        valid_examples = [valid_set["question"], valid_set["context"], valid_set["label"]]
+        # logger.info("Evaluating on development data")
+        # token_cm, entity_scores = self.evaluate_answer(sess, dev_set, dev_set_raw)
+        # logger.debug("Token-level confusion matrix:\n" + token_cm.as_table())
+        # logger.debug("Token-level scores:\n" + token_cm.summary())
+        # logger.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
+
+        f1 = 0.00 # TODO: remove later
+        # f1 = entity_scores[-1]
+        return f1
+
     def train(self, session, dataset, train_dir):
         """
         Implement main training loop
@@ -280,3 +318,22 @@ class QASystem(object):
         num_params = sum(map(lambda t: np.prod(tf.shape(t.value()).eval()), params))
         toc = time.time()
         logging.info("Number of params: %d (retreival took %f secs)" % (num_params, toc - tic))
+
+        train_set = dataset['training']
+        valid_set = dataset['validation']
+
+        best_score = 0.
+	for epoch in range(self.config.n_epochs):
+	    logger.info("Epoch %d out of %d", epoch + 1, self.config.n_epochs)
+	    score = self.run_epoch(sess, train_set, valid_set)
+	    if score > best_score:
+		best_score = score
+		# if saver:
+		#     logger.info("New best score! Saving model in %s", self.config.model_output)
+		#     saver.save(sess, self.config.model_output)
+	    print("")
+	#     if self.report:
+	# 	self.report.log_epoch()
+	# 	self.report.save()
+	return best_score
+

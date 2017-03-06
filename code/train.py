@@ -77,6 +77,7 @@ def get_normalized_train_dir(train_dir):
     return global_train_dir
 
 
+
 def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
@@ -87,6 +88,22 @@ def main(_):
     vocab, rev_vocab = initialize_vocab(vocab_path)
 
     embeddings = load_glove_embeddings(embed_path)
+
+    train_set = dataset['training']
+    valid_set = dataset['validation']
+
+    print(train_set["question"])
+    print("")
+    print(train_set["context"])
+    print("")
+    print(train_set["label"])
+
+    print(valid_set["question"])
+    print("")
+    print(valid_set["context"])
+    print("")
+    print(valid_set["label"])
+    return 
 
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
     decoder = Decoder(output_size=FLAGS.output_size)
@@ -109,7 +126,7 @@ def main(_):
         save_train_dir = get_normalized_train_dir(FLAGS.train_dir)
         qa.train(sess, dataset, save_train_dir)
 
-        qa.evaluate_answer(sess, dataset, vocab, FLAGS.evaluate, log=True)
+        # qa.evaluate_answer(sess, dataset, vocab, FLAGS.evaluate, log=True)
 
 if __name__ == "__main__":
     tf.app.run()
