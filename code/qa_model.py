@@ -44,7 +44,7 @@ class Mixer(object):
         Return:
             new context_paragraph_repr weighted by attention
         """
-        a = tf.nn.softmax(tf.matmul(tf.transpose(context_paragraph_repr), question_repr))
+        a = tf.nn.softmax(tf.matmul(context_paragraph_repr, tf.expand_dims(question_repr, -1)))
         return tf.matmul(context_paragraph_repr, tf.diag(a))
 
 
@@ -76,8 +76,13 @@ class Encoder(object):
         cell_bw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
 
         # Split initial state
-        if encoder_state_input:
+        if encoder_state_input is not None:
             initial_state_fw, initial_state_bw = tf.split(1, 2, encoder_state_input)
+            state_fw=(tf.zeros(tf.shape(initial_state_fw)), initial_state_fw)
+            state_bw=(tf.zeros(tf.shape(initial_state_bw)), initial_state_bw)
+        else:
+            state_fw = None
+            state_bw = None
 
         # Note input should be padded all to the same length https://piazza.com/class/iw9g8b9yxp46s8?cid=2190
         # inputs: shape (batch_size, max_length, embedding_size)
@@ -85,17 +90,22 @@ class Encoder(object):
                                                                  cell_bw=cell_bw,
                                                                  inputs=inputs,
                                                                  sequence_length=masks,
-                                                                 initial_state_fw=initial_state_fw,
-                                                                 initial_state_bw=initial_state_bw,
+                                                                 initial_state_fw=state_fw,
+                                                                 initial_state_bw=state_bw,
                                                                  dtype=tf.float32)
 
         # Concatenate two end hidden vectors for the final encoded
         # representation of inputs
-        concat_hidden_states = tf.concat(hidden_states, 2)
-        logging.debug('Shape of concatenated BiRNN hidden states is %d' % str(tf.shape(concat_hidden_states)))
-        concat_final_state = tf.concat(final_state)
-        logging.debug('Shape of concatenated BiRNN final hiden state is %d' % str(tf.shape(concat_final_state)))
-        return concat_hidden_states[:, :masks, :], concat_final_state
+        print(hidden_states[0])
+        concat_hidden_states = tf.concat(2, hidden_states)
+        logging.debug('Shape of concatenated BiRNN hidden states is %s' % str(tf.shape(concat_hidden_states)))
+        logging.debug('Shape of BiRNN foward final state is %s' % str(tf.shape(final_state[0])))
+        _, final_fw_m_state = tf.split(1, 2, final_state[0])
+        _, final_bw_m_state = tf.split(1, 2, final_state[1])
+        concat_final_state = tf.concat(1, [final_fw_m_state, final_bw_m_state])
+        logging.debug('Shape of concatenated BiRNN final hiden state is %s' % str(tf.shape(concat_final_state)))
+        # TOFIX: concat_hidden_states should only return sentence length
+        return concat_hidden_states, concat_final_state
 
 
 class Decoder(object):
@@ -149,14 +159,14 @@ class QASystem(object):
         self.decoder = decoder
         # ==== set up placeholder tokens ========
         # TMP TO REMOVE START
-        max_question_length = 100
-        max_context_length = 100
-        embedding_size = 100
+        max_question_length = 66
+        max_context_length = 35
+        embedding_size = 50
         # TMP TO REMOVE END
         self.question_placeholder = tf.placeholder(tf.float32, (None, max_question_length, embedding_size))
-        self.question_length_placeholder = tf.placeholder(tf.int32, (None, 1))
+        self.question_length_placeholder = tf.placeholder(tf.int32, (None,))
         self.context_placeholder = tf.placeholder(tf.float32, (None, max_context_length, embedding_size))
-        self.context_length_placeholder = tf.placeholder(tf.int32, (None, 1))
+        self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
 
 
         # ==== assemble pieces ====
@@ -185,19 +195,22 @@ class QASystem(object):
         """
         # STEP1: Run a BiLSTM over the question, concatenate the two end hidden
         # vectors and call that the question representation.
-        question = self.question_placeholder  # TODO: name
-        question_length = self.question_length_placeholder  # TODO: name
-        question_paragraph_repr, question_repr = self.encoder.encode(inputs=question,
-                                                                masks=question_length,
-                                                                encoder_state_input=None)
+        with tf.variable_scope('q'):
+            question = self.question_placeholder  # TODO: name
+            question_length = self.question_length_placeholder  # TODO: name
+            question_paragraph_repr, question_repr = self.encoder.encode(inputs=question,
+                                                                    masks=question_length,
+                                                                    encoder_state_input=None)
 
+        logging.debug('Shape of question_repr is %s' % str(tf.shape(question_repr)))
         # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
         # question representation.
-        context = self.context_placeholder  # TODO: name
-        context_length = self.context_length_placeholder  # TODO: name
-        context_paragraph_repr, context_repr = self.encoder.encode(inputs=context,
-                                                              masks=context_length,
-                                                              encoder_state_input=question_repr)
+        with tf.variable_scope('c'):
+            context = self.context_placeholder  # TODO: name
+            context_length = self.context_length_placeholder  # TODO: name
+            context_paragraph_repr, context_repr = self.encoder.encode(inputs=context,
+                                                                  masks=context_length,
+                                                                  encoder_state_input=question_repr)
         # STEP3: Calculate an attention vector over the context paragraph representation based on the question
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
