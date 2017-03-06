@@ -79,6 +79,10 @@ class QASystem(object):
         """
 
         # ==== set up placeholder tokens ========
+        self.input_placeholder = tf.placeholder(tf.int32, (None, self.max_length, self.embedding_size))
+        self.labels_placeholder = tf.placeholder(tf.int32, (None, self.max_length))
+        self.mask_placeholder = tf.placeholder(tf.bool, (None, self.max_length))
+        self.dropout_placeholder = tf.placeholder(tf.float32)
 
 
         # ==== assemble pieces ====
@@ -98,6 +102,7 @@ class QASystem(object):
         to assemble your reading comprehension system!
         :return:
         """
+        
         raise NotImplementedError("Connect all parts of your system here!")
 
 
