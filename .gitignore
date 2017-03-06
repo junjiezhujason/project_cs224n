@@ -1,4 +1,5 @@
 .env
 code/*.swp
+code/*.pyc
 data
 download
