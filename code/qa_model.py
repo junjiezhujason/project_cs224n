@@ -76,7 +76,8 @@ class Encoder(object):
         cell_bw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
 
         # Split initial state
-        initial_state_fw, initial_state_bw = tf.split(1, 2, encoder_state_input)
+        if encoder_state_input:
+            initial_state_fw, initial_state_bw = tf.split(1, 2, encoder_state_input)
 
         # Note input should be padded all to the same length https://piazza.com/class/iw9g8b9yxp46s8?cid=2190
         # inputs: shape (batch_size, max_length, embedding_size)
