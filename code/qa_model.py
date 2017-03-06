@@ -25,6 +25,29 @@ def get_optimizer(opt):
     return optfn
 
 
+class Mixer(object):
+    def __init__(self):
+        pass
+
+    def mix(self, question_repr, context_paragraph_repr):
+        """
+        3. Calculate an attention vector over the context paragraph representation based on the question
+        representation, or compare the last hidden state of question to all computed paragraph hidden states
+        4. Compute a new vector for each context paragraph position that multiplies context-paragraph
+        representation with the attention vector.
+
+        Args:
+            question_repr: the last hidden state of encoded question
+            context_paragraph_repr: all hidden states of encoded context
+        Return:
+            new context_paragraph_repr weighted by attention
+        """
+        a = tf.nn.softmax(tf.matmul(tf.transpose(context_paragraph_repr), question_repr))
+        return tf.matmul(context_paragraph_repr, tf.diag(a))
+
+
+
+
 class Encoder(object):
     def __init__(self, size, vocab_dim):
         self.size = size
@@ -45,27 +68,31 @@ class Encoder(object):
                  It can be context-level representation, word-level representation,
                  or both.
         """
+
         # Create forward and backward cells
         cell_fw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
         cell_bw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
 
-        # TODO: Figure out what to do with masks
-        # inputs: shape (batch_size, length, embedding_size)
-        outputs, output_states = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
+        # Split initial state
+        initial_state_fw, initial_state_bw = tf.split(1, 2, encoder_state_input)
+
+        # Note input should be padded all to the same length https://piazza.com/class/iw9g8b9yxp46s8?cid=2190
+        # inputs: shape (batch_size, max_length, embedding_size)
+        hidden_states, final_state = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
                                                                  cell_bw=cell_bw,
                                                                  inputs=inputs,
-                                                                 #sequence_length
-                                                                 initial_state_fw=encoder_state_input,
-                                                                 initial_state_bw=encoder_state_input,
+                                                                 sequence_length=masks,
+                                                                 initial_state_fw=initial_state_fw,
+                                                                 initial_state_bw=initial_state_bw,
                                                                  dtype=tf.float32)
-        output_fw, output_bw = outputs
-        logging.debug('Shape of encoder BiRNN forward output is %d' % str(tf.shape(output_fw)))
 
         # Concatenate two end hidden vectors for the final encoded
         # representation of inputs
-        encoded_inputs = tf.concat(0, [output_fw, output_bw])
-        logging.debug('Shape of concatenated BiRNN encoder output is %d' % str(tf.shape(encoded_inputs)))
-        return encoded_inputs
+        concat_hidden_states = tf.concat(hidden_states, 2)
+        logging.debug('Shape of concatenated BiRNN hidden states is %d' % str(tf.shape(concat_hidden_states)))
+        concat_final_state = tf.concat(final_state)
+        logging.debug('Shape of concatenated BiRNN final hiden state is %d' % str(tf.shape(concat_final_state)))
+        return concat_hidden_states[:, :masks, :], concat_final_state
 
 
 class Decoder(object):
@@ -80,15 +107,32 @@ class Decoder(object):
         the start of the answer span, and which should be
         the end of the answer span.
 
+        Run a final LSTM that does a 2-class classification of these vectors as O or ANSWER.
+
         :param knowledge_rep: it is a representation of the paragraph and question,
                               decided by how you choose to implement the encoder
         :return:
         """
+        cell = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
+        hidden_states, final_state = tf.nn.dynamic_rnn(cell=cell,
+                                                       inputs=inputs,
+                                                       dtype=tf.float32)
+        xavier_init = tf.contrib.layers.xavier_initializer()
+        zero_init = tf.constant_initializer(0)
+        W = tf.get_variable('W', shape=(1, 2*self.state_size), initializer=xavier_init)
+        b = tf.get_variable('b', shape=(1,), initializer=zero_init)
 
-        return
+        preds = tf.sigmoid(matmul(W, hidden_states) + b)
+        preds = ['O' if p>0.5 else 'A' for p in preds]
+
+        # Index for start of answer is where first 'A' appears
+        s_idx = preds.index('A')
+        # Index for end of answer
+        e_idx = preds[s:].index('O') + s_idx
+        return s_idx, e_idx
 
 class QASystem(object):
-    def __init__(self, encoder, decoder, *args):
+    def __init__(self, encoder, mixer, decoder, *args):
         """
         Initializes your System
 
@@ -97,7 +141,19 @@ class QASystem(object):
         :param args: pass in more arguments as needed
         """
 
+        self.encoder = encoder
+        self.mixer = mixer
+        self.decoder = decoder
         # ==== set up placeholder tokens ========
+        # TMP TO REMOVE START
+        max_question_length = 100
+        max_context_length = 100
+        embedding_size = 100
+        # TMP TO REMOVE END
+        self.question_placeholder = tf.placeholder(tf.float32, (None, max_question_length, embedding_size))
+        self.question_length_placeholder = tf.placeholder(tf.int32, (None, 1))
+        self.context_placeholder = tf.placeholder(tf.float32, (None, max_context_length, embedding_size))
+        self.context_length_placeholder = tf.placeholder(tf.int32, (None, 1))
 
 
         # ==== assemble pieces ====
@@ -109,6 +165,13 @@ class QASystem(object):
         # ==== set up training/updating procedure ====
         pass
 
+    # TODO: add label etc.
+    def create_feed_dict(self, question_batch, question_length_batch, context_batch, context_length_batch):
+        feed_dict = {}
+        feed_dict[self.question_placeholder] = question_batch
+        feed_dict[self.question_length_batch] = question_length_batch
+        feed_dict[self.context_placeholder] = context_batch
+        feed_dict[self.context_length_placeholder] = context_length_batch
 
     def setup_system(self):
         """
@@ -117,8 +180,29 @@ class QASystem(object):
         to assemble your reading comprehension system!
         :return:
         """
-        raise NotImplementedError("Connect all parts of your system here!")
+        # STEP1: Run a BiLSTM over the question, concatenate the two end hidden
+        # vectors and call that the question representation.
+        question = self.question_placeholder  # TODO: name
+        question_length = self.question_length_placeholder  # TODO: name
+        question_paragraph_repr, question_repr = self.encoder.encode(inputs=question,
+                                                                masks=question_length,
+                                                                encoder_state_input=None)
 
+        # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
+        # question representation.
+        context = self.context_placeholder  # TODO: name
+        context_length = self.context_length_placeholder  # TODO: name
+        context_paragraph_repr, context_repr = self.encoder.encode(inputs=context,
+                                                              masks=context_length,
+                                                              encoder_state_input=question_repr)
+        # STEP3: Calculate an attention vector over the context paragraph representation based on the question
+        # representation.
+        # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
+        # representation with the attention vector.
+        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
+
+        # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWER.
+        s_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
 
     def setup_loss(self):
         """
