@@ -44,11 +44,14 @@ class Mixer(object):
         Return:
             new context_paragraph_repr weighted by attention
         """
+        logging.debug('='*10 + 'Mixer' + '='*10)
+        logging.debug('Context paragraph is %s' % str(context_paragraph_repr))
+        logging.debug('Question is %s' % str(question_repr))
         a = tf.nn.softmax(tf.matmul(context_paragraph_repr, tf.expand_dims(question_repr, -1)))
-        return tf.matmul(context_paragraph_repr, tf.diag(a))
-
-
-
+        logging.debug('Attention vector is %s' % str(a))
+        new_context_paragraph_repr = context_paragraph_repr * a
+        logging.debug('New context paragraph is %s' % str(new_context_paragraph_repr))
+        return new_context_paragraph_repr
 
 class Encoder(object):
     def __init__(self, size, vocab_dim):
@@ -71,19 +74,20 @@ class Encoder(object):
                  or both.
         """
 
+        logging.debug('='*10 + 'Encoder' + '='*10)
         # Create forward and backward cells
         cell_fw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
         cell_bw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
 
         # Split initial state
         if encoder_state_input is not None:
-            initial_state_fw, initial_state_bw = tf.split(1, 2, encoder_state_input)
-            state_fw=(tf.zeros(tf.shape(initial_state_fw)), initial_state_fw)
-            state_bw=(tf.zeros(tf.shape(initial_state_bw)), initial_state_bw)
+            state_fw = encoder_state_input[0]
+            state_bw = encoder_state_input[1]
         else:
             state_fw = None
             state_bw = None
 
+        logging.debug('Inputs is %s' % str(inputs))
         # Note input should be padded all to the same length https://piazza.com/class/iw9g8b9yxp46s8?cid=2190
         # inputs: shape (batch_size, max_length, embedding_size)
         hidden_states, final_state = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
@@ -96,16 +100,15 @@ class Encoder(object):
 
         # Concatenate two end hidden vectors for the final encoded
         # representation of inputs
-        print(hidden_states[0])
         concat_hidden_states = tf.concat(2, hidden_states)
-        logging.debug('Shape of concatenated BiRNN hidden states is %s' % str(tf.shape(concat_hidden_states)))
-        logging.debug('Shape of BiRNN foward final state is %s' % str(tf.shape(final_state[0])))
-        _, final_fw_m_state = tf.split(1, 2, final_state[0])
-        _, final_bw_m_state = tf.split(1, 2, final_state[1])
+        logging.debug('Shape of concatenated BiRNN hidden states is %s' % str(concat_hidden_states))
+
+        final_fw_m_state = final_state[0][1]
+        final_bw_m_state = final_state[1][1]
+        logging.debug('Shape of BiRNN foward m final_state is %s' % str(final_bw_m_state))
         concat_final_state = tf.concat(1, [final_fw_m_state, final_bw_m_state])
-        logging.debug('Shape of concatenated BiRNN final hiden state is %s' % str(tf.shape(concat_final_state)))
-        # TOFIX: concat_hidden_states should only return sentence length
-        return concat_hidden_states, concat_final_state
+        logging.debug('Shape of concatenated BiRNN final hiden state is %s' % str(concat_final_state))
+        return concat_hidden_states, concat_final_state, final_state
 
 
 class Decoder(object):
@@ -126,22 +129,33 @@ class Decoder(object):
                               decided by how you choose to implement the encoder
         :return:
         """
-        cell = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
+        logging.debug('='*10 + 'Decoder' + '='*10)
+        logging.debug('Input knowledge_rep is %s' % str(knowledge_rep))
+        cell = tf.nn.rnn_cell.LSTMCell(num_units=1, state_is_tuple=True)
         hidden_states, final_state = tf.nn.dynamic_rnn(cell=cell,
-                                                       inputs=inputs,
+                                                       inputs=knowledge_rep,
                                                        dtype=tf.float32)
+        logging.debug('hidden_states is %s' % str(hidden_states))
         xavier_init = tf.contrib.layers.xavier_initializer()
         zero_init = tf.constant_initializer(0)
-        W = tf.get_variable('W', shape=(1, 2*self.state_size), initializer=xavier_init)
-        b = tf.get_variable('b', shape=(1,), initializer=zero_init)
+        b = tf.get_variable('b', shape=(1, ), initializer=zero_init)
+        preds = tf.reduce_mean(tf.sigmoid(hidden_states + b), 2)
+        logging.debug('preds is %s' % str(preds))
+        # True = Answer, False = Others
+        preds = tf.greater_equal(preds, 0.5)
+        logging.debug('preds is %s' % str(preds))
 
-        preds = tf.sigmoid(matmul(W, hidden_states) + b)
-        preds = ['O' if p>0.5 else 'A' for p in preds]
-
+        # TODO: figure out how to get the index
         # Index for start of answer is where first 'A' appears
-        s_idx = preds.index('A')
+        # s_idx = preds.index(True)
+        def true_index(t):
+            return tf.reduce_min(tf.where(tf.equal(t, True)))
+        s_idx = tf.map_fn(true_index, preds, dtype=tf.int64)
+        logging.debug('s_idx is %s' % str(s_idx))
+
         # Index for end of answer
-        e_idx = preds[s:].index('O') + s_idx
+        # e_idx = preds[s_idx:].index(False) + s_idx
+        e_idx = s_idx
         return s_idx, e_idx
 
 class QASystem(object):
@@ -198,19 +212,18 @@ class QASystem(object):
         with tf.variable_scope('q'):
             question = self.question_placeholder  # TODO: name
             question_length = self.question_length_placeholder  # TODO: name
-            question_paragraph_repr, question_repr = self.encoder.encode(inputs=question,
+            question_paragraph_repr, question_repr, q_state = self.encoder.encode(inputs=question,
                                                                     masks=question_length,
                                                                     encoder_state_input=None)
 
-        logging.debug('Shape of question_repr is %s' % str(tf.shape(question_repr)))
         # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
         # question representation.
         with tf.variable_scope('c'):
             context = self.context_placeholder  # TODO: name
             context_length = self.context_length_placeholder  # TODO: name
-            context_paragraph_repr, context_repr = self.encoder.encode(inputs=context,
+            context_paragraph_repr, context_repr, c_state = self.encoder.encode(inputs=context,
                                                                   masks=context_length,
-                                                                  encoder_state_input=question_repr)
+                                                                  encoder_state_input=q_state)
         # STEP3: Calculate an attention vector over the context paragraph representation based on the question
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
