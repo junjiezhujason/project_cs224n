@@ -176,12 +176,15 @@ class QASystem(object):
         max_question_length = 66
         max_context_length = 35
         embedding_size = 50
+        label_size = 2
         # TMP TO REMOVE END
         self.question_placeholder = tf.placeholder(tf.float32, (None, max_question_length, embedding_size))
         self.question_length_placeholder = tf.placeholder(tf.int32, (None,))
         self.context_placeholder = tf.placeholder(tf.float32, (None, max_context_length, embedding_size))
         self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
 
+        self.labels_placeholder=tf.placeholder(tf.int32,(None,label_size))
+        self.config = args[0]
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -193,12 +196,19 @@ class QASystem(object):
         pass
 
     # TODO: add label etc.
-    def create_feed_dict(self, question_batch, question_length_batch, context_batch, context_length_batch):
+    def create_feed_dict(self, 
+                         question_batch, 
+                         question_length_batch, 
+                         context_batch, 
+                         context_length_batch,
+                         labels_batch=None):
         feed_dict = {}
         feed_dict[self.question_placeholder] = question_batch
-        feed_dict[self.question_length_batch] = question_length_batch
+        feed_dict[self.question_length_placeholder] = question_length_batch
         feed_dict[self.context_placeholder] = context_batch
         feed_dict[self.context_length_placeholder] = context_length_batch
+        if labels_batch is not None:
+            feed_dict[self.labels_placeholder] = labels_batch
 
     def setup_system(self):
         """
@@ -355,36 +365,36 @@ class QASystem(object):
         return f1, em
 
 
-    def train_on_batch(self, sess, question_batch, context_batch, labels_batch):
-        feed = self.create_feed_dict(question_batch, context_batch, labels_batch=labels_batch)
-        print("created feed dict")
+    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, labels_batch):
+        feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=labels_batch)
         loss = 0.00 # TODO: remove later
         # _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         # return loss
         return loss
 
     def run_epoch(self, sess, train_set, valid_set):
-        train_examples = [train_set["question"], train_set["context"], train_set["label"]]
-        n_train_examples = len(train_set["labels"])
-        prog = Progbar(target=1 + int(n_train_example / self.config.batch_size))
+        train_examples = np.array(train_set)
+        n_train_examples = len(train_examples)
+        prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
+
         for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
             loss = self.train_on_batch(sess, *batch)
-            # prog.update(i + 1, [("train loss", loss)])
+            prog.update(i + 1, [("train loss", loss)])
             # if self.report: self.report.log_train_loss(loss)
         print("")
 
-        #logger.info("Evaluating on training data")
+        #logging.info("Evaluating on training data")
         #token_cm, entity_scores = self.evaluate(sess, train_examples, train_examples_raw)
-        #logger.debug("Token-level confusion matrix:\n" + token_cm.as_table())
-        #logger.debug("Token-level scores:\n" + token_cm.summary())
-        #logger.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
+        #logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
+        #logging.debug("Token-level scores:\n" + token_cm.summary())
+        #logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
 
-        valid_examples = [valid_set["question"], valid_set["context"], valid_set["label"]]
-        # logger.info("Evaluating on development data")
+        valid_examples = np.array(valid_set) 
+        logging.info("Evaluating on development data")
         # token_cm, entity_scores = self.evaluate_answer(sess, dev_set, dev_set_raw)
-        # logger.debug("Token-level confusion matrix:\n" + token_cm.as_table())
-        # logger.debug("Token-level scores:\n" + token_cm.summary())
-        # logger.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
+        # logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
+        # logging.debug("Token-level scores:\n" + token_cm.summary())
+        # logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
 
         f1 = 0.00 # TODO: remove later
         # f1 = entity_scores[-1]
@@ -430,13 +440,13 @@ class QASystem(object):
         valid_set = dataset['validation']
 
         best_score = 0.
-	for epoch in range(self.config.n_epochs):
-	    logger.info("Epoch %d out of %d", epoch + 1, self.config.n_epochs)
-	    score = self.run_epoch(sess, train_set, valid_set)
+	for epoch in range(self.config.epochs):
+	    logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
+	    score = self.run_epoch(session, train_set, valid_set)
 	    if score > best_score:
 		best_score = score
 		# if saver:
-		#     logger.info("New best score! Saving model in %s", self.config.model_output)
+		#     logging.info("New best score! Saving model in %s", self.config.model_output)
 		#     saver.save(sess, self.config.model_output)
 	    print("")
 	#     if self.report:

@@ -82,6 +82,7 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     dataset = load_dataset(FLAGS.data_dir, "tiny")
+    # dataset = load_dataset(FLAGS.data_dir, "full")
 
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
     vocab_path = FLAGS.vocab_path or pjoin(FLAGS.data_dir, "vocab.dat")
@@ -89,12 +90,15 @@ def main(_):
 
     embeddings = load_glove_embeddings(embed_path)
 
+    # test data loading 
+
 
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
     mixer = Mixer()
     decoder = Decoder(output_size=FLAGS.output_size)
 
-    qa = QASystem(encoder, mixer, decoder)
+    qa = QASystem(encoder, mixer, decoder, FLAGS)
+
 
     if not os.path.exists(FLAGS.log_dir):
         os.makedirs(FLAGS.log_dir)
