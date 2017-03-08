@@ -32,9 +32,11 @@ tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per pri
 tf.app.flags.DEFINE_integer("keep", 0, "How many checkpoints to keep, 0 indicates keep all.")
 tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab file (default: ./data/squad/vocab.dat)")
 tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
-tf.app.flags.DEFINE_string("max_question_length", 60, "maximum question length to consider")
+tf.app.flags.DEFINE_string("max_question_length", 10, "maximum question length to consider")
 tf.app.flags.DEFINE_string("max_context_length", 250, "maximum context length to consider")
 tf.app.flags.DEFINE_string("label_size", 2, "dimension of the predicted labels that can be mapped to start-end postion in context")
+tf.app.flags.DEFINE_string("n_features", 1, "number of features to include for each word in the sentence")
+tf.app.flags.DEFINE_string("window_length", 1, "number of features to include for each word in the sentence")
 
 FLAGS = tf.app.flags.FLAGS
 

@@ -13,8 +13,11 @@ from tensorflow.python.ops import variable_scope as vs
 from evaluate import exact_match_score, f1_score
 from util import Progbar, minibatches
 
+from qa_data import PAD_ID, SOS_ID, UNK_ID
+
 
 logging.basicConfig(level=logging.INFO)
+
 
 
 def get_optimizer(opt):
@@ -58,15 +61,12 @@ class Encoder(object):
         self.size = size
         self.vocab_dim = vocab_dim
 
-    def encode(self, inputs, masks, encoder_state_input):
+    def encode(self, inputs, seq_len, encoder_state_input):
         """
-        In a generalized encode function, you pass in your inputs,
-        masks, and an initial
-        hidden state input into this function.
+        In a generalized encode function, you pass in your inputs, seq_len, and an initial hidden state input into this function.
 
         :param inputs: Symbolic representations of your input
-        :param masks: this is to make sure tf.nn.dynamic_rnn doesn't iterate
-                      through masked steps
+        :param seq_len: this is to make sure tf.nn.dynamic_rnn doesn't iterate through masked steps
         :param encoder_state_input: (Optional) pass this as initial hidden state
                                     to tf.nn.dynamic_rnn to build conditional representations
         :return: an encoded representation of your input.
@@ -93,7 +93,7 @@ class Encoder(object):
         hidden_states, final_state = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
                                                                  cell_bw=cell_bw,
                                                                  inputs=inputs,
-                                                                 sequence_length=masks,
+                                                                 sequence_length=seq_len,
                                                                  initial_state_fw=state_fw,
                                                                  initial_state_bw=state_bw,
                                                                  dtype=tf.float64)
@@ -182,9 +182,9 @@ class QASystem(object):
         # label_size = 2
 
         # TMP TO REMOVE END
-        self.question_placeholder = tf.placeholder(tf.int32, (None, self.config.max_question_length))
+        self.question_placeholder = tf.placeholder(tf.int32, (None, self.config.max_question_length, self.config.n_features))
         self.question_length_placeholder = tf.placeholder(tf.int32, (None,))
-        self.context_placeholder = tf.placeholder(tf.int32, (None, self.config.max_context_length))
+        self.context_placeholder = tf.placeholder(tf.int32, (None, self.config.max_context_length, self.config.n_features))
         self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
 
         self.labels_placeholder=tf.placeholder(tf.int32,(None,self.config.label_size))
@@ -227,7 +227,7 @@ class QASystem(object):
         with tf.variable_scope('q'):
             question_length = self.question_length_placeholder  # TODO: name
             question_paragraph_repr, question_repr, q_state = self.encoder.encode(inputs=question,
-                                                                    masks=question_length,
+                                                                    seq_len=question_length,
                                                                     encoder_state_input=None)
 
         # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
@@ -235,7 +235,7 @@ class QASystem(object):
         with tf.variable_scope('c'):
             context_length = self.context_length_placeholder  # TODO: name
             context_paragraph_repr, context_repr, c_state = self.encoder.encode(inputs=context,
-                                                                  masks=context_length,
+                                                                  seq_len=context_length,
                                                                   encoder_state_input=q_state)
         # STEP3: Calculate an attention vector over the context paragraph representation based on the question
         # representation.
@@ -264,8 +264,8 @@ class QASystem(object):
             embedding_tensor = tf.Variable(self.pretrained_embeddings)
             question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
             context_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.context_placeholder)
-            question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size])
-            context_embeddings = tf.reshape(context_embedding_lookup, [-1, self.config.max_context_length, self.config.embedding_size])
+            question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size * self.config.n_features])
+            context_embeddings = tf.reshape(context_embedding_lookup, [-1, self.config.max_context_length, self.config.embedding_size * self.config.n_features])
         return question_embeddings, context_embeddings
 
     def optimize(self, session, train_x, train_y):
@@ -372,7 +372,49 @@ class QASystem(object):
 
         return f1, em
 
+    def pad_sequence(self, sentence, max_length):
+	"""Ensures a seqeunce is of length @max_length by padding it and truncating the rest of the sequence.
+	Args:
+	    sentence: list of featurized words
+	    max_length: the desired length for all input/output sequences.
+	Returns:
+	    a new sentence and  mask
+	    Each of sentence', mask are of length @max_length.
+	"""
+	# Use this zero vector when padding sequences.
+	zero_vector = [PAD_ID] * self.config.n_features
+	pad_len = max_length - len(sentence) 
+	mask = [True] * len(sentence)
+	if pad_len > 0: 
+	    p_sentence = sentence + [zero_vector] * pad_len 
+	    mask += [False] * pad_len
+	else:
+	    p_sentence = sentence[:max_length]
+	return p_sentence, mask
 
+    def featurize_window(self, sentence, window_size=1):
+        # sentence_ = []
+        # from util import window_iterator
+        # for window in window_iterator(sentence, window_size, beg=start, end=end):
+        #     sentence_.append(sum(window, []))
+        sentence_ = [[word] for word in sentence]
+        return sentence_
+
+    def preprocess_question_answer(self, examples):
+	# pad sequences
+	ret = []
+	for q_sent, q_len, c_sent, c_len, lab in examples:
+            # window selection
+            # TODO: CHANGE LATER
+            q_sent = self.featurize_window(q_sent)
+            c_sent = self.featurize_window(c_sent)
+            
+            # padding
+            p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
+            p_c_sent, _ = self.pad_sequence(c_sent, self.config.max_context_length)
+            ret.append([p_q_sent, q_len, p_c_sent, c_len, lab])	
+        return ret
+	
     def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, labels_batch):
         feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=labels_batch)
         loss = 0.00 # TODO: remove later
@@ -381,8 +423,9 @@ class QASystem(object):
         return loss
 
     def run_epoch(self, sess, train_set, valid_set):
-        train_examples = np.array(train_set)
+        train_examples = np.array(self.preprocess_question_answer(train_set))
         n_train_examples = len(train_examples)
+        print(train_examples)
         prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
 
         for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
@@ -397,7 +440,7 @@ class QASystem(object):
         #logging.debug("Token-level scores:\n" + token_cm.summary())
         #logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
 
-        valid_examples = np.array(valid_set) 
+        valid_examples = np.array(self.preprocess_question_answer(valid_set))
         logging.info("Evaluating on development data")
         # token_cm, entity_scores = self.evaluate_answer(sess, dev_set, dev_set_raw)
         # logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
