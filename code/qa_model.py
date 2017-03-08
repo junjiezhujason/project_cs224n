@@ -173,18 +173,21 @@ class QASystem(object):
         self.decoder = decoder
         # ==== set up placeholder tokens ========
         # TMP TO REMOVE START
-        max_question_length = 66
-        max_context_length = 35
-        embedding_size = 50
-        label_size = 2
+        self.config = args[0]  # FLAG 
+        self.pretrained_embeddings = args[1] # embeddings
+
+        # max_question_length = 66
+        # max_context_length = 35
+        # embedding_size = 50
+        # label_size = 2
+
         # TMP TO REMOVE END
-        self.question_placeholder = tf.placeholder(tf.float32, (None, max_question_length, embedding_size))
+        self.question_placeholder = tf.placeholder(tf.float32, (None, self.config.max_question_length, self.config.embedding_size))
         self.question_length_placeholder = tf.placeholder(tf.int32, (None,))
-        self.context_placeholder = tf.placeholder(tf.float32, (None, max_context_length, embedding_size))
+        self.context_placeholder = tf.placeholder(tf.float32, (None, self.config.max_context_length, self.config.embedding_size))
         self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
 
-        self.labels_placeholder=tf.placeholder(tf.int32,(None,label_size))
-        self.config = args[0]
+        self.labels_placeholder=tf.placeholder(tf.int32,(None,self.config.label_size))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -256,7 +259,11 @@ class QASystem(object):
         """
         Loads distributed word representations based on placeholder tokens
         :return:
-        """
+        """ 
+        embedding_tensor = tf.Variable(self.pretrained_embeddings)
+        # embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.input_placeholder)
+        # embeddings = tf.reshape(embedding_lookup,[-1, self.max_length, Config.n_features * Config.embed_size])
+
         with vs.variable_scope("embeddings"):
             pass
 

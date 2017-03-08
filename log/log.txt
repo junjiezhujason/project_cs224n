@@ -436,3 +436,95 @@ Epoch 9 out of 10
 Evaluating on development data
 Epoch 10 out of 10
 Evaluating on development data
+Created model with fresh parameters.
+Num params: 12526109
+Number of params: 12526109 (retreival took 1.042122 secs)
+Epoch 1 out of 10
+Evaluating on development data
+Epoch 2 out of 10
+Evaluating on development data
+Epoch 3 out of 10
+Evaluating on development data
+Epoch 4 out of 10
+Evaluating on development data
+Epoch 5 out of 10
+Evaluating on development data
+Epoch 6 out of 10
+Evaluating on development data
+Epoch 7 out of 10
+Evaluating on development data
+Epoch 8 out of 10
+Evaluating on development data
+Epoch 9 out of 10
+Evaluating on development data
+Epoch 10 out of 10
+Evaluating on development data
+Created model with fresh parameters.
+Num params: 12526109
+Number of params: 12526109 (retreival took 1.024975 secs)
+Epoch 1 out of 10
+Evaluating on development data
+Epoch 2 out of 10
+Evaluating on development data
+Epoch 3 out of 10
+Evaluating on development data
+Epoch 4 out of 10
+Evaluating on development data
+Epoch 5 out of 10
+Evaluating on development data
+Epoch 6 out of 10
+Evaluating on development data
+Epoch 7 out of 10
+Evaluating on development data
+Epoch 8 out of 10
+Evaluating on development data
+Epoch 9 out of 10
+Evaluating on development data
+Epoch 10 out of 10
+Evaluating on development data
+Created model with fresh parameters.
+Num params: 12526109
+Number of params: 12526109 (retreival took 1.096571 secs)
+Epoch 1 out of 10
+Evaluating on development data
+Epoch 2 out of 10
+Evaluating on development data
+Epoch 3 out of 10
+Evaluating on development data
+Epoch 4 out of 10
+Evaluating on development data
+Epoch 5 out of 10
+Evaluating on development data
+Epoch 6 out of 10
+Evaluating on development data
+Epoch 7 out of 10
+Evaluating on development data
+Epoch 8 out of 10
+Evaluating on development data
+Epoch 9 out of 10
+Evaluating on development data
+Epoch 10 out of 10
+Evaluating on development data
+Created model with fresh parameters.
+Num params: 12526109
+Number of params: 12526109 (retreival took 1.019207 secs)
+Epoch 1 out of 10
+Evaluating on development data
+Epoch 2 out of 10
+Evaluating on development data
+Epoch 3 out of 10
+Evaluating on development data
+Epoch 4 out of 10
+Evaluating on development data
+Epoch 5 out of 10
+Evaluating on development data
+Epoch 6 out of 10
+Evaluating on development data
+Epoch 7 out of 10
+Evaluating on development data
+Epoch 8 out of 10
+Evaluating on development data
+Epoch 9 out of 10
+Evaluating on development data
+Epoch 10 out of 10
+Evaluating on development data
