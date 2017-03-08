@@ -96,7 +96,7 @@ class Encoder(object):
                                                                  sequence_length=masks,
                                                                  initial_state_fw=state_fw,
                                                                  initial_state_bw=state_bw,
-                                                                 dtype=tf.float32)
+                                                                 dtype=tf.float64)
 
         # Concatenate two end hidden vectors for the final encoded
         # representation of inputs
@@ -134,11 +134,11 @@ class Decoder(object):
         cell = tf.nn.rnn_cell.LSTMCell(num_units=1, state_is_tuple=True)
         hidden_states, final_state = tf.nn.dynamic_rnn(cell=cell,
                                                        inputs=knowledge_rep,
-                                                       dtype=tf.float32)
+                                                       dtype=tf.float64)
         logging.debug('hidden_states is %s' % str(hidden_states))
         xavier_init = tf.contrib.layers.xavier_initializer()
         zero_init = tf.constant_initializer(0)
-        b = tf.get_variable('b', shape=(1, ), initializer=zero_init)
+        b = tf.get_variable('b', shape=(1, ), initializer=zero_init, dtype=tf.float64)
         preds = tf.reduce_mean(tf.sigmoid(hidden_states + b), 2)
         logging.debug('preds is %s' % str(preds))
         # True = Answer, False = Others
@@ -182,9 +182,9 @@ class QASystem(object):
         # label_size = 2
 
         # TMP TO REMOVE END
-        self.question_placeholder = tf.placeholder(tf.float32, (None, self.config.max_question_length, self.config.embedding_size))
+        self.question_placeholder = tf.placeholder(tf.int32, (None, self.config.max_question_length))
         self.question_length_placeholder = tf.placeholder(tf.int32, (None,))
-        self.context_placeholder = tf.placeholder(tf.float32, (None, self.config.max_context_length, self.config.embedding_size))
+        self.context_placeholder = tf.placeholder(tf.int32, (None, self.config.max_context_length))
         self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
 
         self.labels_placeholder=tf.placeholder(tf.int32,(None,self.config.label_size))
@@ -220,10 +220,11 @@ class QASystem(object):
         to assemble your reading comprehension system!
         :return:
         """
+        question, context = self.setup_embeddings()
+
         # STEP1: Run a BiLSTM over the question, concatenate the two end hidden
         # vectors and call that the question representation.
         with tf.variable_scope('q'):
-            question = self.question_placeholder  # TODO: name
             question_length = self.question_length_placeholder  # TODO: name
             question_paragraph_repr, question_repr, q_state = self.encoder.encode(inputs=question,
                                                                     masks=question_length,
@@ -232,7 +233,6 @@ class QASystem(object):
         # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
         # question representation.
         with tf.variable_scope('c'):
-            context = self.context_placeholder  # TODO: name
             context_length = self.context_length_placeholder  # TODO: name
             context_paragraph_repr, context_repr, c_state = self.encoder.encode(inputs=context,
                                                                   masks=context_length,
@@ -260,12 +260,13 @@ class QASystem(object):
         Loads distributed word representations based on placeholder tokens
         :return:
         """ 
-        embedding_tensor = tf.Variable(self.pretrained_embeddings)
-        # embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.input_placeholder)
-        # embeddings = tf.reshape(embedding_lookup,[-1, self.max_length, Config.n_features * Config.embed_size])
-
         with vs.variable_scope("embeddings"):
-            pass
+            embedding_tensor = tf.Variable(self.pretrained_embeddings)
+            question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
+            context_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.context_placeholder)
+            question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size])
+            context_embeddings = tf.reshape(context_embedding_lookup, [-1, self.config.max_context_length, self.config.embedding_size])
+        return question_embeddings, context_embeddings
 
     def optimize(self, session, train_x, train_y):
         """
