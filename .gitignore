@@ -2,6 +2,6 @@
 code/*.swp
 code/preprocessing/*pyc
 code/*.pyc
-data
+data/
 download
-log
+log/
