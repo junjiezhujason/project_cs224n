@@ -76,8 +76,7 @@ class Encoder(object):
 
         logging.debug('='*10 + 'Encoder' + '='*10)
         # Create forward and backward cells
-        cell_fw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
-        cell_bw = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
+        cell = tf.nn.rnn_cell.LSTMCell(num_units=self.size, state_is_tuple=True)
 
         # Split initial state
         if encoder_state_input is not None:
@@ -90,8 +89,8 @@ class Encoder(object):
         logging.debug('Inputs is %s' % str(inputs))
         # Note input should be padded all to the same length https://piazza.com/class/iw9g8b9yxp46s8?cid=2190
         # inputs: shape (batch_size, max_length, embedding_size)
-        hidden_states, final_state = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell_fw,
-                                                                 cell_bw=cell_bw,
+        hidden_states, final_state = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
+                                                                 cell_bw=cell,
                                                                  inputs=inputs,
                                                                  sequence_length=seq_len,
                                                                  initial_state_fw=state_fw,
@@ -112,8 +111,8 @@ class Encoder(object):
 
 
 class Decoder(object):
-    def __init__(self, output_size):
-        self.output_size = output_size
+    def __init__(self, flag):
+        self.config=flag
 
     def decode(self, knowledge_rep):
         """
@@ -131,6 +130,25 @@ class Decoder(object):
         """
         logging.debug('='*10 + 'Decoder' + '='*10)
         logging.debug('Input knowledge_rep is %s' % str(knowledge_rep))
+
+        if self.config.model == 'baseline':
+            # as = Wahp + W ahq + ba
+            # ae = Wehp + W ehq + be
+            p, q = knowledge_rep
+            xavier_init = tf.contrib.layers.xavier_initializer()
+            zero_init = tf.constant_initializer(0)
+            Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float64)
+            Wp_e = tf.get_variable('Wp_e', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float64)
+            Wq_s = tf.get_variable('Wq_s', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float64)
+            Wq_e = tf.get_variable('Wq_e', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float64)
+            b_s  = tf.get_variable('b_s', shape=(self.config.max_context_length, ), initializer=zero_init, dtype=tf.float64)
+            b_e  = tf.get_variable('b_e', shape=(self.config.max_context_length, ), initializer=zero_init, dtype=tf.float64)
+            with tf.variable_scope('answer_start'):
+                a_s = tf.matmul(p, Wp_s) + tf.matmul(q, Wq_s) + b_s
+            with tf.variable_scope('answer_scope'):
+                a_e = tf.matmul(p, Wp_e) + tf.matmul(q, Wq_e) + b_e
+            return a_s, a_e
+
         cell = tf.nn.rnn_cell.LSTMCell(num_units=1, state_is_tuple=True)
         hidden_states, final_state = tf.nn.dynamic_rnn(cell=cell,
                                                        inputs=knowledge_rep,
@@ -187,17 +205,21 @@ class QASystem(object):
         self.context_placeholder = tf.placeholder(tf.int32, (None, self.config.max_context_length, self.config.n_features))
         self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
 
-        self.labels_placeholder=tf.placeholder(tf.int32,(None,self.config.label_size))
+        if self.config.model == 'baseline':
+            self.start_labels_placeholder=tf.placeholder(tf.int32,(None,))
+            self.end_labels_placeholder=tf.placeholder(tf.int32,(None,))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
-            self.setup_system()
-            self.setup_loss()
+            self.preds = self.setup_system()
+            self.loss = self.setup_loss(self.preds)
 
         # ==== set up training/updating procedure ====
-        pass
+        optfn = get_optimizer(self.config.optimizer)
+        self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
 
+    
     # TODO: add label etc.
     def create_feed_dict(self, 
                          question_batch, 
@@ -211,7 +233,9 @@ class QASystem(object):
         feed_dict[self.context_placeholder] = context_batch
         feed_dict[self.context_length_placeholder] = context_length_batch
         if labels_batch is not None:
-            feed_dict[self.labels_placeholder] = labels_batch
+            if self.config.model == 'baseline':
+                feed_dict[self.start_labels_placeholder] = labels_batch[0]
+                feed_dict[self.end_labels_placeholder] = labels_batch[1]
 
     def setup_system(self):
         """
@@ -243,23 +267,29 @@ class QASystem(object):
         # representation with the attention vector.
         updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
-        # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWER.
-        s_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
+        # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWERs_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
+        s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
+        return s_idx, e_idx
 
-
-    def setup_loss(self):
+    def setup_loss(self, preds):
         """
         Set up your loss computation here
         :return:
         """
         with vs.variable_scope("loss"):
-            pass
+            if self.config.model == "baseline":
+                pred_s, pred_e = preds
+                loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
+                loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
+                loss = loss_s + loss_e
+
+        return loss
 
     def setup_embeddings(self):
         """
         Loads distributed word representations based on placeholder tokens
         :return:
-        """ 
+        """
         with vs.variable_scope("embeddings"):
             embedding_tensor = tf.Variable(self.pretrained_embeddings)
             question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
@@ -417,15 +447,15 @@ class QASystem(object):
 	
     def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, labels_batch):
         feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=labels_batch)
-        loss = 0.00 # TODO: remove later
-        # _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
+        #loss = 0.00 # TODO: remove later
+        _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         # return loss
         return loss
 
     def run_epoch(self, sess, train_set, valid_set):
         train_examples = np.array(self.preprocess_question_answer(train_set))
         n_train_examples = len(train_examples)
-        print(train_examples)
+        #print(train_examples)
         prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
 
         for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
