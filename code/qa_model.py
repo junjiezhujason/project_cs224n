@@ -400,7 +400,10 @@ class QASystem(object):
         em = []
         for raw_context, labels, labels_  in self.output(sess, dataset):
             true_answer = ' '.join(raw_context[labels[0]:labels[1]+1])
-            pred_answer = ' '.join(raw_context[labels_[0]:labels_[1]+1])
+            if labels_[0] >= len(raw_context):
+                pred_answer = ''
+            else:
+                pred_answer = ' '.join(raw_context[labels_[0]:labels_[1]+1])
             # Caculate score from golden & predicted answer strings.
             f1.append(f1_score(pred_answer, true_answer))
             em.append(exact_match_score(pred_anwer, true_answer))
