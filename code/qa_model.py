@@ -390,7 +390,7 @@ class QASystem(object):
         from either training or testing set.
 
         :param session: session should always be centrally managed in train.py
-        :param dataset: a representation of our data, in some implementations, you can
+        :param dataset: a representation of our data [data_tokenized, data_raw], in some implementations, you can
                         pass in multiple components (arguments) of one dataset to this function
         :param sample: how many examples in dataset we look at
         :param log: whether we print to std out stream
@@ -398,15 +398,35 @@ class QASystem(object):
         """
         f1 = []
         em = []
-        for raw_context, labels, labels_  in self.output(sess, dataset):
-            true_answer = ' '.join(raw_context[labels[0]:labels[1]+1])
-            if labels_[0] >= len(raw_context):
+        n_samples = 0
+        input_data = dataset[0]
+        raw_context = dataset[1][1]
+        for i, output_res in enumerate(self.output(session, input_data)):
+            _, labels, labels_ = output_res
+            print(labels)
+            print(labels_)
+            n_samples = len(labels[0])
+            print(n_samples)
+            # print(output_res)
+            raw_context_i = raw_context[i]
+
+            true_answer = ' '.join(raw_context_i[labels[0]:labels[1]+1])
+
+            if labels_[0] > labels_[1]:
                 pred_answer = ''
             else:
-                pred_answer = ' '.join(raw_context[labels_[0]:labels_[1]+1])
+                if labels_[0] >= len(raw_context):
+                    pred_answer = ''
+                else:
+                    pred_answer = ' '.join(raw_context_i[labels_[0]:labels_[1]+1])
             # Caculate score from golden & predicted answer strings.
             f1.append(f1_score(pred_answer, true_answer))
             em.append(exact_match_score(pred_anwer, true_answer))
+
+            n_samples += 1
+            if (n_samples == sample):
+                break
+
         f1 = np.mean(f1)
         em = np.mean(em)
 
@@ -461,22 +481,23 @@ class QASystem(object):
 
     def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, start_labels_batch, end_labels_batch):
         feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=[start_labels_batch, end_labels_batch])
-        #loss = 0.00 # TODO: remove later
        
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
-        # return loss
         return loss
 
     def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch):
-    """
-    Return the predicted start index and end index (index NOT onehot).
-    """
+        """
+        Return the predicted start index and end index (index NOT onehot).
+        """
         feed = self.create_feed_dict(q_batch,
                                      q_len_batch,
                                      c_batch,
                                      c_len_batch)
-        predictions = sess.run([tf.argmax(self.preds[0], axis=2),
-                                tf.argmax(self.preds[1], axis=2)], feed_dict=feed)
+        predictions = sess.run([tf.argmax(self.preds[0], axis=1),
+                                tf.argmax(self.preds[1], axis=1)], feed_dict=feed)
+        # print(predictions)
+        # predictions = np.transpose(predictions)
+        # print(predictions)
         return predictions
 
     def run_epoch(self, sess, train_set, valid_set, train_raw, valid_raw):
@@ -499,14 +520,16 @@ class QASystem(object):
 
         valid_examples = self.preprocess_question_answer(valid_set)
         logging.info("Evaluating on development data")
+
+        valid_dataset = [valid_examples,valid_raw]
+        f1, em = self.evaluate_answer(sess, valid_dataset)
+
         # token_cm, entity_scores = self.evaluate_answer(sess, dev_set, dev_set_raw)
         # logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
         # logging.debug("Token-level scores:\n" + token_cm.summary())
         # logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
 
-        f1 = 0.00 # TODO: remove later
-        # f1 = entity_scores[-1]
-        return f1
+        return f1, em
 
     def train(self, session, dataset, train_dir):
         """
@@ -552,7 +575,7 @@ class QASystem(object):
         best_score = 0.
 	for epoch in range(self.config.epochs):
 	    logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
-	    score = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
+	    score, _ = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
 	    if score > best_score:
 		best_score = score
 		# if saver:
@@ -576,6 +599,6 @@ class QASystem(object):
             preds_ = self.predict_on_batch(sess, *batch)
             prog.update(i + 1, [])
             # Return context sentence, gold indexes, predicted indexes
-            ret.append([batch[2], batch[-2:], list(preds_))
+            ret.append([batch[2], batch[-2:], preds_])
         return ret
 
