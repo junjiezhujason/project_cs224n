@@ -396,9 +396,19 @@ class QASystem(object):
         :param log: whether we print to std out stream
         :return:
         """
-
-        f1 = 0.
-        em = 0.
+        f1 = []
+        em = []
+        for raw_context, labels, labels_  in self.output(sess, dataset):
+            true_answer = ' '.join(raw_context[labels[0]:labels[1]+1])
+            if labels_[0] >= len(raw_context):
+                pred_answer = ''
+            else:
+                pred_answer = ' '.join(raw_context[labels_[0]:labels_[1]+1])
+            # Caculate score from golden & predicted answer strings.
+            f1.append(f1_score(pred_answer, true_answer))
+            em.append(exact_match_score(pred_anwer, true_answer))
+        f1 = np.mean(f1)
+        em = np.mean(em)
 
         if log:
             logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, sample))
@@ -447,7 +457,8 @@ class QASystem(object):
             p_c_sent, _ = self.pad_sequence(c_sent, self.config.max_context_length)
             ret.append([p_q_sent, q_len, p_c_sent, c_len, lab[0], lab[1]])	
         return np.array(ret)
-	
+    
+
     def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, start_labels_batch, end_labels_batch):
         feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=[start_labels_batch, end_labels_batch])
         #loss = 0.00 # TODO: remove later
@@ -455,6 +466,18 @@ class QASystem(object):
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         # return loss
         return loss
+
+    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch):
+    """
+    Return the predicted start index and end index (index NOT onehot).
+    """
+        feed = self.create_feed_dict(q_batch,
+                                     q_len_batch,
+                                     c_batch,
+                                     c_len_batch)
+        predictions = sess.run([tf.argmax(self.preds[0], axis=2),
+                                tf.argmax(self.preds[1], axis=2)], feed_dict=feed)
+        return predictions
 
     def run_epoch(self, sess, train_set, valid_set, train_raw, valid_raw):
         train_examples = self.preprocess_question_answer(train_set)
@@ -540,4 +563,19 @@ class QASystem(object):
 	# 	self.report.log_epoch()
 	# 	self.report.save()
 	return best_score
+
+    def output(self, sess, inputs):
+        """
+        Reports the output of the model on examples (uses helper to featurize each example).
+        """
+        ret = []
+        prog = Progbar(target=1 + int(len(inputs) / self.config.batch_size))
+        for i, batch in enumerate(minibatches(inputs, self.config.batch_size, shuffle=False)):
+            # Ignore predict
+            batch = batch[:-2]
+            preds_ = self.predict_on_batch(sess, *batch)
+            prog.update(i + 1, [])
+            # Return context sentence, gold indexes, predicted indexes
+            ret.append([batch[2], batch[-2:], list(preds_))
+        return ret
 
