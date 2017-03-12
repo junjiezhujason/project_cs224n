@@ -200,20 +200,22 @@ class QASystem(object):
         # label_size = 2
 
         # TMP TO REMOVE END
-        self.question_placeholder = tf.placeholder(tf.int32, (None, self.config.max_question_length, self.config.n_features))
-        self.question_length_placeholder = tf.placeholder(tf.int32, (None,))
-        self.context_placeholder = tf.placeholder(tf.int32, (None, self.config.max_context_length, self.config.n_features))
-        self.context_length_placeholder = tf.placeholder(tf.int32, (None,))
+        self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features), name="debug")
+        print(self.question_placeholder)
+        self.question_length_placeholder = tf.placeholder(tf.int64, (None,), name="qlp")
+        self.context_placeholder = tf.placeholder(tf.int64, (None, self.config.max_context_length, self.config.n_features))
+        self.context_length_placeholder = tf.placeholder(tf.int64, (None,))
 
         if self.config.model == 'baseline':
-            self.start_labels_placeholder=tf.placeholder(tf.int32,(None,))
-            self.end_labels_placeholder=tf.placeholder(tf.int32,(None,))
+            self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
+            self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
-            self.preds = self.setup_system()
-            self.loss = self.setup_loss(self.preds)
+        self.preds = self.setup_system()
+        
+        self.loss = self.setup_loss(self.preds)
 
         # ==== set up training/updating procedure ====
         optfn = get_optimizer(self.config.optimizer)
@@ -234,8 +236,10 @@ class QASystem(object):
         feed_dict[self.context_length_placeholder] = context_length_batch
         if labels_batch is not None:
             if self.config.model == 'baseline':
+                labels_batch = np.transpose(labels_batch)
                 feed_dict[self.start_labels_placeholder] = labels_batch[0]
                 feed_dict[self.end_labels_placeholder] = labels_batch[1]
+        return feed_dict
 
     def setup_system(self):
         """
@@ -282,8 +286,7 @@ class QASystem(object):
                 loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
                 loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
                 loss = loss_s + loss_e
-
-        return loss
+        return tf.reduce_mean(loss)
 
     def setup_embeddings(self):
         """
@@ -448,6 +451,7 @@ class QASystem(object):
     def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, labels_batch):
         feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=labels_batch)
         #loss = 0.00 # TODO: remove later
+       
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         # return loss
         return loss
