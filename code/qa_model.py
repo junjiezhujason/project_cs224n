@@ -456,7 +456,7 @@ class QASystem(object):
         # return loss
         return loss
 
-    def run_epoch(self, sess, train_set, valid_set):
+    def run_epoch(self, sess, train_set, valid_set, train_raw, valid_raw):
         train_examples = self.preprocess_question_answer(train_set)
         n_train_examples = len(train_examples)
         #print(train_examples)
@@ -523,11 +523,13 @@ class QASystem(object):
 
         train_set = dataset['training']
         valid_set = dataset['validation']
+        train_raw = dataset['training_raw']
+        valid_raw = dataset['validation_raw']
 
         best_score = 0.
 	for epoch in range(self.config.epochs):
 	    logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
-	    score = self.run_epoch(session, train_set, valid_set)
+	    score = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
 	    if score > best_score:
 		best_score = score
 		# if saver:

@@ -87,16 +87,20 @@ def get_normalized_train_dir(train_dir):
 def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
-    dataset = load_dataset(FLAGS.data_dir, "tiny")
+    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, "tiny")
     # dataset = load_dataset(FLAGS.data_dir, "full")
 
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
     vocab_path = FLAGS.vocab_path or pjoin(FLAGS.data_dir, "vocab.dat")
     vocab, rev_vocab = initialize_vocab(vocab_path)
-
     embeddings = load_glove_embeddings(embed_path)
 
-    # test data loading 
+    # test = 10
+    # ans = dataset['training'][test][4]
+    # context = (dataset['training_raw'][test])[1]
+    # for i in range(ans[0],ans[1]+1):
+    #     print(context[i])
+    # return
 
 
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
