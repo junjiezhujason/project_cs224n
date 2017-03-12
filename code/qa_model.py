@@ -236,7 +236,7 @@ class QASystem(object):
         feed_dict[self.context_length_placeholder] = context_length_batch
         if labels_batch is not None:
             if self.config.model == 'baseline':
-                labels_batch = np.transpose(labels_batch)
+                # labels_batch = np.transpose(labels_batch)
                 feed_dict[self.start_labels_placeholder] = labels_batch[0]
                 feed_dict[self.end_labels_placeholder] = labels_batch[1]
         return feed_dict
@@ -445,11 +445,11 @@ class QASystem(object):
             # padding
             p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
             p_c_sent, _ = self.pad_sequence(c_sent, self.config.max_context_length)
-            ret.append([p_q_sent, q_len, p_c_sent, c_len, lab])	
-        return ret
+            ret.append([p_q_sent, q_len, p_c_sent, c_len, lab[0], lab[1]])	
+        return np.array(ret)
 	
-    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, labels_batch):
-        feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=labels_batch)
+    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, start_labels_batch, end_labels_batch):
+        feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=[start_labels_batch, end_labels_batch])
         #loss = 0.00 # TODO: remove later
        
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
@@ -457,7 +457,7 @@ class QASystem(object):
         return loss
 
     def run_epoch(self, sess, train_set, valid_set):
-        train_examples = np.array(self.preprocess_question_answer(train_set))
+        train_examples = self.preprocess_question_answer(train_set)
         n_train_examples = len(train_examples)
         #print(train_examples)
         prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
@@ -474,7 +474,7 @@ class QASystem(object):
         #logging.debug("Token-level scores:\n" + token_cm.summary())
         #logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
 
-        valid_examples = np.array(self.preprocess_question_answer(valid_set))
+        valid_examples = self.preprocess_question_answer(valid_set)
         logging.info("Evaluating on development data")
         # token_cm, entity_scores = self.evaluate_answer(sess, dev_set, dev_set_raw)
         # logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
