@@ -88,6 +88,8 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, "tiny")
+    FLAGS.max_context_length = max_c_len
+    FLAGS.max_question_length = max_q_len
     # dataset = load_dataset(FLAGS.data_dir, "full")
 
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))

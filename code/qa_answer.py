@@ -14,10 +14,11 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Decoder
+from qa_model import Encoder, QASystem, Decoder, Mixer
 from preprocessing.squad_preprocess import data_from_json, maybe_download, squad_base_url, \
     invert_map, tokenize, token_idx_map
 import qa_data
+from data_util import load_glove_embeddings
 
 import logging
 
@@ -38,6 +39,14 @@ tf.app.flags.DEFINE_string("log_dir", "log", "Path to store log and flag files (
 tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab file (default: ./data/squad/vocab.dat)")
 tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
+# Added
+tf.app.flags.DEFINE_integer("max_question_length", 100, "Maximum question length to consider.")
+tf.app.flags.DEFINE_integer("max_context_length", 1000, "Maximum context length to consider.")
+tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels that can be mapped to start-end postion in context.")
+tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
+tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
+tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
+tf.app.flags.DEFINE_string("optimizer", "adam", "adam / sgd")
 
 def initialize_model(session, model, train_dir):
     ckpt = tf.train.get_checkpoint_state(train_dir)
@@ -69,7 +78,9 @@ def read_dataset(dataset, tier, vocab):
     and answer pointer in their own file. Returns the number
     of questions and answers processed for the dataset"""
 
+    context_tokens_data = []
     context_data = []
+    question_tokens_data = []
     query_data = []
     question_uuid_data = []
 
@@ -96,8 +107,10 @@ def read_dataset(dataset, tier, vocab):
                 context_data.append(' '.join(context_ids))
                 query_data.append(' '.join(qustion_ids))
                 question_uuid_data.append(question_uuid)
+                context_tokens_data.append(context_tokens)
+                question_tokens_data.append(question_tokens)
 
-    return context_data, query_data, question_uuid_data
+    return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data
 
 
 def prepare_dev(prefix, dev_filename, vocab):
@@ -105,9 +118,9 @@ def prepare_dev(prefix, dev_filename, vocab):
     dev_dataset = maybe_download(squad_base_url, dev_filename, prefix)
 
     dev_data = data_from_json(os.path.join(prefix, dev_filename))
-    context_data, question_data, question_uuid_data = read_dataset(dev_data, 'dev', vocab)
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = read_dataset(dev_data, 'dev', vocab)
 
-    return context_data, question_data, question_uuid_data
+    return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data
 
 
 def generate_answers(sess, model, dataset, rev_vocab):
@@ -131,6 +144,29 @@ def generate_answers(sess, model, dataset, rev_vocab):
     """
     answers = {}
 
+    context_tokens_data, context_data, context_len_data, question_tokens_data, question_data, question_len_data, question_uuid_data = dataset
+
+
+    # Pad input data with model.preprocess_question_answer
+    fake_label = [None, None]
+    data_set = [(question_data[i].split(), question_len_data[i], context_data[i].split(), context_len_data[i], fake_label) for i in xrange(len(question_data))]
+    padded_inputs = model.preprocess_question_answer(data_set) # 6 lists
+    outputs = model.output(sess, padded_inputs)
+    for i, output_res in enumerate(outputs):
+        _, pred_labels = output_res
+        start_idx = pred_labels[0]
+        end_idx = pred_labels[1]
+        context_len = context_len_data[i]
+
+        if (start_idx >= context_len) or (end_idx < start_idx):
+            answer = ''
+        else:
+            # TOCHECK how are their golden answer generated?
+            # Use rev_vocab to reverse look up vocab from index token
+            answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx]])
+            # Use original context
+            # answer = ' '.join(context_tokens_data[i][start_idx: end_idx])
+        answers[question_uuid_data[i]] = answer
     return answers
 
 
@@ -153,7 +189,6 @@ def get_normalized_train_dir(train_dir):
 def main(_):
 
     vocab, rev_vocab = initialize_vocab(FLAGS.vocab_path)
-
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
 
     if not os.path.exists(FLAGS.log_dir):
@@ -170,16 +205,37 @@ def main(_):
 
     dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
     dev_filename = os.path.basename(FLAGS.dev_path)
-    context_data, question_data, question_uuid_data = prepare_dev(dev_dirname, dev_filename, vocab)
-    dataset = (context_data, question_data, question_uuid_data)
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = prepare_dev(dev_dirname, dev_filename, vocab)
+    # Get data length
+    context_len_data = [len(context.split()) for context in context_data]
+    question_len_data = [len(question.split()) for question in question_data]
+    dataset = (context_tokens_data, context_data, context_len_data,
+               question_tokens_data, question_data, question_len_data, question_uuid_data)
+
+    FLAGS.max_context_length = max(context_len_data)
+    FLAGS.max_question_length = max(question_len_data)
+
+    for i in range(10):
+      logging.debug('context')
+      logging.debug(' '.join(context_tokens_data[i]))
+      logging.debug('context_data')
+      logging.debug(context_data[i])
+      logging.debug('question')
+      logging.debug(' '.join(question_tokens_data[i]))
+      logging.debug('question_data')
+      logging.debug(question_data[i])
+      logging.debug('uuid_data')
+      logging.debug(question_uuid_data[i])
 
     # ========= Model-specific =========
     # You must change the following code to adjust to your model
-
+    embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
+    embeddings = load_glove_embeddings(embed_path)
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
-    decoder = Decoder(output_size=FLAGS.output_size)
+    mixer = Mixer()
+    decoder = Decoder(FLAGS)
 
-    qa = QASystem(encoder, decoder)
+    qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
 
     with tf.Session() as sess:
         train_dir = get_normalized_train_dir(FLAGS.train_dir)
