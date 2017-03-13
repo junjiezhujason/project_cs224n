@@ -400,28 +400,23 @@ class QASystem(object):
         em = []
         n_samples = 0
         input_data = dataset[0]
-        raw_context = dataset[1][1]
+        raw_context = dataset[1]
         for i, output_res in enumerate(self.output(session, input_data)):
-            _, labels, labels_ = output_res
-            print(labels)
-            print(labels_)
-            n_samples = len(labels[0])
-            print(n_samples)
             # print(output_res)
-            raw_context_i = raw_context[i]
+            raw_context_i = raw_context[i][1]
+            true_labels, pred_labels = output_res
+            true_answer = ' '.join(raw_context_i[true_labels[0]:true_labels[1]+1])
 
-            true_answer = ' '.join(raw_context_i[labels[0]:labels[1]+1])
-
-            if labels_[0] > labels_[1]:
+            if pred_labels[0] > pred_labels[1]:
                 pred_answer = ''
             else:
-                if labels_[0] >= len(raw_context):
+                if pred_labels[0] >= len(raw_context):
                     pred_answer = ''
                 else:
-                    pred_answer = ' '.join(raw_context_i[labels_[0]:labels_[1]+1])
+                    pred_answer = ' '.join(raw_context_i[pred_labels[0]:pred_labels[1]+1])
             # Caculate score from golden & predicted answer strings.
             f1.append(f1_score(pred_answer, true_answer))
-            em.append(exact_match_score(pred_anwer, true_answer))
+            em.append(exact_match_score(pred_answer, true_answer))
 
             n_samples += 1
             if (n_samples == sample):
@@ -575,6 +570,7 @@ class QASystem(object):
         best_score = 0.
 	for epoch in range(self.config.epochs):
 	    logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
+            logging.info("Best score so far: "+str(best_score))
 	    score, _ = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
 	    if score > best_score:
 		best_score = score
@@ -591,14 +587,24 @@ class QASystem(object):
         """
         Reports the output of the model on examples (uses helper to featurize each example).
         """
-        ret = []
         prog = Progbar(target=1 + int(len(inputs) / self.config.batch_size))
+        
+        true = []
+        pred = []
+        
+        # NOTE shuffle = False means everything will be predicting in order
         for i, batch in enumerate(minibatches(inputs, self.config.batch_size, shuffle=False)):
             # Ignore predict
-            batch = batch[:-2]
-            preds_ = self.predict_on_batch(sess, *batch)
+            batch_input = batch[:-2]
+            preds_ = self.predict_on_batch(sess, *batch_input)
+
+            pred += list((np.transpose(preds_)))     # pred for this batch
+            true += list(np.transpose(batch[-2:])) # true for this batch
             prog.update(i + 1, [])
             # Return context sentence, gold indexes, predicted indexes
-            ret.append([batch[2], batch[-2:], preds_])
-        return ret
+            # ret.append([batch[2], batch[-2:], preds_])
+
+        ret = [(true[i], pred[i]) for i in range(len(true))] 
+        # print(ret)
+        return ret 
 
