@@ -137,7 +137,7 @@ class Decoder(object):
         if self.config.model == 'baseline':
             # as = Wahp + W ahq + ba
             # ae = Wehp + W ehq + be
-            p, q = knowledge_rep
+            q, p = knowledge_rep
             xavier_init = tf.contrib.layers.xavier_initializer()
             zero_init = tf.constant_initializer(0)
             Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float64)
@@ -151,7 +151,7 @@ class Decoder(object):
             with tf.variable_scope('answer_scope'):
                 a_e = tf.matmul(p, Wp_e) + tf.matmul(q, Wq_e) + b_e
             return a_s, a_e
-
+"""
         cell = tf.nn.rnn_cell.LSTMCell(num_units=1, state_is_tuple=True)
         hidden_states, final_state = tf.nn.dynamic_rnn(cell=cell,
                                                        inputs=knowledge_rep,
@@ -178,6 +178,7 @@ class Decoder(object):
         # e_idx = preds[s_idx:].index(False) + s_idx
         e_idx = s_idx
         return s_idx, e_idx
+"""
 
 class QASystem(object):
     def __init__(self, encoder, mixer, decoder, *args):
@@ -205,9 +206,9 @@ class QASystem(object):
         # label_size = 2
 
         # TMP TO REMOVE END
-        self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features), name="debug")
+        self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features))
         print(self.question_placeholder)
-        self.question_length_placeholder = tf.placeholder(tf.int64, (None,), name="qlp")
+        self.question_length_placeholder = tf.placeholder(tf.int64, (None,))
         self.context_placeholder = tf.placeholder(tf.int64, (None, self.config.max_context_length, self.config.n_features))
         self.context_length_placeholder = tf.placeholder(tf.int64, (None,))
 
@@ -276,7 +277,7 @@ class QASystem(object):
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
         # representation with the attention vector.
-        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
+#        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
         # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWERs_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
         s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
