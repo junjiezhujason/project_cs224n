@@ -6,3 +6,4 @@ data/
 download
 log/*
 train/
+weights_backup
