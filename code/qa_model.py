@@ -4,6 +4,9 @@ from __future__ import print_function
 
 import time
 import logging
+import os
+from datetime import datetime
+
 
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
@@ -194,6 +197,8 @@ class QASystem(object):
         self.config = args[0]  # FLAG 
         self.pretrained_embeddings = args[1] # embeddings
 
+        # self.saver = args[2]
+
         # max_question_length = 66
         # max_context_length = 35
         # embedding_size = 50
@@ -220,6 +225,8 @@ class QASystem(object):
         # ==== set up training/updating procedure ====
         optfn = get_optimizer(self.config.optimizer)
         self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
+
+        self.saver = tf.train.Saver()
 
     
     # TODO: add label etc.
@@ -555,6 +562,9 @@ class QASystem(object):
         # you will also want to save your model parameters in train_dir
         # so that you can use your trained model to make predictions, or
         # even continue training
+        
+        results_path = os.path.join(train_dir, "{:%Y%m%d_%H%M%S}".format(datetime.now()))
+        model_path = results_path 
 
         tic = time.time()
         params = tf.trainable_variables()
@@ -574,9 +584,10 @@ class QASystem(object):
 	    score, _ = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
 	    if score > best_score:
 		best_score = score
-		# if saver:
-		#     logging.info("New best score! Saving model in %s", self.config.model_output)
-		#     saver.save(sess, self.config.model_output)
+	        print("")
+		if self.saver:
+		    logging.info("New best score! Saving model in %s", model_path)
+                    self.saver.save(session, model_path)
 	    print("")
 	#     if self.report:
 	# 	self.report.log_epoch()
