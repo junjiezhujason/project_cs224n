@@ -209,10 +209,14 @@ def main(_):
     # Get data length
     context_len_data = [len(context.split()) for context in context_data]
     question_len_data = [len(question.split()) for question in question_data]
-    dataset = (context_tokens_data[:50], context_data[:50], context_len_data[:50],
-               question_tokens_data[:50], question_data[:50], question_len_data[0:50], question_uuid_data[0:50])
-
-    FLAGS.max_context_length = max(context_len_data)
+    dataset = (context_tokens_data, context_data, context_len_data,
+               question_tokens_data, question_data, question_len_data, question_uuid_data)
+    print('max question lengti is %d' % max(question_len_data))
+    print('max context_length is %d' % max(context_len_data))
+    
+    # FLAGS.max_context_length = max(context_len_data) #700 in this dataset.
+    # For baseline, because the linear decoder weights dimension is max_length x state_size*2, it need to the max of both dataset
+    FLAGS.max_context_length = 766
     FLAGS.max_question_length = max(question_len_data)
 
     for i in range(10):
