@@ -474,6 +474,10 @@ class QASystem(object):
             # TODO: CHANGE LATER
             q_sent = self.featurize_window(q_sent)
             c_sent = self.featurize_window(c_sent)
+
+            # avoid bidirection rnn from complaining
+            q_len = min(q_len, self.config.max_question_length)
+            c_len = min(c_len, self.config.max_context_length)
             
             # padding
             p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
