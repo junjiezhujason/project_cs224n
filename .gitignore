@@ -4,5 +4,5 @@ code/preprocessing/*pyc
 code/*.pyc
 data/
 download
-log/
+log/*
 train/
