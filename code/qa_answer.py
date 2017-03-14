@@ -163,7 +163,7 @@ def generate_answers(sess, model, dataset, rev_vocab):
         else:
             # TOCHECK how are their golden answer generated?
             # Use rev_vocab to reverse look up vocab from index token
-            answer = ' '.join([rev_vocab[int(vocab_idx)] for vocab_idx in context_data[i][start_idx: end_idx]])
+            answer = ' '.join([rev_vocab[int(vocab_idx)] for vocab_idx in context_data[i].split()[start_idx: end_idx]])
             # Use original context
             # answer = ' '.join(context_tokens_data[i][start_idx: end_idx])
         answers[question_uuid_data[i]] = answer
@@ -209,8 +209,10 @@ def main(_):
     # Get data length
     context_len_data = [len(context.split()) for context in context_data]
     question_len_data = [len(question.split()) for question in question_data]
+
     dataset = (context_tokens_data, context_data, context_len_data,
                question_tokens_data, question_data, question_len_data, question_uuid_data)
+
     print('max question lengti is %d' % max(question_len_data))
     print('max context_length is %d' % max(context_len_data))
     
