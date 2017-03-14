@@ -214,6 +214,7 @@ class QASystem(object):
         if self.config.model == 'baseline':
             self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
             self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+            self.mask_placeholder = tf.placeholder(tf.bool, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -235,17 +236,21 @@ class QASystem(object):
                          question_length_batch, 
                          context_batch, 
                          context_length_batch,
+                         mask_batch=None,
                          labels_batch=None):
         feed_dict = {}
         feed_dict[self.question_placeholder] = question_batch
         feed_dict[self.question_length_placeholder] = question_length_batch
         feed_dict[self.context_placeholder] = context_batch
         feed_dict[self.context_length_placeholder] = context_length_batch
-        if labels_batch is not None:
-            if self.config.model == 'baseline':
+        if self.config.model == 'baseline':
                 # labels_batch = np.transpose(labels_batch)
+            if labels_batch is not None:
                 feed_dict[self.start_labels_placeholder] = labels_batch[0]
                 feed_dict[self.end_labels_placeholder] = labels_batch[1]
+            if mask_batch is not None:
+                feed_dict[self.mask_placeholder] = mask_batch
+
         return feed_dict
 
     def setup_system(self):
@@ -292,7 +297,7 @@ class QASystem(object):
                 pred_s, pred_e = preds
                 loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
                 loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
-                loss = loss_s + loss_e
+                loss = tf.boolean_mask(loss_s + loss_e, self.mask_placeholder)
         return tf.reduce_mean(loss)
 
     def setup_embeddings(self):
@@ -465,6 +470,7 @@ class QASystem(object):
         sentence_ = [[word] for word in sentence]
         return sentence_
 
+    # NOTE CHANGES BELOW
     def preprocess_question_answer(self, examples):
 	# pad sequences
 	ret = []
@@ -473,28 +479,37 @@ class QASystem(object):
             # TODO: CHANGE LATER
             q_sent = self.featurize_window(q_sent)
             c_sent = self.featurize_window(c_sent)
+
+            p_q_len = min(q_len, self.config.max_question_length) 
+            p_c_len = min(c_len, self.config.max_context_length) 
             
             # padding
             p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
-            p_c_sent, _ = self.pad_sequence(c_sent, self.config.max_context_length)
-            ret.append([p_q_sent, q_len, p_c_sent, c_len, lab[0], lab[1]])	
+            p_c_sent, c_mask = self.pad_sequence(c_sent, self.config.max_context_length)
+            ret.append([p_q_sent, p_q_len, p_c_sent, p_c_len, c_mask, lab[0], lab[1]])	
         return np.array(ret)
     
 
-    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, start_labels_batch, end_labels_batch):
-        feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=[start_labels_batch, end_labels_batch])
+    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch, start_labels_batch, end_labels_batch):
+        feed = self.create_feed_dict(q_batch, 
+                                     q_len_batch, 
+                                     c_batch, 
+                                     c_len_batch, 
+                                     mask_batch = mask_batch, 
+                                     labels_batch = [start_labels_batch, end_labels_batch])
        
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         return loss
 
-    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch):
+    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch):
         """
         Return the predicted start index and end index (index NOT onehot).
         """
         feed = self.create_feed_dict(q_batch,
                                      q_len_batch,
                                      c_batch,
-                                     c_len_batch)
+                                     c_len_batch,
+                                     mask_batch = mask_batch)
         predictions = sess.run([tf.argmax(self.preds[0], axis=1),
                                 tf.argmax(self.preds[1], axis=1)], feed_dict=feed)
         # print(predictions)
