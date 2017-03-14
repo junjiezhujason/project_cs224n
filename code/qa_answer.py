@@ -157,13 +157,13 @@ def generate_answers(sess, model, dataset, rev_vocab):
         start_idx = pred_labels[0]
         end_idx = pred_labels[1]
         context_len = context_len_data[i]
-
+        
         if (start_idx >= context_len) or (end_idx < start_idx):
             answer = ''
         else:
             # TOCHECK how are their golden answer generated?
             # Use rev_vocab to reverse look up vocab from index token
-            answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx]])
+            answer = ' '.join([rev_vocab[int(vocab_idx)] for vocab_idx in context_data[i][start_idx: end_idx]])
             # Use original context
             # answer = ' '.join(context_tokens_data[i][start_idx: end_idx])
         answers[question_uuid_data[i]] = answer
@@ -209,8 +209,8 @@ def main(_):
     # Get data length
     context_len_data = [len(context.split()) for context in context_data]
     question_len_data = [len(question.split()) for question in question_data]
-    dataset = (context_tokens_data, context_data, context_len_data,
-               question_tokens_data, question_data, question_len_data, question_uuid_data)
+    dataset = (context_tokens_data[:50], context_data[:50], context_len_data[:50],
+               question_tokens_data[:50], question_data[:50], question_len_data[0:50], question_uuid_data[0:50])
 
     FLAGS.max_context_length = max(context_len_data)
     FLAGS.max_question_length = max(question_len_data)
