@@ -717,6 +717,9 @@ class QASystemMatchLSTM(QASystem):
             w = tf.get_variable('w', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
             b = tf.get_variable('b', shape=(), initializer=zero_init, dtype=tf.float64)
 
+        # ========================================================
+        #  MatchLSTMCell class
+        #  =======================================================
         class MatchLSTMCell(tf.nn.rnn_cell.BasicLSTMCell):
             def __call__(self, h_p, state):
                 """Long short-term memory cell (LSTM)."""
@@ -750,17 +753,20 @@ class QASystemMatchLSTM(QASystem):
                 z = tf.concat_v2([h_p, tf.reshape(z_part2, [-1, state_size])], axis=1)
                 logging.debug('z is ' + str(z))
                 return super(MatchLSTMCell, self).__call__(z, state)
+        # ========================================================
+        #  end MatchLSTMCell class
+        #  =======================================================
 
-        p_len = self.context_length_placeholder
-        with tf.variable_scope('forward_match_LSTM'):
+
+        with tf.variable_scope('match_LSTM'):
             cell = MatchLSTMCell(num_units=self.config.state_size, state_is_tuple=True)
             H_r_tuple, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
                                                      cell_bw=cell,
                                                      inputs=H_p,
-                                                     sequence_length=p_len,
+                                                     sequence_length=self.context_length_placeholder,
                                                      dtype=tf.float64)
             logging.debug('H_r_tuple is' + str(H_r_tuple))
-        
+
         H_r = tf.concat(2, H_r_tuple)
         logging.debug('H_r is' + str(H_r))
         return H_r
