@@ -745,12 +745,12 @@ class QASystemMatchLSTM(QASystem):
                 logging.debug('a is' + str(a))
                 
                 # h_p is (?, L), a is (?, Q), H_q is (?, Q, L)
-                # H_q => (?, L, Q)TODO: not sure if this is correct, a=>(?, Q, 1).
-                # multiple to get (?, L, 1)
-                z_part2 = tf.matmul(tf.reshape(H_q, [-1, state_size, max_question_length]), tf.expand_dims(a, 2))
+                # a reshape to (?, 1, Q), multipe to create (?, 1, L), then
+                # reshape to (?, L)
+                z_part2 = tf.reshape(tf.matmul(tf.expand_dims(a, 1), H_q), [-1, state_size])
                 logging.debug('z_part2 is ' + str(z_part2))
 
-                z = tf.concat_v2([h_p, tf.reshape(z_part2, [-1, state_size])], axis=1)
+                z = tf.concat_v2([h_p, z_part2], axis=1)
                 logging.debug('z is ' + str(z))
                 return super(MatchLSTMCell, self).__call__(z, state)
         # ========================================================
