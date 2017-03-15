@@ -822,15 +822,18 @@ class QASystemMatchLSTM(QASystem):
 
         with tf.variable_scope('ansptr_LSTM'):
             cell = AnsPtrCell(num_units=self.config.state_size, state_is_tuple=True)
+            seq_len_2 =  2*tf.ones((tf.shape(self.context_length_placeholder)))
+            input_dummy = tf.zeros(((tf.shape(self.context_length_placeholder)[0]),2,1))
+            print("+"*10)
+            print(seq_len_2)
+            print(input_dummy)
             H_a, _ = tf.nn.dynamic_rnn(cell=cell,
-                                       inputs=H_r, # NOTE t his input shouldn't matter? this probably wrong....
-                                       sequence_length=2*tf.ones((tf.shape(self.context_length_placeholder))), # only unroll twice
+                                       inputs=input_dummy, # NOTE this input shouldn't matter? 
+                                       sequence_length=seq_len_2, # only unroll twice
                                        dtype=tf.float64)
 
             logging.debug('H_a is' + str(H_a))
-
             # NOTE we only need beta_0 and beta_1 in the intermediate steps in the cell
-
         return H_a
 
     def setup_system(self):
