@@ -7,7 +7,7 @@ import json
 
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Mixer, Decoder
+from qa_model import Encoder, QASystem, Mixer, Decoder, QASystemMatchLSTM
 from os.path import join as pjoin
 from data_util import load_glove_embeddings, load_dataset
 
@@ -88,7 +88,7 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     # dataset = load_dataset(FLAGS.data_dir, "full")
-    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, "tiny")
+    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, 'tiny')
     #FLAGS.max_context_length = max_c_len
     FLAGS.max_question_length = max_q_len
 
@@ -110,8 +110,10 @@ def main(_):
     mixer = Mixer()
     decoder = Decoder(FLAGS)
 
-
-    qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    if FLAGS.model == 'baseline':
+        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    elif FLAGS.model == 'matchLSTM':
+        qa = QASystemMatchLSTM(FLAGS, embeddings)
     # saver = tf.train.Saver()
 
     if not os.path.exists(FLAGS.log_dir):
