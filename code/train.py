@@ -7,7 +7,7 @@ import json
 
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Mixer, Decoder
+from qa_model import Encoder, QASystem, Mixer, Decoder, QASystemMatchLSTM
 from os.path import join as pjoin
 from data_util import load_glove_embeddings, load_dataset
 
@@ -20,7 +20,7 @@ tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this nor
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
 tf.app.flags.DEFINE_integer("batch_size", 10, "Batch size to use during training.")
 tf.app.flags.DEFINE_integer("epochs", 10, "Number of epochs to train.")
-tf.app.flags.DEFINE_integer("state_size", 200, "Size of each model layer.")
+tf.app.flags.DEFINE_integer("state_size", 20, "Size of each model layer.")
 tf.app.flags.DEFINE_integer("output_size", 750, "The output size of your model.")
 tf.app.flags.DEFINE_integer("embedding_size", 100, "Size of the pretrained vocabulary.")
 tf.app.flags.DEFINE_string("data_dir", "data/squad", "SQuAD directory (default ./data/squad)")
@@ -88,7 +88,7 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     # dataset = load_dataset(FLAGS.data_dir, "full")
-    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, "tiny")
+    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, 'tiny')
     #FLAGS.max_context_length = max_c_len
     FLAGS.max_question_length = max_q_len
 
@@ -110,8 +110,10 @@ def main(_):
     mixer = Mixer()
     decoder = Decoder(FLAGS)
 
-
-    qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    if FLAGS.model == 'baseline':
+        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    elif FLAGS.model == 'matchLSTM':
+        qa = QASystemMatchLSTM(FLAGS, embeddings)
     # saver = tf.train.Saver()
 
     if not os.path.exists(FLAGS.log_dir):

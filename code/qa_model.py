@@ -624,3 +624,153 @@ class QASystem(object):
         # print(ret)
         return ret 
 
+# ===============================================================
+# Match-LSTM
+# ===============================================================
+
+
+class QASystemMatchLSTM(QASystem):
+    def __init__(self, *args):
+        """
+        Initializes your System
+
+        :param encoder: an encoder that you constructed in train.py
+        :param decoder: a decoder that you constructed in train.py
+        :param args: pass in more arguments as needed
+        """
+
+        # ==== set up placeholder tokens ========
+        # TMP TO REMOVE START
+        self.config = args[0]  # FLAG 
+        self.pretrained_embeddings = args[1] # embeddings
+
+        # TMP TO REMOVE END
+        self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features))
+        print(self.question_placeholder)
+        self.question_length_placeholder = tf.placeholder(tf.int64, (None,))
+        self.context_placeholder = tf.placeholder(tf.int64, (None, self.config.max_context_length, self.config.n_features))
+        self.context_length_placeholder = tf.placeholder(tf.int64, (None,))
+
+        # ==== assemble pieces ====
+        with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
+            self.setup_embeddings()
+        self.preds = self.setup_system()
+        self.loss = self.setup_loss(self.preds)
+        optfn = get_optimizer(self.config.optimizer)
+        self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
+        self.saver = tf.train.Saver()
+
+    def setup_loss(self, preds):
+        """
+        Set up your loss computation here
+        :return:
+        """
+        # TODO
+        return preds
+
+    def setup_LSTM_preprocessing_layer(self):
+        """
+        In a generalized encode function, you pass in your inputs, seq_len, and an initial hidden state input into this function.
+
+        :param inputs: Symbolic representations of your input
+        :param seq_len: this is to make sure tf.nn.dynamic_rnn doesn't iterate through masked steps
+        :param encoder_state_input: (Optional) pass this as initial hidden state
+                                    to tf.nn.dynamic_rnn to build conditional representations
+        :return: an encoded representation of your input.
+                 It can be context-level representation, word-level representation,
+                 or both.
+        """
+
+        question, passage = self.setup_embeddings()
+
+        # LSTM Preprocessing Layer for passage
+        q_len = self.question_length_placeholder
+        p_len = self.context_length_placeholder
+        with tf.variable_scope('p'):
+            cell_p = tf.nn.rnn_cell.LSTMCell(num_units=self.config.state_size, state_is_tuple=True)
+            H_p, _ = tf.nn.dynamic_rnn(cell=cell_p,
+                                       inputs=passage,
+                                       sequence_length=p_len,
+                                       dtype=tf.float64)
+
+        # LSTM Preprocessing Layer for question
+        with tf.variable_scope('q'):
+            cell_q = tf.nn.rnn_cell.LSTMCell(num_units=self.config.state_size, state_is_tuple=True)
+            H_q, _ = tf.nn.dynamic_rnn(cell=cell_q,
+                                       inputs=question,
+                                       sequence_length=q_len,
+                                       dtype=tf.float64)
+
+        return H_p, H_q
+
+    def setup_match_LSTM_layer(self, H_p, H_q):
+        zero_init = tf.constant_initializer(0)
+        xavier_init = tf.contrib.layers.xavier_initializer()
+        state_size = self.config.state_size
+        max_question_length = self.config.max_question_length
+      
+        with tf.variable_scope('match_LSTM'):
+            W_q = tf.get_variable('W_q', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
+            W_p = tf.get_variable('W_p', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
+            W_r = tf.get_variable('W_r', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
+            b_p = tf.get_variable('b_p', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
+            w = tf.get_variable('w', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
+            b = tf.get_variable('b', shape=(), initializer=zero_init, dtype=tf.float64)
+
+        class MatchLSTMCell(tf.nn.rnn_cell.BasicLSTMCell):
+            def __call__(self, h_p, state):
+                """Long short-term memory cell (LSTM)."""
+                # Parameters of gates are concatenated into one multiply for efficiency.
+                c, h = state
+                logging.debug('W_q is ' + str(W_q))
+                logging.debug('H_q is ' + str(H_q))
+                
+                # H_q was (?, Q, L), change it to (?xQ, L), so we can multiple
+                # to W_q (L, L). Then return to (?, Q, L)
+                G_part1 = tf.reshape(tf.matmul(tf.reshape(H_q, [-1, state_size]), W_q), [-1, max_question_length, state_size])
+                logging.debug('G_1 is' + str(G_part1))
+                
+                G_part2 = tf.matmul(h_p, W_p) + tf.matmul(h, W_r) + b_p
+                logging.debug('G_2 is' + str(G_part2))
+
+                G = tf.tanh(G_part1 + G_part2)
+                logging.debug('G is' + str(G))
+                
+                # G is (?, Q, L), w is (L, 1), reshape G to (?xQ, L) so can
+                # multiple with w to get (?xQ, 1), then reshape to get a(?, Q)
+                a = tf.nn.softmax(tf.reshape(tf.matmul(tf.reshape(G, [-1, state_size]), tf.expand_dims(w, 1)), [-1, max_question_length]) + b)
+                logging.debug('a is' + str(a))
+                
+                # h_p is (?, L), a is (?, Q), H_q is (?, Q, L)
+                # H_q => (?, L, Q)TODO: not sure if this is correct, a=>(?, Q, 1).
+                # multiple to get (?, L, 1)
+                z_part2 = tf.matmul(tf.reshape(H_q, [-1, state_size, max_question_length]), tf.expand_dims(a, 2))
+                logging.debug('z_part2 is ' + str(z_part2))
+
+                z = tf.concat_v2([h_p, tf.reshape(z_part2, [-1, state_size])], axis=1)
+                logging.debug('z is ' + str(z))
+                return super(MatchLSTMCell, self).__call__(z, state)
+
+        p_len = self.context_length_placeholder
+        with tf.variable_scope('forward_match_LSTM'):
+            cell = MatchLSTMCell(num_units=self.config.state_size, state_is_tuple=True)
+            H_r_tuple, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
+                                                     cell_bw=cell,
+                                                     inputs=H_p,
+                                                     sequence_length=p_len,
+                                                     dtype=tf.float64)
+            logging.debug('H_r_tuple is' + str(H_r_tuple))
+        
+        H_r = tf.concat(2, H_r_tuple)
+        logging.debug('H_r is' + str(H_r))
+        return H_r
+
+
+
+    def setup_system(self):
+        H_p, H_q = self.setup_LSTM_preprocessing_layer()
+        print('H_q is ' + str(H_q))
+        print('H_p is ' + str(H_p))
+        H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
+
+
