@@ -782,13 +782,13 @@ class QASystemMatchLSTM(QASystem):
             W_a = tf.get_variable('W_a', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
             b_a = tf.get_variable('b_a', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
             v =     tf.get_variable('v', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
-            c = tf.get_variable('c', shape=(), initializer=zero_init, dtype=tf.float64)
+            c_v = tf.get_variable('c_v', shape=(), initializer=zero_init, dtype=tf.float64)
 
         # ========================================================
-        #  AnswerPointer class
+        #  AnswerPointerCell class
         #  =======================================================
         class AnsPtrCell(tf.nn.rnn_cell.BasicLSTMCell):
-            def __call__(self, state):
+            def __call__(self, dummy, state): # there are no inputs neeed to the cell like before?
                 """Long short-term memory cell (LSTM)."""
                 # Parameters of gates are concatenated into one multiply for efficiency.
                 c, h = state
@@ -798,36 +798,47 @@ class QASystemMatchLSTM(QASystem):
                 # H_r is (?, P, 2*L), change it to (?xP, 2*L), so we can multiply
                 # with W_q (2*L, L). Then return to (?, P, L)
                 F_part1 = tf.reshape(tf.matmul(tf.reshape(H_r, [-1, 2*state_size]), V), [-1, max_context_length, state_size])
-                logging.debug('G_1 is' + str(G_part1))
+                logging.debug('G_1 is' + str(F_part1))
                 
-                F_part2 = tf.matmul(h, W_a) + b_p
-                logging.debug('G_2 is' + str(G_part2))
+                F_part2 = tf.matmul(h, W_a) + b_a
+                logging.debug('G_2 is' + str(F_part2))
 
                 F = tf.tanh(F_part1 + F_part2)
-                logging.debug('G is' + str(G))
+                logging.debug('G is' + str(F))
                 
-                # F is (?, P, L), v is (L, 1), reshape G to (?xQ, L) so can
-                # multiple with w to get (?xQ, 1), then reshape to get a(?, Q)
-                a = tf.nn.softmax(tf.reshape(tf.matmul(tf.reshape(G, [-1, state_size]), tf.expand_dims(w, 1)), [-1, max_question_length]) + b)
-                logging.debug('a is' + str(a))
+                # F is (?, P, L), v is (L, 1), reshape G to (?xP, L) so can
+                # multiple with w to get (?xP, 1), then reshape to get a(?, P)
+                beta = tf.nn.softmax(tf.reshape(tf.matmul(tf.reshape(F, [-1, state_size]), tf.expand_dims(v, 1)), [-1, max_context_length]) + c_v)
+                logging.debug('beta is' + str(beta))
                 
-                # h_p is (?, L), a is (?, Q), H_q is (?, Q, L)
-                # H_q => (?, L, Q)TODO: not sure if this is correct, a=>(?, Q, 1).
-                # multiple to get (?, L, 1)
-                z_part2 = tf.matmul(tf.reshape(H_q, [-1, state_size, max_question_length]), tf.expand_dims(a, 2))
-                logging.debug('z_part2 is ' + str(z_part2))
+                # beta reshape to (?, 1, P), multipy with H_r (?, P, 2*L)  to create (?, 1, 2*L), then # reshape to (?, 2*L)
+                Hbeta = tf.reshape(tf.matmul(tf.expand_dims(beta, 1), H_r), [-1, 2*state_size])
+                logging.debug('Hbeta is ' + str(Hbeta))
 
-                z = tf.concat_v2([h_p, tf.reshape(z_part2, [-1, state_size])], axis=1)
-                logging.debug('z is ' + str(z))
-                return super(MatchLSTMCell, self).__call__(z, state)
+                return super(AnsPtrCell, self).__call__(Hbeta, state)
         # ========================================================
-        #  end MatchLSTMCell class
+        #  end AnswerPointerCell class
         #  =======================================================
+
+        with tf.variable_scope('ansptr_LSTM'):
+            cell = AnsPtrCell(num_units=self.config.state_size, state_is_tuple=True)
+            H_a, _ = tf.nn.dynamic_rnn(cell=cell,
+                                       inputs=H_r, # NOTE t his input shouldn't matter? this probably wrong....
+                                       sequence_length=2*tf.ones((tf.shape(self.context_length_placeholder))), # only unroll twice
+                                       dtype=tf.float64)
+
+            logging.debug('H_a is' + str(H_a))
+
+            # NOTE we only need beta_0 and beta_1 in the intermediate steps in the cell
+
+        return H_a
 
     def setup_system(self):
         H_p, H_q = self.setup_LSTM_preprocessing_layer()
         print('H_q is ' + str(H_q))
         print('H_p is ' + str(H_p))
         H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
+        H_a = self.setup_pointer_layer(H_r_fw)
+        # NOTE reconstruct vF + c as the predictions to input to the softmax_logit_loss
 
 
