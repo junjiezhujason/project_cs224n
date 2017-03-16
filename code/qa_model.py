@@ -776,7 +776,7 @@ class QASystemMatchLSTM(QASystem):
         return H_r
 
     def setup_pointer_layer(self, H_r):
-        print("="*)
+        print("="*10)
         print("Pointer Decoder")
         zero_init = tf.constant_initializer(0)
         xavier_init = tf.contrib.layers.xavier_initializer()
