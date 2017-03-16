@@ -290,7 +290,7 @@ class QASystem(object):
             Same shape as val, where some elements are very small (exponentially zero)
         """
         VERY_NEG_NUM = -1e10
-        return tf.add(val, (1 - tf.cast(mask, 'float64')) * VERY_NEG_NUM, name="exp_mask")
+        return tf.add(val, (1 - tf.cast(mask, tf.float64)) * VERY_NEG_NUM, name="exp_mask")
 
     def setup_loss(self, preds):
         """
@@ -680,6 +680,7 @@ class QASystemMatchLSTM(QASystem):
 
         self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
         self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.mask_placeholder = tf.placeholder(tf.bool, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
