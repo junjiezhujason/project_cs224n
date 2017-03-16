@@ -138,6 +138,9 @@ class Decoder(object):
             # as = Wahp + W ahq + ba
             # ae = Wehp + W ehq + be
             q, p = knowledge_rep
+            logging.debug('Input knowledge_rep q is %s' % str(q))
+            logging.debug('Input knowledge_rep p is %s' % str(p))
+
             xavier_init = tf.contrib.layers.xavier_initializer()
             zero_init = tf.constant_initializer(0)
             Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float64)
@@ -212,9 +215,8 @@ class QASystem(object):
         self.context_placeholder = tf.placeholder(tf.int64, (None, self.config.max_context_length, self.config.n_features))
         self.context_length_placeholder = tf.placeholder(tf.int64, (None,))
 
-        if self.config.model == 'baseline':
-            self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
-            self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -243,10 +245,9 @@ class QASystem(object):
         feed_dict[self.context_placeholder] = context_batch
         feed_dict[self.context_length_placeholder] = context_length_batch
         if labels_batch is not None:
-            if self.config.model == 'baseline':
-                # labels_batch = np.transpose(labels_batch)
-                feed_dict[self.start_labels_placeholder] = labels_batch[0]
-                feed_dict[self.end_labels_placeholder] = labels_batch[1]
+            # labels_batch = np.transpose(labels_batch)
+            feed_dict[self.start_labels_placeholder] = labels_batch[0]
+            feed_dict[self.end_labels_placeholder] = labels_batch[1]
         return feed_dict
 
     def setup_system(self):
@@ -289,11 +290,13 @@ class QASystem(object):
         :return:
         """
         with vs.variable_scope("loss"):
-            if self.config.model == "baseline":
-                pred_s, pred_e = preds
-                loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
-                loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
-                loss = loss_s + loss_e
+            pred_s, pred_e = preds
+            print("LOSS pred_s: "+str(pred_s))
+            print("LOSS pred_e: "+str(pred_e))
+            
+            loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
+            loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
+            loss = loss_s + loss_e
         return tf.reduce_mean(loss)
 
     def setup_embeddings(self):
@@ -515,8 +518,9 @@ class QASystem(object):
 
         for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
             loss = self.train_on_batch(sess, *batch)
-            prog.update(i + 1, [("train loss", loss)])
+            # prog.update(i + 1, [("train loss", loss)])
             # if self.report: self.report.log_train_loss(loss)
+            print("train loss", loss)
         print("")
 
         #logging.info("Evaluating on training data")
@@ -586,12 +590,14 @@ class QASystem(object):
 	for epoch in range(self.config.epochs):
 	    logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
             logging.info("Best score so far: "+str(best_score))
-	    score, _ = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
+	    score, em = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
 	    if score > best_score:
 		best_score = score
 	        print("")
 		if self.saver:
 		    logging.info("New best score! Saving model in %s", model_path)
+                    logging.info("f1: "+str(score)+" em:"+str(em))
+
                     self.saver.save(session, model_path)
 	    print("")
 	#     if self.report:
@@ -651,6 +657,9 @@ class QASystemMatchLSTM(QASystem):
         self.context_placeholder = tf.placeholder(tf.int64, (None, self.config.max_context_length, self.config.n_features))
         self.context_length_placeholder = tf.placeholder(tf.int64, (None,))
 
+        self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
@@ -660,13 +669,6 @@ class QASystemMatchLSTM(QASystem):
         self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
         self.saver = tf.train.Saver()
 
-    def setup_loss(self, preds):
-        """
-        Set up your loss computation here
-        :return:
-        """
-        # TODO
-        return preds
 
     def setup_LSTM_preprocessing_layer(self):
         """
@@ -733,7 +735,7 @@ class QASystemMatchLSTM(QASystem):
                 G_part1 = tf.reshape(tf.matmul(tf.reshape(H_q, [-1, state_size]), W_q), [-1, max_question_length, state_size])
                 logging.debug('G_1 is' + str(G_part1))
                 
-                G_part2 = tf.matmul(h_p, W_p) + tf.matmul(h, W_r) + b_p
+                G_part2 = tf.expand_dims(tf.matmul(h_p, W_p) + tf.matmul(h, W_r) + b_p,1)
                 logging.debug('G_2 is' + str(G_part2))
 
                 G = tf.tanh(G_part1 + G_part2)
@@ -758,6 +760,8 @@ class QASystemMatchLSTM(QASystem):
         #  =======================================================
 
         with tf.variable_scope('match_LSTM'):
+            print("\n"*3)
+            print(H_p)
             cell = MatchLSTMCell(num_units=self.config.state_size, state_is_tuple=True)
             H_r_tuple, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
                                                      cell_bw=cell,
@@ -769,7 +773,6 @@ class QASystemMatchLSTM(QASystem):
         H_r = tf.concat(2, H_r_tuple)
         logging.debug('H_r is' + str(H_r))
         return H_r
-
 
     def setup_pointer_layer(self, H_r):
         zero_init = tf.constant_initializer(0)
@@ -800,7 +803,7 @@ class QASystemMatchLSTM(QASystem):
                 F_part1 = tf.reshape(tf.matmul(tf.reshape(H_r, [-1, 2*state_size]), V), [-1, max_context_length, state_size])
                 logging.debug('G_1 is' + str(F_part1))
                 
-                F_part2 = tf.matmul(h, W_a) + b_a
+                F_part2 = tf.expand_dims(tf.matmul(h, W_a) + b_a, 1)
                 logging.debug('G_2 is' + str(F_part2))
 
                 F = tf.tanh(F_part1 + F_part2)
@@ -808,14 +811,22 @@ class QASystemMatchLSTM(QASystem):
                 
                 # F is (?, P, L), v is (L, 1), reshape G to (?xP, L) so can
                 # multiple with w to get (?xP, 1), then reshape to get a(?, P)
-                beta = tf.nn.softmax(tf.reshape(tf.matmul(tf.reshape(F, [-1, state_size]), tf.expand_dims(v, 1)), [-1, max_context_length]) + c_v)
+                pre_softmax_score = tf.reshape(tf.matmul(tf.reshape(F, [-1, state_size]), tf.expand_dims(v, 1)), [-1, max_context_length]) + c_v
+                beta = tf.nn.softmax(pre_softmax_score)
                 logging.debug('beta is' + str(beta))
                 
                 # beta reshape to (?, 1, P), multipy with H_r (?, P, 2*L)  to create (?, 1, 2*L), then # reshape to (?, 2*L)
                 Hbeta = tf.reshape(tf.matmul(tf.expand_dims(beta, 1), H_r), [-1, 2*state_size])
                 logging.debug('Hbeta is ' + str(Hbeta))
 
-                return super(AnsPtrCell, self).__call__(Hbeta, state)
+                LSTM_output, LSTM_state = super(AnsPtrCell, self).__call__(Hbeta, state)
+
+                return pre_softmax_score, LSTM_state 
+
+            @property
+            def output_size(self):
+                return max_context_length
+
         # ========================================================
         #  end AnswerPointerCell class
         #  =======================================================
@@ -823,25 +834,35 @@ class QASystemMatchLSTM(QASystem):
         with tf.variable_scope('ansptr_LSTM'):
             cell = AnsPtrCell(num_units=self.config.state_size, state_is_tuple=True)
             seq_len_2 =  2*tf.ones((tf.shape(self.context_length_placeholder)))
-            input_dummy = tf.zeros(((tf.shape(self.context_length_placeholder)[0]),2,1))
+            input_dummy = tf.zeros((tf.shape(self.context_length_placeholder)[0],2,1))
             print("+"*10)
             print(seq_len_2)
             print(input_dummy)
-            H_a, _ = tf.nn.dynamic_rnn(cell=cell,
+            beta_log, _ = tf.nn.dynamic_rnn(cell=cell,
                                        inputs=input_dummy, # NOTE this input shouldn't matter? 
                                        sequence_length=seq_len_2, # only unroll twice
                                        dtype=tf.float64)
 
-            logging.debug('H_a is' + str(H_a))
+            logging.debug('beta_log' + str(beta_log))
             # NOTE we only need beta_0 and beta_1 in the intermediate steps in the cell
-        return H_a
+        return beta_log 
 
     def setup_system(self):
         H_p, H_q = self.setup_LSTM_preprocessing_layer()
         print('H_q is ' + str(H_q))
         print('H_p is ' + str(H_p))
         H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
-        H_a = self.setup_pointer_layer(H_r_fw)
+        beta_log_scores = self.setup_pointer_layer(H_r_fw)
         # NOTE reconstruct vF + c as the predictions to input to the softmax_logit_loss
+        # split the data into two
+        pred_s, pred_e = tf.split(1, 2, beta_log_scores)
+        logging.debug("pred_s is "+str(pred_s))
+        logging.debug("pred_e is "+str(pred_e))
+        pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
+        pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
+        
+        logging.debug("pred_s is "+str(pred_s))
+        logging.debug("pred_e is "+str(pred_e))
+        return pred_s, pred_e 
 
 
