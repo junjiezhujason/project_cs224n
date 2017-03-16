@@ -39,6 +39,7 @@ tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels 
 tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
+tf.app.flags.DEFINE_string("datasize", "tiny", "tiny/full.")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -89,7 +90,7 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     # dataset = load_dataset(FLAGS.data_dir, "full")
-    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, 'tiny')
+    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, FLAGS.datasize)
     #FLAGS.max_context_length = max_c_len
     FLAGS.max_question_length = max_q_len
 

@@ -514,7 +514,7 @@ class QASystem(object):
         train_examples = self.preprocess_question_answer(train_set)
         n_train_examples = len(train_examples)
         #print(train_examples)
-        prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
+        # prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
 
         for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
             loss = self.train_on_batch(sess, *batch)
@@ -609,7 +609,7 @@ class QASystem(object):
         """
         Reports the output of the model on examples (uses helper to featurize each example).
         """
-        prog = Progbar(target=1 + int(len(inputs) / self.config.batch_size))
+        # prog = Progbar(target=1 + int(len(inputs) / self.config.batch_size))
         
         true = []
         pred = []
@@ -622,7 +622,7 @@ class QASystem(object):
 
             pred += list((np.transpose(preds_)))     # pred for this batch
             true += list(np.transpose(batch[-2:])) # true for this batch
-            prog.update(i + 1, [])
+            # prog.update(i + 1, [])
             # Return context sentence, gold indexes, predicted indexes
             # ret.append([batch[2], batch[-2:], preds_])
 
