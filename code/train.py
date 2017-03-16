@@ -39,6 +39,7 @@ tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels 
 tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
+tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
 
 FLAGS = tf.app.flags.FLAGS
 

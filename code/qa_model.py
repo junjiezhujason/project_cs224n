@@ -649,6 +649,7 @@ class QASystemMatchLSTM(QASystem):
         # TMP TO REMOVE START
         self.config = args[0]  # FLAG 
         self.pretrained_embeddings = args[1] # embeddings
+        
 
         # TMP TO REMOVE END
         self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features))
@@ -775,6 +776,8 @@ class QASystemMatchLSTM(QASystem):
         return H_r
 
     def setup_pointer_layer(self, H_r):
+        print("="*)
+        print("Pointer Decoder")
         zero_init = tf.constant_initializer(0)
         xavier_init = tf.contrib.layers.xavier_initializer()
         state_size = self.config.state_size
@@ -848,12 +851,15 @@ class QASystemMatchLSTM(QASystem):
         return beta_log 
 
     def naive_decoder(self, H_r):
+        print("="*10)
+        print("NAIVE DECODER")
+
         state_size = self.config.state_size
         xavier_init = tf.contrib.layers.xavier_initializer()
         max_context_length = self.config.max_context_length
         zero_init = tf.constant_initializer(0)
-        Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, ), initializer=zero_init, dtype=tf.float64)
-        Wp_e = tf.get_variable('Wp_e', shape=(self.config.state_size*2, ), initializer=zero_init, dtype=tf.float64)
+        Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, ), initializer=xavier_init, dtype=tf.float64)
+        Wp_e = tf.get_variable('Wp_e', shape=(self.config.state_size*2, ), initializer=xavier_init, dtype=tf.float64)
         b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64)
         b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float64)
 
@@ -864,25 +870,22 @@ class QASystemMatchLSTM(QASystem):
         return a_s, a_e
 
 
-        
-
     def setup_system(self):
         H_p, H_q = self.setup_LSTM_preprocessing_layer()
         print('H_q is ' + str(H_q))
         print('H_p is ' + str(H_p))
         H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
 
-        """
-        beta_log_scores = self.setup_pointer_layer(H_r_fw)
-        # NOTE reconstruct vF + c as the predictions to input to the softmax_logit_loss
-        # split the data into two
-        pred_s, pred_e = tf.split(1, 2, beta_log_scores)
-        logging.debug("pred_s is "+str(pred_s))
-        logging.debug("pred_e is "+str(pred_e))
-        pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
-        pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
-        """
-        pred_s, pred_e = self.naive_decoder(H_r_fw)
+        if self.config.decoder_type == "naive":
+            pred_s, pred_e = self.naive_decoder(H_r_fw)
+        else:
+            beta_log_scores = self.setup_pointer_layer(H_r_fw)
+            pred_s, pred_e = tf.split(1, 2, beta_log_scores)
+            logging.debug("pred_s is "+str(pred_s))
+            logging.debug("pred_e is "+str(pred_e))
+            pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
+            pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
+
         
         logging.debug("pred_s is "+str(pred_s))
         logging.debug("pred_e is "+str(pred_e))
