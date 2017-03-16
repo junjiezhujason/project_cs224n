@@ -229,6 +229,11 @@ class QASystem(object):
 
         self.saver = tf.train.Saver()
 
+    def attension_flow_layer(self, H_q, H_p):
+        
+        # Query2Context
+        return 
+
     
     # TODO: add label etc.
     def create_feed_dict(self, 
@@ -487,6 +492,15 @@ class QASystem(object):
 	# pad sequences
 	ret = []
 	for q_sent, q_len, c_sent, c_len, lab in examples:
+
+            if len(c_sent) > self.config.max_context_length:
+                logging.info("Ignoring sample with context length: "+str(len(c_sent)))
+                continue
+
+            if len(q_sent) > self.config.max_question_length:
+                logging.info("Ignoring sample with question length: "+str(len(q_sent)))
+                continue
+
             # window selection
             # TODO: CHANGE LATER
             q_sent = self.featurize_window(q_sent)

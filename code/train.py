@@ -40,6 +40,7 @@ tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for 
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
+tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -90,7 +91,7 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     # dataset = load_dataset(FLAGS.data_dir, "full")
-    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, 'tiny')
+    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, FLAGS.data_size)
     #FLAGS.max_context_length = max_c_len
     FLAGS.max_question_length = max_q_len
 
