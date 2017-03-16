@@ -18,9 +18,7 @@ from util import Progbar, minibatches
 
 from qa_data import PAD_ID, SOS_ID, UNK_ID
 
-
 logging.basicConfig(level=logging.INFO)
-
 
 
 def get_optimizer(opt):
@@ -217,12 +215,12 @@ class QASystem(object):
 
         self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
         self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.mask_placeholder = tf.placeholder(tf.bool, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
         self.preds = self.setup_system()
-        
         self.loss = self.setup_loss(self.preds)
 
         # ==== set up training/updating procedure ====
@@ -238,6 +236,7 @@ class QASystem(object):
                          question_length_batch, 
                          context_batch, 
                          context_length_batch,
+                         mask_batch=None,
                          labels_batch=None):
         feed_dict = {}
         feed_dict[self.question_placeholder] = question_batch
@@ -248,10 +247,12 @@ class QASystem(object):
             # labels_batch = np.transpose(labels_batch)
             feed_dict[self.start_labels_placeholder] = labels_batch[0]
             feed_dict[self.end_labels_placeholder] = labels_batch[1]
+        if mask_batch is not None:
+            feed_dict[self.mask_placeholder] = mask_batch
         return feed_dict
 
     def setup_system(self):
-        """
+	"""
         After your modularized implementation of encoder and decoder
         you should call various functions inside encoder, decoder here
         to assemble your reading comprehension system!
@@ -278,11 +279,18 @@ class QASystem(object):
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
         # representation with the attention vector.
-#        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
+        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
-        # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWERs_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
+
         s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
         return s_idx, e_idx
+
+    def exp_mask(self, val, mask):
+        """Give very negative number to unmasked elements in val.
+            Same shape as val, where some elements are very small (exponentially zero)
+        """
+        VERY_NEG_NUM = -1e10
+        return tf.add(val, (1 - tf.cast(mask, 'float64')) * VERY_NEG_NUM, name="exp_mask")
 
     def setup_loss(self, preds):
         """
@@ -290,22 +298,28 @@ class QASystem(object):
         :return:
         """
         with vs.variable_scope("loss"):
-            pred_s, pred_e = preds
+            u_pred_s, u_pred_e = preds
+
+            pred_s = self.exp_mask(u_pred_s, self.mask_placeholder)
+            pred_e = self.exp_mask(u_pred_e, self.mask_placeholder)
             print("LOSS pred_s: "+str(pred_s))
             print("LOSS pred_e: "+str(pred_e))
             
             loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
             loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
+
             loss = loss_s + loss_e
         return tf.reduce_mean(loss)
-
+    
+        
     def setup_embeddings(self):
         """
         Loads distributed word representations based on placeholder tokens
         :return:
         """
         with vs.variable_scope("embeddings"):
-            embedding_tensor = tf.Variable(self.pretrained_embeddings, trainable=False)
+            # embedding_tensor = tf.Variable(self.pretrained_embeddings, trainable=False)
+            embedding_tensor = tf.cast(self.pretrained_embeddings, tf.float64)
             question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
             context_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.context_placeholder)
             question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size * self.config.n_features])
@@ -484,25 +498,31 @@ class QASystem(object):
             
             # padding
             p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
-            p_c_sent, _ = self.pad_sequence(c_sent, self.config.max_context_length)
-            ret.append([p_q_sent, q_len, p_c_sent, c_len, lab[0], lab[1]])	
+            p_c_sent, c_mask = self.pad_sequence(c_sent, self.config.max_context_length)
+            ret.append([p_q_sent, q_len, p_c_sent, c_len, c_mask, lab[0], lab[1]])	
         return np.array(ret)
     
 
-    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, start_labels_batch, end_labels_batch):
-        feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=[start_labels_batch, end_labels_batch])
+    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch, start_labels_batch, end_labels_batch):
+        feed = self.create_feed_dict(q_batch, 
+                                     q_len_batch, 
+                                     c_batch, 
+                                     c_len_batch, 
+                                     mask_batch = mask_batch,
+ 				     labels_batch=[start_labels_batch, end_labels_batch])
        
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         return loss
 
-    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch):
+    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch):
         """
         Return the predicted start index and end index (index NOT onehot).
         """
         feed = self.create_feed_dict(q_batch,
                                      q_len_batch,
                                      c_batch,
-                                     c_len_batch)
+                                     c_len_batch,
+                                     mask_batch=mask_batch)
         predictions = sess.run([tf.argmax(self.preds[0], axis=1),
                                 tf.argmax(self.preds[1], axis=1)], feed_dict=feed)
         # print(predictions)

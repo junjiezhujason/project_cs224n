@@ -132,9 +132,9 @@ def summarize_dataset(source_dir, out_dir, data_type="train"):
 
                         c_text = c_file.readline().strip().split(" ")
                         q_text = q_file.readline().strip().split(" ")
+                        # print(q_text[0])
 
-                        q_first_word = q_text[0]
-                        first_word_dict[q_first_word] += 1
+                        first_word_dict[q_text[0]] += 1
 
                         c_len = len(c_text)
                         q_len = len(q_text)
@@ -145,11 +145,15 @@ def summarize_dataset(source_dir, out_dir, data_type="train"):
                         if counter % 10000 == 0:
                             logger.info("read %d context lines" % counter)
 
+    min_freq = 100
+    for key in first_word_dict:
+        if first_word_dict[key] > min_freq :
+            print(key+": "+str(first_word_dict[key]))
 
 
 if __name__=="__main__":
     data_dir="data/squad"
     out_dir ="summary"
-    # summarize_dataset(data_dir, out_dir)
-    summarize_dataset(data_dir, out_dir, data_type="val")
+    summarize_dataset(data_dir, out_dir)
+    # summarize_dataset(data_dir, out_dir, data_type="val")
     
