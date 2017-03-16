@@ -847,11 +847,32 @@ class QASystemMatchLSTM(QASystem):
             # NOTE we only need beta_0 and beta_1 in the intermediate steps in the cell
         return beta_log 
 
+    def naive_decoder(self, H_r):
+        state_size = self.config.state_size
+        xavier_init = tf.contrib.layers.xavier_initializer()
+        max_context_length = self.config.max_context_length
+        zero_init = tf.constant_initializer(0)
+        Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, ), initializer=zero_init, dtype=tf.float64)
+        Wp_e = tf.get_variable('Wp_e', shape=(self.config.state_size*2, ), initializer=zero_init, dtype=tf.float64)
+        b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64)
+        b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float64)
+
+        with tf.variable_scope('answer_start'):
+            a_s  = tf.reshape(tf.matmul(tf.reshape(H_r, [-1, 2*self.config.state_size]), tf.expand_dims(Wp_s, 1)), [-1, max_context_length]) + b_s
+        with tf.variable_scope('answer_scope'):
+            a_e  = tf.reshape(tf.matmul(tf.reshape(H_r, [-1, 2*self.config.state_size]), tf.expand_dims(Wp_e, 1)), [-1, max_context_length]) + b_e
+        return a_s, a_e
+
+
+        
+
     def setup_system(self):
         H_p, H_q = self.setup_LSTM_preprocessing_layer()
         print('H_q is ' + str(H_q))
         print('H_p is ' + str(H_p))
         H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
+
+        """
         beta_log_scores = self.setup_pointer_layer(H_r_fw)
         # NOTE reconstruct vF + c as the predictions to input to the softmax_logit_loss
         # split the data into two
@@ -860,6 +881,8 @@ class QASystemMatchLSTM(QASystem):
         logging.debug("pred_e is "+str(pred_e))
         pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
         pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
+        """
+        pred_s, pred_e = self.naive_decoder(H_r_fw)
         
         logging.debug("pred_s is "+str(pred_s))
         logging.debug("pred_e is "+str(pred_e))
