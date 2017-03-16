@@ -305,7 +305,7 @@ class QASystem(object):
         :return:
         """
         with vs.variable_scope("embeddings"):
-            embedding_tensor = tf.Variable(self.pretrained_embeddings)
+            embedding_tensor = tf.Variable(self.pretrained_embeddings, trainable=False)
             question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
             context_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.context_placeholder)
             question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size * self.config.n_features])
