@@ -506,6 +506,7 @@ class QASystem(object):
         for i, output_res in enumerate(self.output(session, input_data)):
             # print(output_res)
             raw_context_i = raw_context[i][1]
+            # print(raw_context_i)
             true_labels, pred_labels = output_res
             true_answer = ' '.join(raw_context_i[true_labels[0]:true_labels[1]+1])
 
@@ -523,6 +524,10 @@ class QASystem(object):
             n_samples += 1
             if (n_samples == sample):
                 break
+
+            if self.config.data_size == "tiny":
+                print("*** TRUE ANSWER: "+true_answer)
+                print("*** PRED ANSWER: "+pred_answer)
 
         f1 = np.mean(f1)
         em = np.mean(em)

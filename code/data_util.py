@@ -33,7 +33,7 @@ def load_dataset(source_dir, data_mode):
 
     if data_mode=="tiny":
         max_train = 100
-        max_valid = 23
+        max_valid = 2333
 
     train = []
     valid = []
