@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source .env/bin/activate
+
 rm -r train/
 rm -r data/tmp-squad-train 
 rm -r log/
