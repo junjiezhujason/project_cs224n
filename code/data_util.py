@@ -24,7 +24,7 @@ def load_glove_embeddings(glove_path):
     logger.info("Vocabulary: {}" .format(glove.shape[0]))
     return glove
 
-def load_dataset(source_dir, data_mode):
+def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
 
     assert os.path.exists(source_dir)
 
@@ -32,8 +32,8 @@ def load_dataset(source_dir, data_mode):
     valid_pfx = pjoin(source_dir, "val")
 
     if data_mode=="tiny":
-        max_train = 100
-        max_valid = 2333
+        max_train = 10
+        max_valid = 5
 
     train = []
     valid = []
@@ -75,16 +75,28 @@ def load_dataset(source_dir, data_mode):
                                 label = map(int,line.strip().split(" "))
                                 context = map(int, c_file.readline().strip().split(" "))
                                 question = map(int,q_file.readline().strip().split(" "))
-                                entry = [question, len(question), context, len(context), label]
-                                data_list.append(entry)
-                                
                                 context_raw = r_c_file.readline().strip().split(" ")
                                 question_raw = r_q_file.readline().strip().split(" ")
+
+                                c_len = len(context)
+                                q_len = len(question)
+
+                                if q_len > max_q_toss:
+                                    logging.info("Ignoring sample with question length: "+str(q_len))
+                                    continue
+                                if c_len > max_c_toss:
+                                    logging.info("Ignoring sample with question length: "+str(c_len))
+                                    continue
+
+                                max_c_len = max(max_c_len, c_len)
+                                max_q_len = max(max_q_len, q_len)
+
+                                entry = [question, q_len, context, c_len, label]
+                                data_list.append(entry)
+                                
                                 raw_entry = [question_raw, context_raw]
                                 data_list_raw.append(raw_entry)
 
-                                max_c_len = max(max_c_len, len(context))
-                                max_q_len = max(max_q_len, len(question))
                                 counter += 1
                                 if counter % 10000 == 0:
                                     logger.info("read %d context lines" % counter)

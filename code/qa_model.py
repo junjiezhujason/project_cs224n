@@ -14,6 +14,9 @@ from tensorflow.python.ops.rnn_cell import _linear
 import tensorflow as tf
 from tensorflow.python.ops import variable_scope as vs
 
+from tensorflow.python.ops.gen_math_ops import _batch_mat_mul
+
+
 from evaluate import exact_match_score, f1_score
 from util import Progbar, minibatches
 
@@ -223,7 +226,6 @@ class QASystem(object):
         # self.preds = self.setup_system()
         u_pred_s, u_pred_e= self.setup_system()
         self.preds = (self.exp_mask(u_pred_s), self.exp_mask(u_pred_e)) # mask the start end end predictions
-        
         self.loss = self.setup_loss(self.preds)
 
         # ==== set up training/updating procedure ====
@@ -253,50 +255,67 @@ class QASystem(object):
             feed_dict[self.mask_placeholder] = mask_batch
         return feed_dict
 
-    def attention_flow_layer(self, h, u, h_mask=None, u_mask=None):
+    def attention_flow_layer(self, h, u, d, simple=False):
+        # h is context
+        # u is question
+        # d is the embedding dimension for each of them
         # Query2Context
+        P = h
+        Q = u
+        JP = self.config.max_context_length
+        JQ = self.config.max_question_length
+
         with tf.variable_scope("attn_layer"):
-            # create bi-attension layer
-            # N = tf.shape(self.context_length_placeholder)[0] # batch size
-            # JX = tf.shape(h)[1]  # maximum_context_length
-            JQ = self.config.max_question_length
-            JX = self.config.max_context_length
-            d = self.config.state_size*2
 
 	    xavier_init = tf.contrib.layers.xavier_initializer()
 	    zero_init = tf.constant_initializer(0)
-
-	    w_s = tf.get_variable('w_s', shape=(3*d, ), initializer=xavier_init, dtype=tf.float64)
-
-
-            h_aug = tf.tile(tf.expand_dims(h, 2), [1, 1, JQ, 1]) # [?, JX, JQ, d]
-            u_aug = tf.tile(tf.expand_dims(u, 1), [1, JX, 1, 1]) # [?. JX, JQ, d]
-	    h_dot_u = tf.multiply(h_aug,  u_aug)                 # [?. JX, JQ, d]
-
-            huhu = tf.concat(3, [h_aug, u_aug, h_dot_u])         # [?. JX, JQ, 3d]
             
-            logging.info("h_aug:"+str(h_aug))
-            logging.info("u_aug:"+str(u_aug))
-            logging.info("h_dot_u:"+str(h_dot_u))
-            logging.info("huhu:"+str(huhu))
+            if simple:
+	        W_s = tf.get_variable('Ws_s', shape=(2*d, d), initializer=xavier_init, dtype=tf.float64)
+	        b_s = tf.get_variable('bs_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
 
-            S_logits = tf.reshape(tf.matmul(tf.reshape(huhu, [-1, 3*d]), tf.expand_dims(w_s,1)), [-1, JX, JQ])  # S_logit to be [N, JX, JQ]
-	    logging.info("S_logits: "+str(S_logits))
-	     
-	    # u_a = softsel(u_aug, S_logits)	
-            a_t = tf.nn.softmax(S_logits, -1) # [N, JX, JQ] softmax on the question dimension
-            
-            # [N, JX, JQ] * [N, JQ, 2*d]
-            u_a = tf.matmul(a_t, u)
-	    logging.info("u_a: "+str(u_a)) 
+                QT = tf.transpose(Q, [0,2,1])
+                A = tf.nn.softmax(_batch_mat_mul(h, QT))
+                C_P = _batch_mat_mul(A, Q)
+                logging.info("C_P:"+str(C_P))
 
-            p0 = tf.concat(2, [h, u_a, h * u_a])
-	    logging.info("p0: "+str(p0))
+                P_concat = tf.concat(2, [C_P, P]) # [N, JP, 2*d]
+                logging.info("P_concat:"+str(P_concat))
 
-        return p0
+                P_out = _batch_mat_mul(P_concat, tf.expand_dims(W_s, 0)) + b_s
 
+                embed_dim = d
+
+            else:
+                w_s = tf.get_variable('w_s', shape=(3*d, ), initializer=xavier_init, dtype=tf.float64)
+
+                h_aug = tf.tile(tf.expand_dims(h, 2), [1, 1, JQ, 1]) # [?, JP, JQ, d]
+                u_aug = tf.tile(tf.expand_dims(u, 1), [1, JP, 1, 1]) # [?. JP, JQ, d]
+                h_dot_u = tf.multiply(h_aug,  u_aug)                 # [?. JP, JQ, d]
+
+                huhu = tf.concat(3, [h_aug, u_aug, h_dot_u])         # [?. JP, JQ, 3d]
+                
+                logging.info("h_aug:"+str(h_aug))
+                logging.info("u_aug:"+str(u_aug))
+                logging.info("h_dot_u:"+str(h_dot_u))
+                logging.info("huhu:"+str(huhu))
+
+                S_logits = tf.reshape(tf.matmul(tf.reshape(huhu, [-1, 3*d]), tf.expand_dims(w_s,1)), [-1, JP, JQ])  # S_logit to be [N, JP, JQ]
+                logging.info("S_logits: "+str(S_logits))
+                 
+                # u_a = softsel(u_aug, S_logits)	
+                a_t = tf.nn.softmax(S_logits, -1) # [N, JP, JQ] softmax on the question dimension
+                
+                # [N, JP, JQ] * [N, JQ, 2*d]
+                u_a = tf.matmul(a_t, u)
+                logging.info("u_a: "+str(u_a)) 
+
+                P_out = tf.concat(2, [h, u_a, h * u_a])
+                logging.info("P_out: "+str(P_out))
+                embed_dim = 3 * d
+
+        return P_out, embed_dim
     
-
     def setup_system(self):
 	"""
         After your modularized implementation of encoder and decoder
@@ -330,14 +349,19 @@ class QASystem(object):
 	logging.info("Question_paragraph_repr:"+str(question_paragraph_repr))
 	logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))
 	
-	attn_out = self.attention_flow_layer(context_paragraph_repr,question_paragraph_repr)
+        encoded_embed_dim = 2 * self.config.state_size
+	attn_out, attn_embed_dim = self.attention_flow_layer(context_paragraph_repr,
+                                                             question_paragraph_repr,
+                                                             encoded_embed_dim)
 	
 	s_idx, e_idx = self.simple_decoder(attn_out, self.config.state_size*6, self.config.max_context_length)
+	# s_idx, e_idx = self.lstm_decoder(attn_out, attn_embed_dim, self.config.max_context_length)
         
         # s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
         return s_idx, e_idx
 
     def simple_decoder(self, H_in, d, con_len):
+        logging.info("="*10+"Simple Decoder"+"="*10)
 	xavier_init = tf.contrib.layers.xavier_initializer()
 	zero_init = tf.constant_initializer(0)
 
@@ -353,12 +377,46 @@ class QASystem(object):
                 a_e  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_e, 1)), [-1, con_len]) + b_e
         return a_s, a_e
 
-    def naive_decoder(self, H_r):
+    def lstm_decoder(self, H_in, d, con_len):
+        logging.info("="*10+"LSTM Decoder"+"="*10)
+	xavier_init = tf.contrib.layers.xavier_initializer()
+	zero_init = tf.constant_initializer(0)
+
+
+        with tf.variable_scope("lstm_decoder"):
+            Wp_s = tf.get_variable('Wp_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
+            Wp_e = tf.get_variable('Wp_e', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
+            # b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64)
+            # b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float64)
+
+            with tf.variable_scope('answer_start'):
+                a_s  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_s, 1)), [-1, con_len]) #  + b_s
+
+            # implement a lstm with H_in as input and H_out where H_out will be used for the end position prediction
+            cell = tf.nn.rnn_cell.LSTMCell(num_units=d, state_is_tuple=True)
+            context_len = self.context_length_placeholder
+            H_out, _ = tf.nn.dynamic_rnn(cell=cell,
+                                         inputs=H_in,
+                                         sequence_length=context_len,
+                                         dtype=tf.float64)
+            
+            with tf.variable_scope('answer_end'):
+                a_e  = tf.reshape(tf.matmul(tf.reshape(H_out, [-1, d]), tf.expand_dims(Wp_e, 1)), [-1, con_len]) #  + b_s
+
+            # with tf.variable_scope('answer_scope'):
+            #     a_e  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_e, 1)), [-1, con_len]) + b_e
+        return a_s, a_e
+
+    def naive_decoder(self, H_r, simple=True):
 	print("="*10)
 	print("NAIVE DECODER")
         d = self.config.state_size*2
         con_len = self.config.max_context_length
-        return self.simple_decoder(H_r, d, con_len)
+        if simple:
+            self.simple_decoder(H_r, d, con_len)
+        else: 
+            self.lstm_decoder(H_r, d, con_len)
+        return 
 
     def exp_mask(self, val):
         """Give very negative number to unmasked elements in val.
@@ -381,9 +439,11 @@ class QASystem(object):
             print("LOSS pred_s: "+str(pred_s))
             print("LOSS pred_e: "+str(pred_e))
             
-            loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
+            with vs.variable_scope("start_loss"):
+                loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
 
-            loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
+            with vs.variable_scope("end_loss"):
+                loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
 
             loss = loss_s + loss_e
         return tf.reduce_mean(loss)
@@ -501,22 +561,22 @@ class QASystem(object):
         f1 = []
         em = []
         n_samples = 0
-        input_data = dataset[0]
-        raw_context = dataset[1]
+        input_data = dataset[0] # 
+        input_raw = dataset[1]
         for i, output_res in enumerate(self.output(session, input_data)):
             # print(output_res)
-            raw_context_i = raw_context[i][1]
-            # print(raw_context_i)
+            input_raw_i = input_raw[i][1]
+            # print(input_raw_i)
             true_labels, pred_labels = output_res
-            true_answer = ' '.join(raw_context_i[true_labels[0]:true_labels[1]+1])
+            true_answer = ' '.join(input_raw_i[true_labels[0]:true_labels[1]+1])
 
-            if pred_labels[0] > pred_labels[1]:
-                pred_answer = ''
+            if pred_labels[0] >= len(input_raw_i):
+                pred_answer = '<EXCEEDEND>'
             else:
-                if pred_labels[0] >= len(raw_context):
-                    pred_answer = ''
+                if pred_labels[0] > pred_labels[1]:
+                    pred_answer = '<REVERSEDSE>'
                 else:
-                    pred_answer = ' '.join(raw_context_i[pred_labels[0]:pred_labels[1]+1])
+                    pred_answer = ' '.join(input_raw_i[pred_labels[0]:pred_labels[1]+1])
             # Caculate score from golden & predicted answer strings.
             f1.append(f1_score(pred_answer, true_answer))
             em.append(exact_match_score(pred_answer, true_answer))
@@ -526,8 +586,14 @@ class QASystem(object):
                 break
 
             if self.config.data_size == "tiny":
+                input_ques_i = input_raw[i][0]
+                raw_ques = ' '.join(input_ques_i)
+                print("-"*30)
+                print("*** QUESITON: "+raw_ques)
                 print("*** TRUE ANSWER: "+true_answer)
+                print("*** TRUE INDEX:  "+str(true_labels))
                 print("*** PRED ANSWER: "+pred_answer)
+                print("*** PRED INDEX:  "+str(pred_labels))
 
         f1 = np.mean(f1)
         em = np.mean(em)
@@ -548,12 +614,19 @@ class QASystem(object):
 	# Use this zero vector when padding sequences.
 	zero_vector = [PAD_ID] * self.config.n_features
 	pad_len = max_length - len(sentence) 
-	mask = [0] * len(sentence)
+	mask = [0.0] * len(sentence)
 	if pad_len > 0: 
 	    p_sentence = sentence + [zero_vector] * pad_len 
 	    mask += [-1e10] * pad_len
 	else:
 	    p_sentence = sentence[:max_length]
+        
+        # DOUBLE_CHECKED THAT PADDING IS WORKING
+        # print("")
+        # print(sentence)
+        # print(p_sentence)
+        # print(mask)
+
 	return p_sentence, mask
 
     def featurize_window(self, sentence, window_size=1):
@@ -569,23 +642,26 @@ class QASystem(object):
 	ret = []
 	for q_sent, q_len, c_sent, c_len, lab in examples:
 
+            # TODO HANDLE THIS HERE DOUBLE CHECK WITH YIFEI
+            """
             if len(c_sent) > self.config.max_context_length:
                 if self.config.preprocess_mode == 'train':
-                    logging.info("Ignoring sample with context length: "+str(len(c_sent)))
+                    logging.info("ERROR: Ignoring sample with context length: "+str(len(c_sent)))
                     continue
                 elif self.config.preprocess_mode == 'eval':
-                    c_sent = c_sent[:self.config_max_content_length]
+                    c_sent = c_sent[:self.config_max_context_length]
                 else:
                     raise ValueError('Invalid value "%s" for flag preprocess_mode. Choose from train/eval' % self.config.preprocess_mode)
 
             if len(q_sent) > self.config.max_question_length:
                 if self.config.preprocess_mode == 'train':
-                    logging.info("Ignoring sample with question length: "+str(len(q_sent)))
+                    logging.info("ERROR: Ignoring sample with question length: "+str(len(q_sent)))
                     continue
                 elif self.config.preprocess_mode == 'eval':
                     q_sent = q_sent[:self.config_max_question_length]
                 else:
                     raise ValueError('Invalid value "%s" for flag preprocess_mode. Choose from train/eval' % self.config.preprocess_mode)
+            """
 
             # window selection
             # TODO: CHANGE LATER
@@ -625,9 +701,17 @@ class QASystem(object):
                                      mask_batch=mask_batch)
         predictions = sess.run([tf.argmax(self.preds[0], axis=1),
                                 tf.argmax(self.preds[1], axis=1)], feed_dict=feed)
-        # print(predictions)
-        # predictions = np.transpose(predictions)
-        # print(predictions)
+
+        # DEBUG
+        # start_probs = (sess.run(self.preds[0], feed_dict=feed))
+        # end_probs = (sess.run(self.preds[1], feed_dict=feed))
+        # for i in range(len(predictions)):
+        #     print("---Predict start:"+str(predictions[0][i]))
+        #     print(start_probs[i])
+        #     print("---Predict end:"+str(predictions[1][i]))
+        #     print(end_probs[i])
+        #     print(" ")
+
         return predictions
 
     def run_epoch(self, sess, train_set, valid_set, train_raw, valid_raw):
@@ -635,6 +719,7 @@ class QASystem(object):
         n_train_examples = len(train_examples)
         #print(train_examples)
         prog = Progbar(target=1 + int(n_train_examples / self.config.batch_size))
+
 
         for i, batch in enumerate(minibatches(train_examples, self.config.batch_size)):
             loss = self.train_on_batch(sess, *batch)
