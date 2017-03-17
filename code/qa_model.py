@@ -229,7 +229,6 @@ class QASystem(object):
 
         self.saver = tf.train.Saver()
 
-    
     # TODO: add label etc.
     def create_feed_dict(self, 
                          question_batch, 
@@ -251,8 +250,6 @@ class QASystem(object):
             feed_dict[self.mask_placeholder] = mask_batch
         return feed_dict
 
-
-
     def attention_flow_layer(self, h, u, h_mask=None, u_mask=None):
         # Query2Context
         with tf.variable_scope("attn_layer"):
@@ -269,11 +266,11 @@ class QASystem(object):
 	    w_s = tf.get_variable('w_s', shape=(3*d, ), initializer=xavier_init, dtype=tf.float64)
 
 
-            h_aug = tf.tile(tf.expand_dims(h, 2), [1, 1, JQ, 1]) # [?, 1, JQ, d]
-            u_aug = tf.tile(tf.expand_dims(u, 1), [1, JX, 1, 1]) # [?. JX, 1, d]
-	    h_dot_u = tf.multiply(h_aug,  u_aug)
+            h_aug = tf.tile(tf.expand_dims(h, 2), [1, 1, JQ, 1]) # [?, JX, JQ, d]
+            u_aug = tf.tile(tf.expand_dims(u, 1), [1, JX, 1, 1]) # [?. JX, JQ, d]
+	    h_dot_u = tf.multiply(h_aug,  u_aug)                 # [?. JX, JQ, d]
 
-            huhu = tf.concat(3, [h_aug, u_aug, h_dot_u])
+            huhu = tf.concat(3, [h_aug, u_aug, h_dot_u])         # [?. JX, JQ, 3d]
             
             logging.info("h_aug:"+str(h_aug))
             logging.info("u_aug:"+str(u_aug))
@@ -281,34 +278,21 @@ class QASystem(object):
             logging.info("huhu:"+str(huhu))
 
             S_logits = tf.reshape(tf.matmul(tf.reshape(huhu, [-1, 3*d]), tf.expand_dims(w_s,1)), [-1, JX, JQ])  # S_logit to be [N, JX, JQ]
-
-	    # get logits
-            # args = [h_aug, u_aug]
-	    # if not nest.is_sequence(args):
-            # 	args = [args]
-	    # flat_args = [flatten(arg, 1) for arg in args]
-	    # 
-	    # logging.info("flat_args: "+str(flat_args))
-
-	    # flat_out = _linear(flat_args, 1, False)
-	    # out = reconstruct(flat_out, args[0], 1) 
-            # S_logits = tf.squeeze(out, [len(args[0].get_shape().as_list())-1])# [N, JX, JQ]
-	    
 	    logging.info("S_logits: "+str(S_logits))
 	     
 	    # u_a = softsel(u_aug, S_logits)	
             a_t = tf.nn.softmax(S_logits, -1) # [N, JX, JQ] softmax on the question dimension
-
+            
             # [N, JX, JQ] * [N, JQ, 2*d]
             u_a = tf.matmul(a_t, u)
-
 	    logging.info("u_a: "+str(u_a)) 
 
             p0 = tf.concat(2, [h, u_a, h * u_a])
-
 	    logging.info("p0: "+str(p0))
-	    
+
         return p0
+
+    
 
     def setup_system(self):
 	"""
@@ -346,7 +330,7 @@ class QASystem(object):
 	attn_out = self.attention_flow_layer(context_paragraph_repr,question_paragraph_repr)
 	
 	s_idx, e_idx = self.simple_decoder(attn_out, self.config.state_size*6, self.config.max_context_length)
-	
+        
         # s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
         return s_idx, e_idx
 
@@ -540,8 +524,7 @@ class QASystem(object):
         f1 = np.mean(f1)
         em = np.mean(em)
 
-        if log:
-            logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, sample))
+        logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, sample))
 
         return f1, em
 
@@ -647,10 +630,14 @@ class QASystem(object):
         #logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
         #logging.debug("Token-level scores:\n" + token_cm.summary())
         #logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
+        train_dataset = [train_examples, train_raw]
+        _, _ = self.evaluate_answer(sess, train_dataset)
 
+        logging.info("*"*20)
+        logging.info("Evaluating on training data")
         valid_examples = self.preprocess_question_answer(valid_set)
+        logging.info("*"*20)
         logging.info("Evaluating on development data")
-
         valid_dataset = [valid_examples,valid_raw]
         f1, em = self.evaluate_answer(sess, valid_dataset)
 
@@ -738,7 +725,6 @@ class QASystem(object):
             # Ignore predict
             batch_input = batch[:-2]
             preds_ = self.predict_on_batch(sess, *batch_input)
-
             pred += list((np.transpose(preds_)))     # pred for this batch
             true += list(np.transpose(batch[-2:])) # true for this batch
             prog.update(i + 1, [])
