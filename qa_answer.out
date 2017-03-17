@@ -1,0 +1,540 @@
+nohup: ignoring input
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcublas.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcudnn.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcufft.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcuda.so.1 locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcurand.so locally
+dev-v1.1.json: 0.00B [00:00, ?B/s]dev-v1.1.json:   0%|          | 8.19K/4.85M [00:00<02:11, 36.7KB/s]dev-v1.1.json:  10%|#         | 492K/4.85M [00:00<01:23, 52.3KB/s] dev-v1.1.json:  29%|##9       | 1.41M/4.85M [00:00<00:46, 74.5KB/s]dev-v1.1.json:  59%|#####9    | 2.87M/4.85M [00:00<00:18, 106KB/s] dev-v1.1.json: 4.86MB [00:00, 7.89MB/s]                           
+Preprocessing dev:   0%|          | 0/48 [00:00<?, ?it/s]Preprocessing dev:   2%|2         | 1/48 [00:00<00:19,  2.36it/s]Preprocessing dev:   4%|4         | 2/48 [00:00<00:16,  2.87it/s]Preprocessing dev:   6%|6         | 3/48 [00:00<00:12,  3.61it/s]Preprocessing dev:   8%|8         | 4/48 [00:01<00:12,  3.55it/s]Preprocessing dev:  10%|#         | 5/48 [00:01<00:10,  4.24it/s]Preprocessing dev:  12%|#2        | 6/48 [00:01<00:08,  4.73it/s]Preprocessing dev:  15%|#4        | 7/48 [00:01<00:09,  4.26it/s]Preprocessing dev:  17%|#6        | 8/48 [00:01<00:07,  5.13it/s]Preprocessing dev:  21%|##        | 10/48 [00:01<00:06,  6.32it/s]Preprocessing dev:  23%|##2       | 11/48 [00:01<00:05,  6.62it/s]Preprocessing dev:  25%|##5       | 12/48 [00:02<00:05,  6.82it/s]Preprocessing dev:  27%|##7       | 13/48 [00:02<00:04,  7.01it/s]Preprocessing dev:  31%|###1      | 15/48 [00:02<00:04,  7.42it/s]Preprocessing dev:  33%|###3      | 16/48 [00:02<00:05,  6.11it/s]Preprocessing dev:  38%|###7      | 18/48 [00:02<00:04,  6.95it/s]Preprocessing dev:  42%|####1     | 20/48 [00:03<00:03,  8.29it/s]Preprocessing dev:  46%|####5     | 22/48 [00:03<00:02,  9.62it/s]Preprocessing dev:  50%|#####     | 24/48 [00:03<00:02,  8.30it/s]Preprocessing dev:  54%|#####4    | 26/48 [00:03<00:03,  6.99it/s]Preprocessing dev:  58%|#####8    | 28/48 [00:04<00:02,  7.70it/s]Preprocessing dev:  62%|######2   | 30/48 [00:04<00:02,  8.94it/s]Preprocessing dev:  67%|######6   | 32/48 [00:04<00:01, 10.13it/s]Preprocessing dev:  73%|#######2  | 35/48 [00:04<00:01, 10.90it/s]Preprocessing dev:  77%|#######7  | 37/48 [00:04<00:01, 10.02it/s]Preprocessing dev:  81%|########1 | 39/48 [00:04<00:00, 10.02it/s]Preprocessing dev:  85%|########5 | 41/48 [00:05<00:00,  9.52it/s]Preprocessing dev:  90%|########9 | 43/48 [00:05<00:00,  9.29it/s]Preprocessing dev:  94%|#########3| 45/48 [00:05<00:00,  9.46it/s]Preprocessing dev:  96%|#########5| 46/48 [00:05<00:00,  9.05it/s]Preprocessing dev:  98%|#########7| 47/48 [00:05<00:00,  9.21it/s]Preprocessing dev: 100%|##########| 48/48 [00:05<00:00,  8.99it/s]
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:Which NFL team represented the AFC at Super Bowl 50 ?
+DEBUG:question_data
+DEBUG:253 6202 365 1438 3 40587 31 2091 3804 1026 18
+DEBUG:uuid_data
+DEBUG:56be4db0acb8001400a502ec
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:Which NFL team represented the NFC at Super Bowl 50 ?
+DEBUG:question_data
+DEBUG:253 6202 365 1438 3 50023 31 2091 3804 1026 18
+DEBUG:uuid_data
+DEBUG:56be4db0acb8001400a502ed
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:Where did Super Bowl 50 take place ?
+DEBUG:question_data
+DEBUG:305 48 2091 3804 1026 377 256 18
+DEBUG:uuid_data
+DEBUG:56be4db0acb8001400a502ee
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:Which NFL team won Super Bowl 50 ?
+DEBUG:question_data
+DEBUG:253 6202 365 425 2091 3804 1026 18
+DEBUG:uuid_data
+DEBUG:56be4db0acb8001400a502ef
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:What color was used to emphasize the 50th anniversary of the Super Bowl ?
+DEBUG:question_data
+DEBUG:32 652 13 62 9 9919 3 18706 3819 5 3 2091 3804 18
+DEBUG:uuid_data
+DEBUG:56be4db0acb8001400a502f0
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:What was the theme of Super Bowl 50 ?
+DEBUG:question_data
+DEBUG:32 13 3 2681 5 2091 3804 1026 18
+DEBUG:uuid_data
+DEBUG:56be8e613aeaaa14008c90d1
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:What day was the game played on ?
+DEBUG:question_data
+DEBUG:32 278 13 3 454 416 24 18
+DEBUG:uuid_data
+DEBUG:56be8e613aeaaa14008c90d2
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:What is the AFC short for ?
+DEBUG:question_data
+DEBUG:32 12 3 40587 838 19 18
+DEBUG:uuid_data
+DEBUG:56be8e613aeaaa14008c90d3
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:What was the theme of Super Bowl 50 ?
+DEBUG:question_data
+DEBUG:32 13 3 2681 5 2091 3804 1026 18
+DEBUG:uuid_data
+DEBUG:56bea9923aeaaa14008c91b9
+DEBUG:context
+DEBUG:Super Bowl 50 was an American football game to determine the champion of the National Football League ( NFL ) for the 2015 season . The American Football Conference ( AFC ) champion Denver Broncos defeated the National Football Conference ( NFC ) champion Carolina Panthers 24–10 to earn their third Super Bowl title . The game was played on February 7 , 2016 , at Levi 's Stadium in the San Francisco Bay Area at Santa Clara , California . As this was the 50th Super Bowl , the league emphasized the " golden anniversary " with various gold-themed initiatives , as well as temporarily suspending the tradition of naming each Super Bowl game with Roman numerals ( under which the game would have been known as " Super Bowl L " ) , so that the logo could prominently feature the Arabic numerals 50 .
+DEBUG:context_data
+DEBUG:2091 3804 1026 13 33 121 685 454 9 2485 3 5996 5 3 239 1232 294 17 6202 16 19 3 516 235 6 14 121 1232 2971 17 40587 16 5996 12107 70645 1137 3 239 1232 2971 17 50023 16 5996 855 19718 2 9 6861 40 396 2091 3804 702 6 14 454 13 416 24 499 870 4 2281 4 31 29420 23 2235 8 3 585 3064 1552 3504 31 1607 26456 4 1609 6 163 51 13 3 18706 2091 3804 4 3 1010 5219 3 11 4186 3819 11 22 283 2 6438 4 15 116 15 4341 18940 3 816 5 6502 167 2091 3804 454 22 197 14229 17 104 29 3 454 81 36 52 86 15 11 2091 3804 13996 11 16 4 175 21 3 5804 147 8847 1060 3 1927 14229 1026 6
+DEBUG:question
+DEBUG:What does AFC stand for ?
+DEBUG:question_data
+DEBUG:32 138 40587 2282 19 18
+DEBUG:uuid_data
+DEBUG:56bea9923aeaaa14008c91ba
+INFO:Loading glove embedding
+INFO:Dimension: 100
+INFO:Vocabulary: 115613
+DEBUG:==========Encoder==========
+DEBUG:Inputs is Tensor("embeddings/Reshape:0", shape=(?, 34, 100), dtype=float64)
+DEBUG:Shape of concatenated BiRNN hidden states is Tensor("q/concat:0", shape=(?, 34, 400), dtype=float64)
+DEBUG:Shape of BiRNN foward m final_state is Tensor("q/BiRNN/BW/BW/while/Exit_3:0", shape=(?, 200), dtype=float64)
+DEBUG:Shape of concatenated BiRNN final hiden state is Tensor("q/concat_1:0", shape=(?, 400), dtype=float64)
+DEBUG:==========Encoder==========
+DEBUG:Inputs is Tensor("embeddings/Reshape_1:0", shape=(?, 766, 100), dtype=float64)
+DEBUG:Shape of concatenated BiRNN hidden states is Tensor("c/concat:0", shape=(?, 766, 400), dtype=float64)
+DEBUG:Shape of BiRNN foward m final_state is Tensor("c/BiRNN/BW/BW/while/Exit_3:0", shape=(?, 200), dtype=float64)
+DEBUG:Shape of concatenated BiRNN final hiden state is Tensor("c/concat_1:0", shape=(?, 400), dtype=float64)
+DEBUG:==========Decoder==========
+DEBUG:Input knowledge_rep is (<tf.Tensor 'q/concat_1:0' shape=(?, 400) dtype=float64>, <tf.Tensor 'c/concat_1:0' shape=(?, 400) dtype=float64>)
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:885] Found device 0 with properties: 
+name: Tesla M60
+major: 5 minor: 2 memoryClockRate (GHz) 1.1775
+pciBusID b150:00:00.0
+Total memory: 7.93GiB
+Free memory: 266.94MiB
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:906] DMA: 0 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:916] 0:   Y 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:975] Creating TensorFlow device (/gpu:0) -> (device: 0, name: Tesla M60, pci bus id: b150:00:00.0)
+INFO:Reading model parameters from /tmp/cs224n-squad-train/20170314_085730
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (256): 	Total Chunks: 1, Chunks in use: 0 256B allocated for chunks. 4B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (512): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1024): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2048): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4096): 	Total Chunks: 2, Chunks in use: 0 12.0KiB allocated for chunks. 2.34MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8192): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16384): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (32768): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (65536): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (131072): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (262144): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (524288): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1048576): 	Total Chunks: 2, Chunks in use: 0 3.62MiB allocated for chunks. 1.83MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2097152): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4194304): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8388608): 	Total Chunks: 1, Chunks in use: 0 10.30MiB allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16777216): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (33554432): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (67108864): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (134217728): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (268435456): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:660] Bin for 88.21MiB was 64.00MiB, Chunk State: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107080000 of size 1280
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107081e00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107083700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107085000 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107259c00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725b500 of size 6656
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725cf00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107431b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107606700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107608000 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107609900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760b200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760cb00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760e400 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760fd00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107611600 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de500 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077dff00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e1700 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e2f00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11079b7b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8c700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8df00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8f700 of size 2457344
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107fbc200 of size 2982400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108294400 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11084eab00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108741200 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108997900 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108bee000 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108e44700 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110909ae00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11092f1500 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109547c00 of size 4377600
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109974800 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109b49400 of size 1926400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d1f900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d21200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d22b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109ef7700 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a0cc300 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a322a00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a579100 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a74dd00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107080500 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107612f00 of size 1881600
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077de600 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077e1800 of size 5888
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107de7600 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x110a922900 of size 10802944
+I tensorflow/core/common_runtime/bfc_allocator.cc:693]      Summary of in-use Chunks by size: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 2 Chunks of size 256 totalling 512B
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1280 totalling 1.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 4 Chunks of size 6144 totalling 24.0KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 13 Chunks of size 6400 totalling 81.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 6656 totalling 6.5KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 1920000 totalling 18.31MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1926400 totalling 1.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 2451200 totalling 23.38MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2457344 totalling 2.34MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2982400 totalling 2.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 4377600 totalling 4.17MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:700] Sum Total of in-use chunks: 53.00MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:702] Stats: 
+Limit:                    70189056
+InUse:                    55571968
+MaxInUse:                 57485568
+NumAllocs:                      89
+MaxAllocSize:              4377600
+
+W tensorflow/core/common_runtime/bfc_allocator.cc:274] *********__**********_****x********************************xx************************_______________
+W tensorflow/core/common_runtime/bfc_allocator.cc:275] Ran out of memory trying to allocate 88.21MiB.  See logs for memory state.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (256): 	Total Chunks: 1, Chunks in use: 0 256B allocated for chunks. 4B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (512): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1024): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2048): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4096): 	Total Chunks: 2, Chunks in use: 0 12.0KiB allocated for chunks. 2.34MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8192): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16384): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (32768): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (65536): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (131072): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (262144): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (524288): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1048576): 	Total Chunks: 2, Chunks in use: 0 3.62MiB allocated for chunks. 1.83MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2097152): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4194304): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8388608): 	Total Chunks: 1, Chunks in use: 0 10.30MiB allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16777216): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (33554432): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (67108864): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (134217728): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (268435456): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:660] Bin for 88.21MiB was 64.00MiB, Chunk State: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107080000 of size 1280
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107081e00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107083700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107085000 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107259c00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725b500 of size 6656
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725cf00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107431b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107606700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107608000 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107609900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760b200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760cb00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760e400 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760fd00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107611600 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de500 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077dff00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e1700 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e2f00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11079b7b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8c700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8df00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8f700 of size 2457344
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107fbc200 of size 2982400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108294400 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11084eab00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108741200 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108997900 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108bee000 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108e44700 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110909ae00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11092f1500 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109547c00 of size 4377600
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109974800 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109b49400 of size 1926400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d1f900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d21200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d22b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109ef7700 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a0cc300 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a322a00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a579100 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a74dd00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107080500 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107612f00 of size 1881600
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077de600 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077e1800 of size 5888
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107de7600 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x110a922900 of size 10802944
+I tensorflow/core/common_runtime/bfc_allocator.cc:693]      Summary of in-use Chunks by size: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 2 Chunks of size 256 totalling 512B
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1280 totalling 1.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 4 Chunks of size 6144 totalling 24.0KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 13 Chunks of size 6400 totalling 81.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 6656 totalling 6.5KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 1920000 totalling 18.31MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1926400 totalling 1.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 2451200 totalling 23.38MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2457344 totalling 2.34MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2982400 totalling 2.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 4377600 totalling 4.17MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:700] Sum Total of in-use chunks: 53.00MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:702] Stats: 
+Limit:                    70189056
+InUse:                    55571968
+MaxInUse:                 57485568
+NumAllocs:                      89
+MaxAllocSize:              4377600
+
+W tensorflow/core/common_runtime/bfc_allocator.cc:274] *********__**********_****x********************************xx************************_______________
+W tensorflow/core/common_runtime/bfc_allocator.cc:275] Ran out of memory trying to allocate 88.21MiB.  See logs for memory state.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (256): 	Total Chunks: 1, Chunks in use: 0 256B allocated for chunks. 4B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (512): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1024): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2048): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4096): 	Total Chunks: 2, Chunks in use: 0 12.0KiB allocated for chunks. 2.34MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8192): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16384): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (32768): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (65536): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (131072): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (262144): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (524288): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1048576): 	Total Chunks: 2, Chunks in use: 0 3.62MiB allocated for chunks. 1.83MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2097152): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4194304): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8388608): 	Total Chunks: 1, Chunks in use: 0 10.30MiB allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16777216): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (33554432): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (67108864): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (134217728): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (268435456): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:660] Bin for 88.21MiB was 64.00MiB, Chunk State: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107080000 of size 1280
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107081e00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107083700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107085000 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107259c00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725b500 of size 6656
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725cf00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107431b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107606700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107608000 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107609900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760b200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760cb00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760e400 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760fd00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107611600 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de500 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077dff00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e1700 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e2f00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11079b7b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8c700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8df00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8f700 of size 2457344
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107fbc200 of size 2982400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108294400 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11084eab00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108741200 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108997900 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108bee000 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108e44700 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110909ae00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11092f1500 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109547c00 of size 4377600
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109974800 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109b49400 of size 1926400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d1f900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d21200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d22b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109ef7700 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a0cc300 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a322a00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a579100 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a74dd00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107080500 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107612f00 of size 1881600
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077de600 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077e1800 of size 5888
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107de7600 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x110a922900 of size 10802944
+I tensorflow/core/common_runtime/bfc_allocator.cc:693]      Summary of in-use Chunks by size: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 2 Chunks of size 256 totalling 512B
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1280 totalling 1.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 4 Chunks of size 6144 totalling 24.0KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 13 Chunks of size 6400 totalling 81.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 6656 totalling 6.5KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 1920000 totalling 18.31MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1926400 totalling 1.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 2451200 totalling 23.38MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2457344 totalling 2.34MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2982400 totalling 2.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 4377600 totalling 4.17MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:700] Sum Total of in-use chunks: 53.00MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:702] Stats: 
+Limit:                    70189056
+InUse:                    55571968
+MaxInUse:                 57485568
+NumAllocs:                      89
+MaxAllocSize:              4377600
+
+W tensorflow/core/common_runtime/bfc_allocator.cc:274] *********__**********_****x********************************xx************************_______________
+W tensorflow/core/common_runtime/bfc_allocator.cc:275] Ran out of memory trying to allocate 88.21MiB.  See logs for memory state.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (256): 	Total Chunks: 1, Chunks in use: 0 256B allocated for chunks. 4B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (512): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1024): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2048): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4096): 	Total Chunks: 2, Chunks in use: 0 12.0KiB allocated for chunks. 2.34MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8192): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16384): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (32768): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (65536): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (131072): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (262144): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (524288): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1048576): 	Total Chunks: 2, Chunks in use: 0 3.62MiB allocated for chunks. 1.83MiB client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2097152): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4194304): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8388608): 	Total Chunks: 1, Chunks in use: 0 10.30MiB allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16777216): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (33554432): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (67108864): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (134217728): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (268435456): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:660] Bin for 88.21MiB was 64.00MiB, Chunk State: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107080000 of size 1280
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107081e00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107083700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107085000 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107259c00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725b500 of size 6656
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110725cf00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107431b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107606700 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107608000 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107609900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760b200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760cb00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760e400 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110760fd00 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107611600 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de500 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077de700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077dff00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e1700 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11077e2f00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11079b7b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8c700 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8df00 of size 6144
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107b8f700 of size 2457344
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107fbc200 of size 2982400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108294400 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11084eab00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108741200 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108997900 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108bee000 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1108e44700 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110909ae00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x11092f1500 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109547c00 of size 4377600
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109974800 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109b49400 of size 1926400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d1f900 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d21200 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109d22b00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1109ef7700 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a0cc300 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a322a00 of size 2451200
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a579100 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x110a74dd00 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107080500 of size 6400
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107612f00 of size 1881600
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077de600 of size 256
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x11077e1800 of size 5888
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107de7600 of size 1920000
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x110a922900 of size 10802944
+I tensorflow/core/common_runtime/bfc_allocator.cc:693]      Summary of in-use Chunks by size: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 2 Chunks of size 256 totalling 512B
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1280 totalling 1.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 4 Chunks of size 6144 totalling 24.0KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 13 Chunks of size 6400 totalling 81.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 6656 totalling 6.5KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 1920000 totalling 18.31MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1926400 totalling 1.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 10 Chunks of size 2451200 totalling 23.38MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2457344 totalling 2.34MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 2982400 totalling 2.84MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 4377600 totalling 4.17MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:700] Sum Total of in-use chunks: 53.00MiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:702] Stats: 
+Limit:                    70189056
+InUse:                    55571968
+MaxInUse:                 57485568
+NumAllocs:                      89
+MaxAllocSize:              4377600
+
+W tensorflow/core/common_runtime/bfc_allocator.cc:274] *********__**********_****x********************************xx************************_______________
+W tensorflow/core/common_runtime/bfc_allocator.cc:275] Ran out of memory trying to allocate 88.21MiB.  See logs for memory state.
+{'__flags': {'embedding_size': 100, 'optimizer': 'adam', 'output_size': 750, 'vocab_path': 'data/squad/vocab.dat', 'learning_rate': 0.001, 'max_context_length': 1000, 'dev_path': 'data/squad/dev-v1.1.json', 'batch_size': 10, 'state_size': 200, 'epochs': 0, 'train_dir': 'train', 'log_dir': 'log', 'window_length': 1, 'embed_path': '', 'dropout': 0.15, 'model': 'baseline', 'max_question_length': 100, 'label_size': 2, 'n_features': 1, 'keep': 0}, '__parsed': True}
+Downloading file https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json...
+File dev-v1.1.json successfully loaded
+max question lengti is 34
+max context_length is 700
+Tensor("Placeholder:0", shape=(?, 34, 1), dtype=int64)
+Traceback (most recent call last):
+  File "code/qa_answer.py", line 257, in <module>
+    tf.app.run()
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/platform/app.py", line 43, in run
+    sys.exit(main(sys.argv[:1] + flags_passthrough))
+  File "code/qa_answer.py", line 248, in main
+    initialize_model(sess, qa, train_dir)
+  File "code/qa_answer.py", line 56, in initialize_model
+    model.saver.restore(session, ckpt.model_checkpoint_path)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/training/saver.py", line 1388, in restore
+    {self.saver_def.filename_tensor_name: save_path})
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 766, in run
+    run_metadata_ptr)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 964, in _run
+    feed_dict_string, options, run_metadata)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1014, in _do_run
+    target_list, options, run_metadata)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1034, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InternalError: Dst tensor is not initialized.
+	 [[Node: save/RestoreV2_47/_95 = _Recv[client_terminated=false, recv_device="/job:localhost/replica:0/task:0/gpu:0", send_device="/job:localhost/replica:0/task:0/cpu:0", send_device_incarnation=1, tensor_name="edge_82_save/RestoreV2_47", tensor_type=DT_DOUBLE, _device="/job:localhost/replica:0/task:0/gpu:0"]()]]

@@ -1,0 +1,3 @@
+cl run -- name run - predict -- request - docker - image sckoo / cs224n - squad : v4 \
+: code : data : train dev . json :0 x4870af2556994b0687a1927fcec66392 \
+’python code/qa_answer . py --dev_path dev.json ’

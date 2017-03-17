@@ -14,7 +14,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Decoder, Mixer
+from qa_model import Encoder, QASystem, Decoder, Mixer, QASystemMatchLSTM
 from preprocessing.squad_preprocess import data_from_json, maybe_download, squad_base_url, \
     invert_map, tokenize, token_idx_map
 import qa_data
@@ -25,6 +25,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 FLAGS = tf.app.flags.FLAGS
+
 
 tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
@@ -47,6 +48,8 @@ tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for 
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("optimizer", "adam", "adam / sgd")
+tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
+
 
 def initialize_model(session, model, train_dir):
     ckpt = tf.train.get_checkpoint_state(train_dir)
@@ -241,7 +244,10 @@ def main(_):
     mixer = Mixer()
     decoder = Decoder(FLAGS)
 
-    qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    if FLAGS.model == 'baseline':
+        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    else:
+        qa = QASystemMatchLSTM(FLAGS, embeddings)
 
     with tf.Session() as sess:
         train_dir = get_normalized_train_dir(FLAGS.train_dir)

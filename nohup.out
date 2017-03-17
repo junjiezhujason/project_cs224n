@@ -1,0 +1,3913 @@
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcublas.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcudnn.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcufft.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcuda.so.1 locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcurand.so locally
+INFO:
+INFO:Loading training data
+INFO:read 10000 context lines
+INFO:read 20000 context lines
+INFO:read 30000 context lines
+INFO:read 40000 context lines
+INFO:read 50000 context lines
+INFO:read 60000 context lines
+INFO:read 70000 context lines
+INFO:read 80000 context lines
+INFO:read 81386 questions in total
+INFO:maximum question length 60
+INFO:maximum context length 766
+INFO:
+INFO:Loading validation data
+INFO:read 4284 questions in total
+INFO:maximum question length 60
+INFO:maximum context length 766
+INFO:Loading glove embedding
+INFO:Dimension: 100
+INFO:Vocabulary: 115613
+DEBUG:W_q is Tensor("match_LSTM/W_q/read:0", shape=(150, 150), dtype=float64)
+DEBUG:H_q is Tensor("q/RNN/transpose:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_1 isTensor("match_LSTM_1/BiRNN/FW/FW/while/Reshape_1:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_2 isTensor("match_LSTM_1/BiRNN/FW/FW/while/ExpandDims:0", shape=(?, 1, 150), dtype=float64)
+DEBUG:G isTensor("match_LSTM_1/BiRNN/FW/FW/while/Tanh:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:a isTensor("match_LSTM_1/BiRNN/FW/FW/while/Softmax:0", shape=(?, 60), dtype=float64)
+DEBUG:z_part2 is Tensor("match_LSTM_1/BiRNN/FW/FW/while/Reshape_4:0", shape=(?, 150), dtype=float64)
+DEBUG:z is Tensor("match_LSTM_1/BiRNN/FW/FW/while/concat_v2:0", shape=(?, 300), dtype=float64)
+DEBUG:W_q is Tensor("match_LSTM/W_q/read:0", shape=(150, 150), dtype=float64)
+DEBUG:H_q is Tensor("q/RNN/transpose:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_1 isTensor("match_LSTM_1/BiRNN/BW/BW/while/Reshape_1:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_2 isTensor("match_LSTM_1/BiRNN/BW/BW/while/ExpandDims:0", shape=(?, 1, 150), dtype=float64)
+DEBUG:G isTensor("match_LSTM_1/BiRNN/BW/BW/while/Tanh:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:a isTensor("match_LSTM_1/BiRNN/BW/BW/while/Softmax:0", shape=(?, 60), dtype=float64)
+DEBUG:z_part2 is Tensor("match_LSTM_1/BiRNN/BW/BW/while/Reshape_4:0", shape=(?, 150), dtype=float64)
+DEBUG:z is Tensor("match_LSTM_1/BiRNN/BW/BW/while/concat_v2:0", shape=(?, 300), dtype=float64)
+DEBUG:H_r_tuple is(<tf.Tensor 'match_LSTM_1/BiRNN/FW/FW/transpose:0' shape=(?, 766, 150) dtype=float64>, <tf.Tensor 'match_LSTM_1/ReverseSequence:0' shape=(?, 766, 150) dtype=float64>)
+DEBUG:H_r isTensor("concat:0", shape=(?, 766, 300), dtype=float64)
+DEBUG:pred_s is Tensor("answer_start/add:0", shape=(?, 766), dtype=float64)
+DEBUG:pred_e is Tensor("answer_scope/add:0", shape=(?, 766), dtype=float64)
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:885] Found device 0 with properties: 
+name: Tesla M60
+major: 5 minor: 2 memoryClockRate (GHz) 1.1775
+pciBusID b150:00:00.0
+Total memory: 7.93GiB
+Free memory: 7.86GiB
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:906] DMA: 0 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:916] 0:   Y 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:975] Creating TensorFlow device (/gpu:0) -> (device: 0, name: Tesla M60, pci bus id: b150:00:00.0)
+INFO:Created model with fresh parameters.
+INFO:Num params: 910803
+INFO:Number of params: 910803 (retreival took 1.150565 secs)
+INFO:Epoch 1 out of 10
+INFO:Best score so far: 0.0
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcublas.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcudnn.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcufft.so locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcuda.so.1 locally
+I tensorflow/stream_executor/dso_loader.cc:128] successfully opened CUDA library libcurand.so locally
+INFO:
+INFO:Loading training data
+INFO:read 10000 context lines
+INFO:read 20000 context lines
+INFO:read 30000 context lines
+INFO:read 40000 context lines
+INFO:read 50000 context lines
+INFO:read 60000 context lines
+INFO:read 70000 context lines
+INFO:read 80000 context lines
+INFO:read 81386 questions in total
+INFO:maximum question length 60
+INFO:maximum context length 766
+INFO:
+INFO:Loading validation data
+INFO:read 4284 questions in total
+INFO:maximum question length 60
+INFO:maximum context length 766
+INFO:Loading glove embedding
+INFO:Dimension: 100
+INFO:Vocabulary: 115613
+DEBUG:W_q is Tensor("match_LSTM/W_q/read:0", shape=(150, 150), dtype=float64)
+DEBUG:H_q is Tensor("q/RNN/transpose:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_1 isTensor("match_LSTM_1/BiRNN/FW/FW/while/Reshape_1:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_2 isTensor("match_LSTM_1/BiRNN/FW/FW/while/ExpandDims:0", shape=(?, 1, 150), dtype=float64)
+DEBUG:G isTensor("match_LSTM_1/BiRNN/FW/FW/while/Tanh:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:a isTensor("match_LSTM_1/BiRNN/FW/FW/while/Softmax:0", shape=(?, 60), dtype=float64)
+DEBUG:z_part2 is Tensor("match_LSTM_1/BiRNN/FW/FW/while/Reshape_4:0", shape=(?, 150), dtype=float64)
+DEBUG:z is Tensor("match_LSTM_1/BiRNN/FW/FW/while/concat_v2:0", shape=(?, 300), dtype=float64)
+DEBUG:W_q is Tensor("match_LSTM/W_q/read:0", shape=(150, 150), dtype=float64)
+DEBUG:H_q is Tensor("q/RNN/transpose:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_1 isTensor("match_LSTM_1/BiRNN/BW/BW/while/Reshape_1:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:G_2 isTensor("match_LSTM_1/BiRNN/BW/BW/while/ExpandDims:0", shape=(?, 1, 150), dtype=float64)
+DEBUG:G isTensor("match_LSTM_1/BiRNN/BW/BW/while/Tanh:0", shape=(?, 60, 150), dtype=float64)
+DEBUG:a isTensor("match_LSTM_1/BiRNN/BW/BW/while/Softmax:0", shape=(?, 60), dtype=float64)
+DEBUG:z_part2 is Tensor("match_LSTM_1/BiRNN/BW/BW/while/Reshape_4:0", shape=(?, 150), dtype=float64)
+DEBUG:z is Tensor("match_LSTM_1/BiRNN/BW/BW/while/concat_v2:0", shape=(?, 300), dtype=float64)
+DEBUG:H_r_tuple is(<tf.Tensor 'match_LSTM_1/BiRNN/FW/FW/transpose:0' shape=(?, 766, 150) dtype=float64>, <tf.Tensor 'match_LSTM_1/ReverseSequence:0' shape=(?, 766, 150) dtype=float64>)
+DEBUG:H_r isTensor("concat:0", shape=(?, 766, 300), dtype=float64)
+DEBUG:pred_s is Tensor("answer_start/add:0", shape=(?, 766), dtype=float64)
+DEBUG:pred_e is Tensor("answer_scope/add:0", shape=(?, 766), dtype=float64)
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:885] Found device 0 with properties: 
+name: Tesla M60
+major: 5 minor: 2 memoryClockRate (GHz) 1.1775
+pciBusID b150:00:00.0
+Total memory: 7.93GiB
+Free memory: 268.94MiB
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:906] DMA: 0 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:916] 0:   Y 
+I tensorflow/core/common_runtime/gpu/gpu_device.cc:975] Creating TensorFlow device (/gpu:0) -> (device: 0, name: Tesla M60, pci bus id: b150:00:00.0)
+INFO:Created model with fresh parameters.
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 64837 get requests, put_count=19446 evicted_count=1000 eviction_rate=0.0514245 and unsatisfied allocation rate=0.717044
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 100 to 110
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 12954 get requests, put_count=22964 evicted_count=10000 eviction_rate=0.435464 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 25854 get requests, put_count=45864 evicted_count=20000 eviction_rate=0.436072 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 38806 get requests, put_count=68816 evicted_count=30000 eviction_rate=0.435945 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 49237 get requests, put_count=89246 evicted_count=40000 eviction_rate=0.448199 and unsatisfied allocation rate=2.03099e-05
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (256): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (512): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1024): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2048): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4096): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8192): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16384): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (32768): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (65536): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (131072): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (262144): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (524288): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (1048576): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (2097152): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (4194304): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (8388608): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (16777216): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (33554432): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (67108864): 	Total Chunks: 1, Chunks in use: 0 68.94MiB allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (134217728): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:643] Bin (268435456): 	Total Chunks: 0, Chunks in use: 0 0B allocated for chunks. 0B client-requested for chunks. 0B in use in bin. 0B client-requested in use in bin.
+I tensorflow/core/common_runtime/bfc_allocator.cc:660] Bin for 88.21MiB was 64.00MiB, Chunk State: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:666]   Size: 68.94MiB | Requested Size: 0B | in_use: 0, prev:   Size: 1.2KiB | Requested Size: 1.0KiB | in_use: 1
+I tensorflow/core/common_runtime/bfc_allocator.cc:678] Chunk at 0x1107080000 of size 1280
+I tensorflow/core/common_runtime/bfc_allocator.cc:687] Free at 0x1107080500 of size 72284928
+I tensorflow/core/common_runtime/bfc_allocator.cc:693]      Summary of in-use Chunks by size: 
+I tensorflow/core/common_runtime/bfc_allocator.cc:696] 1 Chunks of size 1280 totalling 1.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:700] Sum Total of in-use chunks: 1.2KiB
+I tensorflow/core/common_runtime/bfc_allocator.cc:702] Stats: 
+Limit:                    72286208
+InUse:                        1280
+MaxInUse:                     1280
+NumAllocs:                       1
+MaxAllocSize:                 1280
+
+W tensorflow/core/common_runtime/bfc_allocator.cc:274] *___________________________________________________________________________________________________
+W tensorflow/core/common_runtime/bfc_allocator.cc:275] Ran out of memory trying to allocate 88.21MiB.  See logs for memory state.
+W tensorflow/core/framework/op_kernel.cc:965] Internal: Dst tensor is not initialized.
+E tensorflow/core/common_runtime/executor.cc:390] Executor failed to create kernel. Internal: Dst tensor is not initialized.
+	 [[Node: qa/embeddings/Variable/initial_value = Const[dtype=DT_DOUBLE, value=Tensor<type: double shape: [115613,100] values: [0.66523673244346215 0.72601356572638054 0.6498354147625377]...>, _device="/job:localhost/replica:0/task:0/gpu:0"]()]]
+Tensor("Placeholder:0", shape=(?, 60, 1), dtype=int64)
+H_q is Tensor("q/RNN/transpose:0", shape=(?, 60, 150), dtype=float64)
+H_p is Tensor("p/RNN/transpose:0", shape=(?, 766, 150), dtype=float64)
+
+
+
+
+Tensor("p/RNN/transpose:0", shape=(?, 766, 150), dtype=float64)
+LOSS pred_s: Tensor("answer_start/add:0", shape=(?, 766), dtype=float64)
+LOSS pred_e: Tensor("answer_scope/add:0", shape=(?, 766), dtype=float64)
+{'__flags': {'embedding_size': 100, 'output_size': 750, 'epochs': 10, 'window_length': 1, 'state_size': 150, 'data_dir': 'data/squad', 'max_context_length': 766, 'max_question_length': 60, 'log_dir': 'log', 'datasize': 'full', 'learning_rate': 0.01, 'optimizer': 'adam', 'vocab_path': 'data/squad/vocab.dat', 'dropout': 0.15, 'batch_size': 32, 'print_every': 1, 'load_train_dir': '', 'max_gradient_norm': 10.0, 'n_features': 1, 'train_dir': 'train', 'keep': 0, 'embed_path': '', 'model': 'matchLSTM', 'label_size': 2}, '__parsed': True}
+Traceback (most recent call last):
+  File "code/train.py", line 142, in <module>
+    tf.app.run()
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/platform/app.py", line 43, in run
+    sys.exit(main(sys.argv[:1] + flags_passthrough))
+  File "code/train.py", line 134, in main
+    initialize_model(sess, qa, load_train_dir)
+  File "code/train.py", line 55, in initialize_model
+    session.run(tf.global_variables_initializer())
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 766, in run
+    run_metadata_ptr)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 964, in _run
+    feed_dict_string, options, run_metadata)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1014, in _do_run
+    target_list, options, run_metadata)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/client/session.py", line 1034, in _do_call
+    raise type(e)(node_def, op, message)
+tensorflow.python.framework.errors_impl.InternalError: Dst tensor is not initialized.
+	 [[Node: qa/embeddings/Variable/initial_value = Const[dtype=DT_DOUBLE, value=Tensor<type: double shape: [115613,100] values: [0.66523673244346215 0.72601356572638054 0.6498354147625377]...>, _device="/job:localhost/replica:0/task:0/gpu:0"]()]]
+
+Caused by op u'qa/embeddings/Variable/initial_value', defined at:
+  File "code/train.py", line 142, in <module>
+    tf.app.run()
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/platform/app.py", line 43, in run
+    sys.exit(main(sys.argv[:1] + flags_passthrough))
+  File "code/train.py", line 117, in main
+    qa = QASystemMatchLSTM(FLAGS, embeddings)
+  File "/home/cs224n/project_cs224n/code/qa_model.py", line 665, in __init__
+    self.setup_embeddings()
+  File "/home/cs224n/project_cs224n/code/qa_model.py", line 308, in setup_embeddings
+    embedding_tensor = tf.Variable(self.pretrained_embeddings, trainable=False)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/ops/variables.py", line 224, in __init__
+    expected_shape=expected_shape)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/ops/variables.py", line 333, in _init_from_args
+    initial_value, name="initial_value", dtype=dtype)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/framework/ops.py", line 669, in convert_to_tensor
+    ret = conversion_func(value, dtype=dtype, name=name, as_ref=as_ref)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/framework/constant_op.py", line 176, in _constant_tensor_conversion_function
+    return constant(v, dtype=dtype, name=name)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/framework/constant_op.py", line 169, in constant
+    attrs={"value": tensor_value, "dtype": dtype_value}, name=name).outputs[0]
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/framework/ops.py", line 2240, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "/home/cs224n/project_cs224n/.env/local/lib/python2.7/site-packages/tensorflow/python/framework/ops.py", line 1128, in __init__
+    self._traceback = _extract_stack()
+
+InternalError (see above for traceback): Dst tensor is not initialized.
+	 [[Node: qa/embeddings/Variable/initial_value = Const[dtype=DT_DOUBLE, value=Tensor<type: double shape: [115613,100] values: [0.66523673244346215 0.72601356572638054 0.6498354147625377]...>, _device="/job:localhost/replica:0/task:0/gpu:0"]()]]
+
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 5150 get requests, put_count=9161 evicted_count=4000 eviction_rate=0.436634 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18103 get requests, put_count=32114 evicted_count=14000 eviction_rate=0.435947 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 31000 get requests, put_count=55011 evicted_count=24000 eviction_rate=0.436276 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43900 get requests, put_count=77911 evicted_count=34000 eviction_rate=0.436395 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 54769 get requests, put_count=98779 evicted_count=44000 eviction_rate=0.445439 and unsatisfied allocation rate=1.82585e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 10353 get requests, put_count=18365 evicted_count=8000 eviction_rate=0.435611 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 23306 get requests, put_count=41318 evicted_count=18000 eviction_rate=0.435645 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 36203 get requests, put_count=64215 evicted_count=28000 eviction_rate=0.436035 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 46858 get requests, put_count=84869 evicted_count=38000 eviction_rate=0.447749 and unsatisfied allocation rate=2.13411e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 1303 get requests, put_count=2316 evicted_count=1000 eviction_rate=0.431779 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 14255 get requests, put_count=25268 evicted_count=11000 eviction_rate=0.435333 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27153 get requests, put_count=48166 evicted_count=21000 eviction_rate=0.435992 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40053 get requests, put_count=71066 evicted_count=31000 eviction_rate=0.436214 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 50628 get requests, put_count=91640 evicted_count=41000 eviction_rate=0.447403 and unsatisfied allocation rate=1.97519e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6505 get requests, put_count=11519 evicted_count=5000 eviction_rate=0.434065 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 19405 get requests, put_count=34419 evicted_count=15000 eviction_rate=0.435806 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 32316 get requests, put_count=57330 evicted_count=25000 eviction_rate=0.436072 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 44842 get requests, put_count=79856 evicted_count=35000 eviction_rate=0.438289 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 56204 get requests, put_count=101217 evicted_count=45000 eviction_rate=0.444589 and unsatisfied allocation rate=1.77923e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 11656 get requests, put_count=20672 evicted_count=9000 eviction_rate=0.435372 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 24554 get requests, put_count=43570 evicted_count=19000 eviction_rate=0.43608 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 37455 get requests, put_count=66471 evicted_count=29000 eviction_rate=0.43628 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 47755 get requests, put_count=86770 evicted_count=39000 eviction_rate=0.449464 and unsatisfied allocation rate=2.09402e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 2604 get requests, put_count=4621 evicted_count=2000 eviction_rate=0.432807 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 15503 get requests, put_count=27520 evicted_count=12000 eviction_rate=0.436047 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 28401 get requests, put_count=50418 evicted_count=22000 eviction_rate=0.436352 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 41354 get requests, put_count=73371 evicted_count=32000 eviction_rate=0.43614 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 52020 get requests, put_count=94036 evicted_count=42000 eviction_rate=0.446637 and unsatisfied allocation rate=1.92234e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7754 get requests, put_count=13773 evicted_count=6000 eviction_rate=0.435635 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 20707 get requests, put_count=36726 evicted_count=16000 eviction_rate=0.435659 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 33606 get requests, put_count=59625 evicted_count=26000 eviction_rate=0.436059 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 45020 get requests, put_count=81039 evicted_count=36000 eviction_rate=0.444231 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 120556 get requests, put_count=120303 evicted_count=46000 eviction_rate=0.382368 and unsatisfied allocation rate=0.383822
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 212 to 233
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 12907 get requests, put_count=22928 evicted_count=10000 eviction_rate=0.436148 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 25855 get requests, put_count=45876 evicted_count=20000 eviction_rate=0.435958 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 38754 get requests, put_count=68775 evicted_count=30000 eviction_rate=0.436205 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 49162 get requests, put_count=89182 evicted_count=40000 eviction_rate=0.448521 and unsatisfied allocation rate=2.03409e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 5208 get requests, put_count=9231 evicted_count=4000 eviction_rate=0.433323 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18106 get requests, put_count=32129 evicted_count=14000 eviction_rate=0.435743 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 31005 get requests, put_count=55028 evicted_count=24000 eviction_rate=0.436142 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43958 get requests, put_count=77981 evicted_count=34000 eviction_rate=0.436004 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 54753 get requests, put_count=98775 evicted_count=44000 eviction_rate=0.445457 and unsatisfied allocation rate=1.82638e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9104 get requests, put_count=16129 evicted_count=7000 eviction_rate=0.434001 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22003 get requests, put_count=39028 evicted_count=17000 eviction_rate=0.435585 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 34909 get requests, put_count=61934 evicted_count=27000 eviction_rate=0.435948 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 45594 get requests, put_count=82618 evicted_count=37000 eviction_rate=0.447844 and unsatisfied allocation rate=2.19327e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 1306 get requests, put_count=2334 evicted_count=1000 eviction_rate=0.428449 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 14217 get requests, put_count=25245 evicted_count=11000 eviction_rate=0.43573 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27156 get requests, put_count=48184 evicted_count=21000 eviction_rate=0.435829 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40056 get requests, put_count=71084 evicted_count=31000 eviction_rate=0.436104 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 50623 get requests, put_count=91650 evicted_count=41000 eviction_rate=0.447354 and unsatisfied allocation rate=1.97539e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6462 get requests, put_count=11492 evicted_count=5000 eviction_rate=0.435085 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 19407 get requests, put_count=34437 evicted_count=15000 eviction_rate=0.435578 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 32306 get requests, put_count=57336 evicted_count=25000 eviction_rate=0.436026 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 44696 get requests, put_count=79726 evicted_count=35000 eviction_rate=0.439004 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 56202 get requests, put_count=101231 evicted_count=45000 eviction_rate=0.444528 and unsatisfied allocation rate=1.7793e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 11665 get requests, put_count=20698 evicted_count=9000 eviction_rate=0.434825 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 24610 get requests, put_count=43643 evicted_count=19000 eviction_rate=0.43535 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 37509 get requests, put_count=66542 evicted_count=29000 eviction_rate=0.435815 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 47827 get requests, put_count=86859 evicted_count=39000 eviction_rate=0.449004 and unsatisfied allocation rate=2.09087e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 3907 get requests, put_count=6944 evicted_count=3000 eviction_rate=0.432028 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 16807 get requests, put_count=29844 evicted_count=13000 eviction_rate=0.435598 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 29759 get requests, put_count=52796 evicted_count=23000 eviction_rate=0.435639 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 42657 get requests, put_count=75694 evicted_count=33000 eviction_rate=0.435966 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 53388 get requests, put_count=96424 evicted_count=43000 eviction_rate=0.445947 and unsatisfied allocation rate=1.87308e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9111 get requests, put_count=16151 evicted_count=7000 eviction_rate=0.43341 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22010 get requests, put_count=39050 evicted_count=17000 eviction_rate=0.435339 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 34910 get requests, put_count=61950 evicted_count=27000 eviction_rate=0.435835 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 45572 get requests, put_count=82612 evicted_count=37000 eviction_rate=0.447877 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 1364 get requests, put_count=2408 evicted_count=1000 eviction_rate=0.415282 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 14262 get requests, put_count=25306 evicted_count=11000 eviction_rate=0.43468 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27161 get requests, put_count=48205 evicted_count=21000 eviction_rate=0.435639 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40114 get requests, put_count=71158 evicted_count=31000 eviction_rate=0.43565 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 50615 get requests, put_count=91658 evicted_count=41000 eviction_rate=0.447315 and unsatisfied allocation rate=1.9757e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6512 get requests, put_count=11561 evicted_count=5000 eviction_rate=0.432489 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 19464 get requests, put_count=34513 evicted_count=15000 eviction_rate=0.434619 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 32362 get requests, put_count=57411 evicted_count=25000 eviction_rate=0.435457 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 44892 get requests, put_count=79941 evicted_count=35000 eviction_rate=0.437823 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 56235 get requests, put_count=101283 evicted_count=45000 eviction_rate=0.4443 and unsatisfied allocation rate=1.77825e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 11714 get requests, put_count=20768 evicted_count=9000 eviction_rate=0.433359 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 24614 get requests, put_count=43668 evicted_count=19000 eviction_rate=0.435101 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 37566 get requests, put_count=66620 evicted_count=29000 eviction_rate=0.435305 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 47863 get requests, put_count=86916 evicted_count=39000 eviction_rate=0.448709 and unsatisfied allocation rate=2.0893e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 3919 get requests, put_count=6978 evicted_count=3000 eviction_rate=0.429923 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 16864 get requests, put_count=29923 evicted_count=13000 eviction_rate=0.434448 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 29763 get requests, put_count=52822 evicted_count=23000 eviction_rate=0.435425 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 42669 get requests, put_count=75728 evicted_count=33000 eviction_rate=0.43577 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 53457 get requests, put_count=96515 evicted_count=43000 eviction_rate=0.445527 and unsatisfied allocation rate=1.87066e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9116 get requests, put_count=16181 evicted_count=7000 eviction_rate=0.432606 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22014 get requests, put_count=39079 evicted_count=17000 eviction_rate=0.435016 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 34913 get requests, put_count=61978 evicted_count=27000 eviction_rate=0.435638 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 45605 get requests, put_count=82669 evicted_count=37000 eviction_rate=0.447568 and unsatisfied allocation rate=2.19274e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 1367 get requests, put_count=2439 evicted_count=1000 eviction_rate=0.410004 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 14273 get requests, put_count=25345 evicted_count=11000 eviction_rate=0.434011 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27218 get requests, put_count=48290 evicted_count=21000 eviction_rate=0.434873 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40117 get requests, put_count=71189 evicted_count=31000 eviction_rate=0.435461 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 50733 get requests, put_count=91804 evicted_count=41000 eviction_rate=0.446604 and unsatisfied allocation rate=1.9711e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7872 get requests, put_count=13951 evicted_count=6000 eviction_rate=0.430077 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 20770 get requests, put_count=36849 evicted_count=16000 eviction_rate=0.434204 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 33670 get requests, put_count=59749 evicted_count=26000 eviction_rate=0.435154 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 45030 get requests, put_count=81109 evicted_count=36000 eviction_rate=0.443847 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 121485 get requests, put_count=121951 evicted_count=46000 eviction_rate=0.377201 and unsatisfied allocation rate=0.375462
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 871 to 958
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 13022 get requests, put_count=23109 evicted_count=10000 eviction_rate=0.432732 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 25920 get requests, put_count=46007 evicted_count=20000 eviction_rate=0.434716 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 38821 get requests, put_count=68908 evicted_count=30000 eviction_rate=0.435363 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 49329 get requests, put_count=89415 evicted_count=40000 eviction_rate=0.447352 and unsatisfied allocation rate=2.02721e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 5326 get requests, put_count=9421 evicted_count=4000 eviction_rate=0.424583 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18224 get requests, put_count=32319 evicted_count=14000 eviction_rate=0.433182 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 31124 get requests, put_count=55219 evicted_count=24000 eviction_rate=0.434633 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43428 get requests, put_count=77523 evicted_count=34000 eviction_rate=0.43858 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 54938 get requests, put_count=99032 evicted_count=44000 eviction_rate=0.444301 and unsatisfied allocation rate=1.82023e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 11776 get requests, put_count=20881 evicted_count=9000 eviction_rate=0.431014 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 24676 get requests, put_count=43781 evicted_count=19000 eviction_rate=0.433978 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 37629 get requests, put_count=66734 evicted_count=29000 eviction_rate=0.434561 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 48019 get requests, put_count=87123 evicted_count=39000 eviction_rate=0.447643 and unsatisfied allocation rate=2.08251e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 5278 get requests, put_count=9393 evicted_count=4000 eviction_rate=0.425849 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18229 get requests, put_count=32344 evicted_count=14000 eviction_rate=0.432847 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 31127 get requests, put_count=55242 evicted_count=24000 eviction_rate=0.434452 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43945 get requests, put_count=78060 evicted_count=34000 eviction_rate=0.435562 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 54978 get requests, put_count=99092 evicted_count=44000 eviction_rate=0.444032 and unsatisfied allocation rate=1.81891e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 10481 get requests, put_count=18608 evicted_count=8000 eviction_rate=0.429923 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 23381 get requests, put_count=41508 evicted_count=18000 eviction_rate=0.433651 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 36292 get requests, put_count=64419 evicted_count=28000 eviction_rate=0.434654 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 46678 get requests, put_count=84804 evicted_count=38000 eviction_rate=0.448092 and unsatisfied allocation rate=2.14234e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 4085 get requests, put_count=7225 evicted_count=3000 eviction_rate=0.415225 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 16985 get requests, put_count=30125 evicted_count=13000 eviction_rate=0.431535 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 29896 get requests, put_count=53036 evicted_count=23000 eviction_rate=0.433668 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 42745 get requests, put_count=75885 evicted_count=33000 eviction_rate=0.434869 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 53750 get requests, put_count=96889 evicted_count=43000 eviction_rate=0.443807 and unsatisfied allocation rate=1.86047e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 10526 get requests, put_count=18680 evicted_count=8000 eviction_rate=0.428266 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 23479 get requests, put_count=41633 evicted_count=18000 eviction_rate=0.432349 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 36377 get requests, put_count=64531 evicted_count=28000 eviction_rate=0.4339 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 46784 get requests, put_count=84937 evicted_count=38000 eviction_rate=0.44739 and unsatisfied allocation rate=2.13748e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 5393 get requests, put_count=9562 evicted_count=4000 eviction_rate=0.418323 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18293 get requests, put_count=32462 evicted_count=14000 eviction_rate=0.431273 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 31244 get requests, put_count=55413 evicted_count=24000 eviction_rate=0.433111 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43494 get requests, put_count=77663 evicted_count=34000 eviction_rate=0.437789 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 55004 get requests, put_count=99172 evicted_count=44000 eviction_rate=0.443674 and unsatisfied allocation rate=1.81805e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 11845 get requests, put_count=21031 evicted_count=9000 eviction_rate=0.42794 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 24744 get requests, put_count=43930 evicted_count=19000 eviction_rate=0.432506 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 37697 get requests, put_count=66883 evicted_count=29000 eviction_rate=0.433593 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 48184 get requests, put_count=87369 evicted_count=39000 eviction_rate=0.446383 and unsatisfied allocation rate=2.07538e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6745 get requests, put_count=11949 evicted_count=5000 eviction_rate=0.418445 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 19645 get requests, put_count=34849 evicted_count=15000 eviction_rate=0.430428 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 32597 get requests, put_count=57801 evicted_count=25000 eviction_rate=0.432518 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43539 get requests, put_count=78743 evicted_count=35000 eviction_rate=0.444484 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 122156 get requests, put_count=123129 evicted_count=45000 eviction_rate=0.36547 and unsatisfied allocation rate=0.362086
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 2253 to 2478
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 13206 get requests, put_count=23431 evicted_count=10000 eviction_rate=0.426785 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 26105 get requests, put_count=46330 evicted_count=20000 eviction_rate=0.431686 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 39005 get requests, put_count=69230 evicted_count=30000 eviction_rate=0.433338 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 49729 get requests, put_count=89953 evicted_count=40000 eviction_rate=0.444677 and unsatisfied allocation rate=2.0109e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 8066 get requests, put_count=14313 evicted_count=6000 eviction_rate=0.419199 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 21014 get requests, put_count=37261 evicted_count=16000 eviction_rate=0.429403 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 33913 get requests, put_count=60160 evicted_count=26000 eviction_rate=0.432181 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 44213 get requests, put_count=80459 evicted_count=36000 eviction_rate=0.447433 and unsatisfied allocation rate=2.26178e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 4217 get requests, put_count=7489 evicted_count=3000 eviction_rate=0.400588 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 17116 get requests, put_count=30388 evicted_count=13000 eviction_rate=0.4278 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 30022 get requests, put_count=53294 evicted_count=23000 eviction_rate=0.431568 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 42221 get requests, put_count=75493 evicted_count=33000 eviction_rate=0.437127 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 53731 get requests, put_count=97002 evicted_count=43000 eviction_rate=0.44329 and unsatisfied allocation rate=1.86112e-05
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 12026 get requests, put_count=21325 evicted_count=9000 eviction_rate=0.42204 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 24924 get requests, put_count=44223 evicted_count=19000 eviction_rate=0.429641 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 37823 get requests, put_count=67122 evicted_count=29000 eviction_rate=0.432049 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 48493 get requests, put_count=87792 evicted_count=39000 eviction_rate=0.444232 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 8184 get requests, put_count=14513 evicted_count=6000 eviction_rate=0.413422 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 21135 get requests, put_count=37464 evicted_count=16000 eviction_rate=0.427077 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 34034 get requests, put_count=60363 evicted_count=26000 eviction_rate=0.430727 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 44367 get requests, put_count=80696 evicted_count=36000 eviction_rate=0.446119 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 4341 get requests, put_count=7703 evicted_count=3000 eviction_rate=0.389459 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 17292 get requests, put_count=30654 evicted_count=13000 eviction_rate=0.424088 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 30191 get requests, put_count=53553 evicted_count=23000 eviction_rate=0.429481 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40941 get requests, put_count=74303 evicted_count=33000 eviction_rate=0.444127 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 1807 get requests, put_count=3205 evicted_count=1000 eviction_rate=0.312012 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 14752 get requests, put_count=26150 evicted_count=11000 eviction_rate=0.42065 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27651 get requests, put_count=49049 evicted_count=21000 eviction_rate=0.428143 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40469 get requests, put_count=71867 evicted_count=31000 eviction_rate=0.431352 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 51503 get requests, put_count=92901 evicted_count=41000 eviction_rate=0.44133 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 10909 get requests, put_count=19347 evicted_count=8000 eviction_rate=0.413501 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 23861 get requests, put_count=42299 evicted_count=18000 eviction_rate=0.425542 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 36759 get requests, put_count=65197 evicted_count=28000 eviction_rate=0.429468 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 47502 get requests, put_count=85940 evicted_count=38000 eviction_rate=0.442169 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9671 get requests, put_count=17153 evicted_count=7000 eviction_rate=0.408092 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22570 get requests, put_count=40052 evicted_count=17000 eviction_rate=0.424448 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 35468 get requests, put_count=62950 evicted_count=27000 eviction_rate=0.428912 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 46105 get requests, put_count=83587 evicted_count=37000 eviction_rate=0.442653 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 8433 get requests, put_count=14963 evicted_count=6000 eviction_rate=0.400989 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 21384 get requests, put_count=37914 evicted_count=16000 eviction_rate=0.422008 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 34283 get requests, put_count=60813 evicted_count=26000 eviction_rate=0.42754 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 44824 get requests, put_count=81354 evicted_count=36000 eviction_rate=0.442511 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7195 get requests, put_count=12778 evicted_count=5000 eviction_rate=0.391298 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 20095 get requests, put_count=35678 evicted_count=15000 eviction_rate=0.420427 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 33006 get requests, put_count=58589 evicted_count=25000 eviction_rate=0.426701 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43562 get requests, put_count=79145 evicted_count=35000 eviction_rate=0.442226 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7312 get requests, put_count=12953 evicted_count=5000 eviction_rate=0.386011 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 20212 get requests, put_count=35853 evicted_count=15000 eviction_rate=0.418375 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 33123 get requests, put_count=58764 evicted_count=25000 eviction_rate=0.425431 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43747 get requests, put_count=79388 evicted_count=35000 eviction_rate=0.440873 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7376 get requests, put_count=13081 evicted_count=5000 eviction_rate=0.382234 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 20275 get requests, put_count=35980 evicted_count=15000 eviction_rate=0.416898 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 33175 get requests, put_count=58880 evicted_count=25000 eviction_rate=0.424592 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 43932 get requests, put_count=79637 evicted_count=35000 eviction_rate=0.439494 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 10044 get requests, put_count=17820 evicted_count=7000 eviction_rate=0.392817 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22997 get requests, put_count=40773 evicted_count=17000 eviction_rate=0.416943 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 35441 get requests, put_count=63217 evicted_count=27000 eviction_rate=0.4271 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 46860 get requests, put_count=84636 evicted_count=37000 eviction_rate=0.437166 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 12712 get requests, put_count=22566 evicted_count=9000 eviction_rate=0.39883 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 25610 get requests, put_count=45464 evicted_count=19000 eviction_rate=0.417913 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 36117 get requests, put_count=65971 evicted_count=29000 eviction_rate=0.439587 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 3783 get requests, put_count=6722 evicted_count=2000 eviction_rate=0.29753 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 16683 get requests, put_count=29622 evicted_count=12000 eviction_rate=0.405104 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 29635 get requests, put_count=52574 evicted_count=22000 eviction_rate=0.418458 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 40226 get requests, put_count=73165 evicted_count=32000 eviction_rate=0.437368 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9110 get requests, put_count=16143 evicted_count=6000 eviction_rate=0.371678 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22007 get requests, put_count=39040 evicted_count=16000 eviction_rate=0.409836 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 32853 get requests, put_count=59886 evicted_count=26000 eviction_rate=0.434158 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 123346 get requests, put_count=125262 evicted_count=36000 eviction_rate=0.287398 and unsatisfied allocation rate=0.284703
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 11366 to 12502
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 14384 get requests, put_count=25520 evicted_count=10000 eviction_rate=0.39185 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27282 get requests, put_count=48418 evicted_count=20000 eviction_rate=0.41307 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 38019 get requests, put_count=69155 evicted_count=30000 eviction_rate=0.433808 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9363 get requests, put_count=16613 evicted_count=6000 eviction_rate=0.361163 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22266 get requests, put_count=39516 evicted_count=16000 eviction_rate=0.404899 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 32709 get requests, put_count=59959 evicted_count=26000 eviction_rate=0.43363 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6944 get requests, put_count=12319 evicted_count=4000 eviction_rate=0.324702 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 19844 get requests, put_count=35219 evicted_count=14000 eviction_rate=0.397513 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 30125 get requests, put_count=55500 evicted_count=24000 eviction_rate=0.432432 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 4529 get requests, put_count=8041 evicted_count=2000 eviction_rate=0.248725 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 17432 get requests, put_count=30944 evicted_count=12000 eviction_rate=0.387797 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 27745 get requests, put_count=51257 evicted_count=22000 eviction_rate=0.42921 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6016 get requests, put_count=10679 evicted_count=3000 eviction_rate=0.280925 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18914 get requests, put_count=33577 evicted_count=13000 eviction_rate=0.38717 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 29417 get requests, put_count=54080 evicted_count=23000 eviction_rate=0.425296 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7506 get requests, put_count=13336 evicted_count=4000 eviction_rate=0.29994 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 20405 get requests, put_count=36235 evicted_count=14000 eviction_rate=0.386367 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 31301 get requests, put_count=57131 evicted_count=24000 eviction_rate=0.420087 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 12953 get requests, put_count=22966 evicted_count=8000 eviction_rate=0.348341 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 23362 get requests, put_count=43375 evicted_count=18000 eviction_rate=0.414986 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 8056 get requests, put_count=14270 evicted_count=4000 eviction_rate=0.280308 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18627 get requests, put_count=34841 evicted_count=14000 eviction_rate=0.401825 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 5708 get requests, put_count=10143 evicted_count=2000 eviction_rate=0.19718 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 16121 get requests, put_count=30556 evicted_count=12000 eviction_rate=0.392722 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 6021 get requests, put_count=10700 evicted_count=2000 eviction_rate=0.186916 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 16581 get requests, put_count=31260 evicted_count=12000 eviction_rate=0.383877 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7931 get requests, put_count=15878 evicted_count=5000 eviction_rate=0.314901 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 3878 get requests, put_count=8120 evicted_count=1000 eviction_rate=0.123153 and unsatisfied allocation rate=0
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 124483 get requests, put_count=127903 evicted_count=11000 eviction_rate=0.0860027 and unsatisfied allocation rate=0.0869356
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 35662 to 39228
+I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 9145 get requests, put_count=16067 evicted_count=3000 eviction_rate=0.186718 and unsatisfied allocation rate=0
+Tensor("Placeholder:0", shape=(?, 60, 1), dtype=int64)
+H_q is Tensor("q/RNN/transpose:0", shape=(?, 60, 150), dtype=float64)
+H_p is Tensor("p/RNN/transpose:0", shape=(?, 766, 150), dtype=float64)
+
+
+
+
+Tensor("p/RNN/transpose:0", shape=(?, 766, 150), dtype=float64)
+LOSS pred_s: Tensor("answer_start/add:0", shape=(?, 766), dtype=float64)
+LOSS pred_e: Tensor("answer_scope/add:0", shape=(?, 766), dtype=float64)
+{'__flags': {'embedding_size': 100, 'output_size': 750, 'epochs': 10, 'window_length': 1, 'state_size': 150, 'data_dir': 'data/squad', 'max_context_length': 766, 'max_question_length': 60, 'log_dir': 'log', 'datasize': 'full', 'learning_rate': 0.01, 'optimizer': 'adam', 'vocab_path': 'data/squad/vocab.dat', 'dropout': 0.15, 'batch_size': 32, 'print_every': 1, 'load_train_dir': '', 'max_gradient_norm': 10.0, 'n_features': 1, 'train_dir': 'train', 'keep': 0, 'embed_path': '', 'model': 'matchLSTM', 'label_size': 2}, '__parsed': True}
+train loss 13.2823643395
+train loss 12.8658885848
+train loss 10.0302008086
+train loss 9.71269477746
+train loss 9.66887326417
+train loss 9.51203326686
+train loss 9.89095176124
+train loss 9.66214680755
+train loss 9.88489361829
+train loss 9.59503863873
+train loss 9.43173495243
+train loss 9.34585798645
+train loss 9.04478029491
+train loss 9.16913530199
+train loss 8.86240731262
+train loss 8.30501711738
+train loss 9.49552580197
+train loss 8.82986523442
+train loss 8.90938188846
+train loss 9.14642402844
+train loss 8.99224880009
+train loss 8.95134802204
+train loss 9.14100995926
+train loss 8.74808170899
+train loss 8.72711348871
+train loss 8.59967658463
+train loss 8.79334659555
+train loss 8.52390085331
+train loss 8.69394443322
+train loss 8.44493951369
+train loss 8.97925067285
+train loss 9.13308921322
+train loss 8.84377463698
+train loss 9.23170474076
+train loss 8.43700849772
+train loss 8.83971535175
+train loss 8.63155333106
+train loss 8.5519390249
+train loss 9.29803415886
+train loss 8.84682021469
+train loss 8.67816157337
+train loss 8.87899736251
+train loss 8.88709674798
+train loss 8.92810913072
+train loss 8.95867340616
+train loss 8.58313125548
+train loss 8.67330878898
+train loss 8.59432127172
+train loss 8.87574743718
+train loss 8.37186082091
+train loss 8.18929107425
+train loss 8.3857966576
+train loss 8.84281811235
+train loss 8.53922422636
+train loss 8.56715873947
+train loss 8.76230083684
+train loss 8.3832860458
+train loss 8.49370108212
+train loss 8.59099477539
+train loss 7.99326424424
+train loss 8.34210429147
+train loss 8.58363429847
+train loss 8.64462480198
+train loss 8.71759270625
+train loss 8.41208030829
+train loss 8.2558130583
+train loss 8.71082060305
+train loss 8.60064488181
+train loss 8.93435187432
+train loss 8.51928465458
+train loss 8.80694273965
+train loss 8.17692050138
+train loss 8.16733888794
+train loss 8.39779077978
+train loss 9.084131942
+train loss 7.99031381025
+train loss 8.32591745791
+train loss 8.43299726031
+train loss 8.69755752018
+train loss 8.8043196257
+train loss 9.26342730922
+train loss 8.54859130627
+train loss 8.26834695229
+train loss 8.51502313322
+train loss 8.11107662967
+train loss 8.15600770729
+train loss 8.43730774291
+train loss 8.75090632707
+train loss 7.90805993794
+train loss 8.61739667911
+train loss 8.26624912197
+train loss 8.23860921147
+train loss 8.31769649419
+train loss 8.64221003645
+train loss 8.31794924722
+train loss 7.88300675492
+train loss 7.9173355435
+train loss 8.15495589804
+train loss 9.09698245088
+train loss 8.29602581081
+train loss 8.40560741123
+train loss 8.2347098537
+train loss 8.22192312546
+train loss 8.01737392186
+train loss 9.10358796692
+train loss 8.28572769379
+train loss 8.45092217134
+train loss 8.24175249474
+train loss 7.81762936027
+train loss 8.32550005583
+train loss 8.39008251026
+train loss 8.47234870997
+train loss 8.0952382849
+train loss 8.35358609334
+train loss 8.61445288366
+train loss 8.0897825772
+train loss 8.64992238891
+train loss 8.53045692455
+train loss 7.73398770474
+train loss 7.73395217529
+train loss 8.42306240687
+train loss 8.18126548572
+train loss 8.05571657445
+train loss 8.00033387129
+train loss 7.99305085006
+train loss 9.34876254248
+train loss 8.01643387942
+train loss 8.04443246556
+train loss 8.12309514269
+train loss 8.2075124196
+train loss 7.65503199524
+train loss 8.35978632408
+train loss 8.71251159573
+train loss 7.85981535167
+train loss 8.12127558364
+train loss 8.19349930812
+train loss 8.30196258519
+train loss 8.22229710638
+train loss 8.03476208949
+train loss 8.4227407877
+train loss 8.21885039652
+train loss 8.0166450543
+train loss 7.94697889834
+train loss 8.75213297248
+train loss 8.29124166685
+train loss 7.42641026232
+train loss 8.52386840923
+train loss 8.05903768246
+train loss 7.84994868785
+train loss 8.62728886659
+train loss 8.71417430526
+train loss 8.28453845097
+train loss 8.36741852807
+train loss 8.11620905517
+train loss 9.04645639574
+train loss 7.5182078184
+train loss 8.37436891758
+train loss 8.19374999714
+train loss 8.09777019974
+train loss 8.1887502489
+train loss 8.0472987863
+train loss 8.36258270416
+train loss 8.40101847797
+train loss 8.36974152639
+train loss 8.00445064242
+train loss 8.47584730749
+train loss 8.23716315104
+train loss 9.0004240747
+train loss 8.17524800985
+train loss 8.46772634393
+train loss 7.72358751582
+train loss 8.02091816303
+train loss 7.96279343056
+train loss 7.32834027288
+train loss 6.64745856042
+train loss 8.56440817877
+train loss 7.92055733327
+train loss 7.79584414662
+train loss 7.77735761619
+train loss 7.71056562902
+train loss 8.18847876675
+train loss 7.5400050702
+train loss 8.21019037568
+train loss 8.14474925134
+train loss 8.4857037003
+train loss 8.2834366071
+train loss 7.83657990286
+train loss 7.51027690358
+train loss 7.32245179199
+train loss 8.14844065452
+train loss 8.3435172806
+train loss 7.91607101233
+train loss 8.24620879365
+train loss 7.64594297038
+train loss 8.17730289809
+train loss 8.5327337586
+train loss 8.16447606649
+train loss 7.92629548903
+train loss 8.07714532475
+train loss 7.54139099604
+train loss 7.40817327378
+train loss 7.78524662
+train loss 8.6072969075
+train loss 6.8675555958
+train loss 8.34812040937
+train loss 7.74529957054
+train loss 8.1803097018
+train loss 7.21669818863
+train loss 7.89961425569
+train loss 7.94175587178
+train loss 7.89152108396
+train loss 7.87790645635
+train loss 7.65015058238
+train loss 8.09163948311
+train loss 7.56698618369
+train loss 7.64530443964
+train loss 7.5525811327
+train loss 7.64276702502
+train loss 8.14253155019
+train loss 7.75442404643
+train loss 7.85451632805
+train loss 7.56931339651
+train loss 8.3679439683
+train loss 8.07439895257
+train loss 7.89886743936
+train loss 7.48876772767
+train loss 7.91923388224
+train loss 8.12448296728
+train loss 7.87402654315
+train loss 7.68543913555
+train loss 8.20828466034
+train loss 8.01864323502
+train loss 7.93283638231
+train loss 8.49952040163
+train loss 7.85021920591
+train loss 8.31204700613
+train loss 7.7425460023
+train loss 7.79261220477
+train loss 7.8699845918
+train loss 7.7362647528
+train loss 8.76512951075
+train loss 7.96998610812
+train loss 7.81501718078
+train loss 8.39348640279
+train loss 7.77422456986
+train loss 7.82956950132
+train loss 8.3542798431
+train loss 7.46115177469
+train loss 7.81610049296
+train loss 7.99076523043
+train loss 8.68347743501
+train loss 8.03101724024
+train loss 7.62359102542
+train loss 7.67086873154
+train loss 8.09818529036
+train loss 7.45918833836
+train loss 7.86968496991
+train loss 8.11538856757
+train loss 8.03076362386
+train loss 7.68117301284
+train loss 7.85402569593
+train loss 7.27763732673
+train loss 7.874665286
+train loss 7.59581387669
+train loss 7.57768295584
+train loss 7.39672621727
+train loss 7.96440052087
+train loss 8.18056489239
+train loss 7.32281130741
+train loss 7.65632703449
+train loss 8.29066245055
+train loss 7.8810328307
+train loss 7.87432091174
+train loss 7.96537111043
+train loss 8.03191968875
+train loss 7.53235309139
+train loss 8.57932391837
+train loss 8.2334979396
+train loss 7.79573708597
+train loss 8.14640275961
+train loss 7.61781864446
+train loss 8.09813409541
+train loss 7.89186773833
+train loss 8.1122964604
+train loss 8.20535603444
+train loss 7.32500128225
+train loss 7.57915967107
+train loss 8.23269002265
+train loss 7.97064954885
+train loss 7.40826728619
+train loss 8.37787506088
+train loss 7.80238186691
+train loss 7.79398832935
+train loss 7.44380073052
+train loss 8.01231425037
+train loss 7.65003294661
+train loss 8.07250098689
+train loss 8.092030429
+train loss 7.75968783328
+train loss 8.26359794461
+train loss 7.51295667993
+train loss 8.06744901938
+train loss 7.84858142002
+train loss 7.58597014473
+train loss 7.43011974998
+train loss 6.70156755368
+train loss 7.06467792537
+train loss 7.75053994827
+train loss 8.14821293463
+train loss 7.42085787511
+train loss 7.58478984335
+train loss 8.62775994749
+train loss 7.82263257113
+train loss 8.04095828627
+train loss 8.05729997868
+train loss 7.32957320812
+train loss 7.2971363195
+train loss 7.37700171205
+train loss 7.75019904415
+train loss 7.36647566319
+train loss 8.06791394785
+train loss 7.60059107358
+train loss 8.05301867379
+train loss 8.52437146358
+train loss 7.96643738226
+train loss 7.58577523239
+train loss 7.74119156146
+train loss 8.01200610577
+train loss 8.2353824459
+train loss 7.25254312443
+train loss 7.46051337236
+train loss 7.25816447926
+train loss 7.86674793147
+train loss 6.72457507392
+train loss 7.38680750243
+train loss 8.04013922341
+train loss 7.86019289581
+train loss 7.58576846887
+train loss 7.69182765412
+train loss 7.32122656553
+train loss 7.84872306209
+train loss 8.07420362643
+train loss 7.6360628454
+train loss 7.27045570214
+train loss 8.42429796862
+train loss 8.09093122177
+train loss 8.10282065657
+train loss 7.20635141031
+train loss 7.28499846428
+train loss 7.78453504181
+train loss 7.94328233664
+train loss 8.6085742457
+train loss 7.3009641101
+train loss 7.92809159101
+train loss 7.19230388476
+train loss 7.49233876257
+train loss 7.62868320323
+train loss 6.54495791557
+train loss 7.87666911461
+train loss 7.20086892661
+train loss 8.1460091125
+train loss 7.50291155175
+train loss 7.53195337422
+train loss 7.0618694755
+train loss 7.10914879625
+train loss 6.48205944543
+train loss 7.03554548822
+train loss 7.9391479658
+train loss 7.14663051577
+train loss 7.36979293219
+train loss 7.37001115522
+train loss 7.56813147334
+train loss 7.64283675371
+train loss 7.27427996479
+train loss 7.66342940413
+train loss 7.59421243547
+train loss 7.31411896201
+train loss 7.53913537253
+train loss 7.90521506332
+train loss 6.97027278335
+train loss 7.70581256035
+train loss 6.7022010129
+train loss 8.81582673691
+train loss 7.68842217622
+train loss 7.75423737144
+train loss 7.54403924548
+train loss 7.43829404556
+train loss 7.30667623644
+train loss 7.6651469993
+train loss 7.49258420338
+train loss 7.66209773002
+train loss 7.75694145161
+train loss 7.18174249133
+train loss 7.87111763189
+train loss 7.8280129009
+train loss 7.31366310433
+train loss 7.02272643305
+train loss 7.66319224009
+train loss 7.45560390993
+train loss 8.32907068845
+train loss 7.58331379487
+train loss 6.92354524182
+train loss 7.74118238669
+train loss 8.29021276227
+train loss 7.38991714578
+train loss 7.41955549564
+train loss 8.23457120921
+train loss 7.69546516052
+train loss 7.00843213997
+train loss 7.73447165568
+train loss 7.72422322519
+train loss 7.05229687297
+train loss 7.155642125
+train loss 7.84396064562
+train loss 6.34378255967
+train loss 6.9498007722
+train loss 7.4710136026
+train loss 7.81691478175
+train loss 7.25805295085
+train loss 7.68636229651
+train loss 7.86741941622
+train loss 6.69961865675
+train loss 7.10730454297
+train loss 7.34389290317
+train loss 8.10562939878
+train loss 7.54899063427
+train loss 7.62550753491
+train loss 7.74892667562
+train loss 7.66556691607
+train loss 8.47110904197
+train loss 8.2604978228
+train loss 7.43351740194
+train loss 8.4495778883
+train loss 7.13720088904
+train loss 7.76094730967
+train loss 7.53506649566
+train loss 7.09109913693
+train loss 7.22197729152
+train loss 8.17240700453
+train loss 8.05677004779
+train loss 6.77832223917
+train loss 8.0754218615
+train loss 7.22440238841
+train loss 7.24583534227
+train loss 7.95048293794
+train loss 7.78994319205
+train loss 7.54013597341
+train loss 7.91877390689
+train loss 7.85439238657
+train loss 8.09212637834
+train loss 7.48587233472
+train loss 8.05167082172
+train loss 7.37187938158
+train loss 7.38574320029
+train loss 7.0460360924
+train loss 7.47465644975
+train loss 6.92597433666
+train loss 7.57003468859
+train loss 7.26533102748
+train loss 7.41294989514
+train loss 7.04258974065
+train loss 7.65272936507
+train loss 8.61572696784
+train loss 7.29142926188
+train loss 7.46952887884
+train loss 8.28724011666
+train loss 7.92367834098
+train loss 7.49380359163
+train loss 7.8345976079
+train loss 7.37159722825
+train loss 7.48157010028
+train loss 7.24735765601
+train loss 7.74739111048
+train loss 7.03787802084
+train loss 7.74805127756
+train loss 7.1214731772
+train loss 7.39099458052
+train loss 7.55218032033
+train loss 7.15968673085
+train loss 7.91601746308
+train loss 7.04541306003
+train loss 7.69319715943
+train loss 7.27388417558
+train loss 7.96551292114
+train loss 8.47738331376
+train loss 6.85317931583
+train loss 7.5545648676
+train loss 7.7461755247
+train loss 7.52034532181
+train loss 7.7955419379
+train loss 7.26826795724
+train loss 7.5081554134
+train loss 7.13054811059
+train loss 7.90468296726
+train loss 7.07250409647
+train loss 6.71082680324
+train loss 7.48415370614
+train loss 7.67793415276
+train loss 7.03168404807
+train loss 7.80272487133
+train loss 6.98980439731
+train loss 7.6883419024
+train loss 7.37480074085
+train loss 7.16485956244
+train loss 7.03422059983
+train loss 7.12902278953
+train loss 7.38142165361
+train loss 8.32933151456
+train loss 7.44273742696
+train loss 7.55998446238
+train loss 7.62152679389
+train loss 7.89563047614
+train loss 7.55201981188
+train loss 7.58755135974
+train loss 7.12362082421
+train loss 7.40996522736
+train loss 7.55031612876
+train loss 7.92478911809
+train loss 7.02391247537
+train loss 7.94572854086
+train loss 6.66955958943
+train loss 7.63218650076
+train loss 7.72637713189
+train loss 7.71587609128
+train loss 7.87258522828
+train loss 7.56947967658
+train loss 7.26661596089
+train loss 7.63223669908
+train loss 7.0428902943
+train loss 7.16955725951
+train loss 7.87681356047
+train loss 7.15638788541
+train loss 7.12081446483
+train loss 8.47242778137
+train loss 8.40646601998
+train loss 7.9447977828
+train loss 8.09640743355
+train loss 8.84427652427
+train loss 7.47308786027
+train loss 8.03286188296
+train loss 7.39050466926
+train loss 7.59997654311
+train loss 7.68183798968
+train loss 7.44335685107
+train loss 8.13274305588
+train loss 7.53257578773
+train loss 7.78398588312
+train loss 6.69140029476
+train loss 6.62995333132
+train loss 6.972758569
+train loss 7.06612540211
+train loss 7.0625302256
+train loss 6.31356569263
+train loss 7.34641396561
+train loss 6.68877303736
+train loss 7.02001502714
+train loss 7.36610393327
+train loss 6.83855763722
+train loss 8.05213552238
+train loss 6.87946754465
+train loss 7.46308516068
+train loss 7.33469567045
+train loss 7.63376253552
+train loss 6.18362242381
+train loss 7.925706411
+train loss 7.07731266909
+train loss 7.39925422879
+train loss 6.87957707651
+train loss 7.81208399744
+train loss 7.46788402371
+train loss 6.86032110549
+train loss 7.57124784883
+train loss 7.78546272808
+train loss 7.20014797513
+train loss 7.4903482786
+train loss 7.5575753298
+train loss 7.47896244469
+train loss 7.28961555831
+train loss 8.03229931604
+train loss 7.06939981399
+train loss 7.16099973459
+train loss 7.71697546424
+train loss 7.81970963151
+train loss 6.8112974186
+train loss 7.0353491782
+train loss 7.33162688143
+train loss 7.37609554639
+train loss 8.20949526732
+train loss 8.12415865627
+train loss 7.56102574274
+train loss 7.038848826
+train loss 7.21606544486
+train loss 6.8680745242
+train loss 8.4799661528
+train loss 7.4185443876
+train loss 6.85565317101
+train loss 7.65194629091
+train loss 7.56723837768
+train loss 7.63427450649
+train loss 7.6292800678
+train loss 7.69200647633
+train loss 7.85811512582
+train loss 7.56059870875
+train loss 7.16185314862
+train loss 7.96307970207
+train loss 7.87519657643
+train loss 6.51802653295
+train loss 7.80857542561
+train loss 7.12180117777
+train loss 7.55824010165
+train loss 7.20445661455
+train loss 6.4709739549
+train loss 7.43076745693
+train loss 7.27141155025
+train loss 7.22039484033
+train loss 7.15783312257
+train loss 7.6784612763
+train loss 6.83759984537
+train loss 6.56583916758
+train loss 7.10368681741
+train loss 7.54629704774
+train loss 7.58568958793
+train loss 7.23351952385
+train loss 7.39951993218
+train loss 6.89979968276
+train loss 7.56027283298
+train loss 7.2666416288
+train loss 7.43840605603
+train loss 6.7683913356
+train loss 7.02857300253
+train loss 7.15652646258
+train loss 7.08810406191
+train loss 7.33165924787
+train loss 7.04137287284
+train loss 7.55950725357
+train loss 6.6722165133
+train loss 7.27195795367
+train loss 6.784357133
+train loss 7.19647278054
+train loss 7.63786235848
+train loss 7.58867241056
+train loss 6.48615216546
+train loss 8.01910521981
+train loss 7.24708494138
+train loss 7.35328065466
+train loss 7.45184740331
+train loss 7.15184644101
+train loss 7.05341325413
+train loss 7.77517748579
+train loss 7.35723567157
+train loss 7.77077943423
+train loss 7.44003502601
+train loss 6.78993251104
+train loss 7.31318552564
+train loss 7.09008999888
+train loss 8.20468725491
+train loss 7.47865319262
+train loss 7.77210597762
+train loss 7.10634510459
+train loss 7.52596407428
+train loss 6.58134210567
+train loss 7.30862220324
+train loss 7.47575938849
+train loss 7.52536588381
+train loss 7.58027937621
+train loss 7.36354998247
+train loss 6.26958962322
+train loss 6.98947609236
+train loss 6.91868115628
+train loss 7.15521683736
+train loss 7.09150427314
+train loss 7.58602481663
+train loss 6.68344853251
+train loss 6.74887938972
+train loss 7.5071264456
+train loss 7.60735495473
+train loss 7.78344617147
+train loss 6.6705096433
+train loss 6.82912817467
+train loss 7.22444774348
+train loss 6.84949980075
+train loss 5.88163028757
+train loss 7.551833983
+train loss 7.07826660584
+train loss 7.52524488428
+train loss 7.27283749724
+train loss 6.97714389484
+train loss 6.91304302328
+train loss 7.60474501449
+train loss 7.3013259912
+train loss 7.58679343481
+train loss 7.14845410722
+train loss 7.86472131926
+train loss 8.06643670023
+train loss 7.08416395607
+train loss 7.73131376342
+train loss 6.89936853436
+train loss 7.44960636187
+train loss 6.41533615838
+train loss 6.9164373729
+train loss 7.02593610227
+train loss 7.98374770498
+train loss 7.42219309945
+train loss 6.91092054328
+train loss 7.81865283983
+train loss 7.28366293852
+train loss 7.65161663448
+train loss 7.77680134617
+train loss 7.11425029087
+train loss 7.38586504923
+train loss 6.46631247062
+train loss 7.34760326398
+train loss 7.5619612322
+train loss 7.03402179603
+train loss 6.91651135143
+train loss 7.22401080989
+train loss 6.6340627563
+train loss 7.71675305219
+train loss 6.66806427607
+train loss 7.57718766907
+train loss 7.75356504905
+train loss 7.24934134334
+train loss 7.03383556552
+train loss 7.23491320495
+train loss 7.30472331454
+train loss 7.29318032239
+train loss 7.90038486721
+train loss 7.15290386447
+train loss 7.36486010482
+train loss 7.08169147835
+train loss 7.18796087007
+train loss 7.68516550865
+train loss 7.3322826987
+train loss 7.26600346761
+train loss 6.94205935424
+train loss 7.57944470082
+train loss 7.55399111964
+train loss 7.43787689426
+train loss 6.51594727075
+train loss 7.13725733296
+train loss 7.53865964386
+train loss 6.87242876593
+train loss 7.76031374422
+train loss 7.81639212239
+train loss 6.89749581078
+train loss 7.21956977801
+train loss 7.66817310468
+train loss 7.57723539685
+train loss 7.98029671141
+train loss 6.42943797559
+train loss 7.10402396919
+train loss 8.08176379953
+train loss 7.62910203124
+train loss 7.14024693118
+train loss 7.28046019105
+train loss 7.3813969379
+train loss 7.44113170521
+train loss 7.1705334772
+train loss 7.02075786055
+train loss 7.48594009857
+train loss 7.10157846071
+train loss 7.15853689837
+train loss 7.56434828117
+train loss 6.66645887418
+train loss 6.82392684912
+train loss 7.35296325273
+train loss 7.45663367858
+train loss 7.10605698079
+train loss 6.48959330483
+train loss 6.33398983538
+train loss 8.10720680535
+train loss 7.62823537551
+train loss 7.71294889881
+train loss 7.77658571002
+train loss 7.20390478648
+train loss 7.52345257992
+train loss 7.11323971089
+train loss 7.02000146744
+train loss 7.38089505277
+train loss 7.46248541293
+train loss 7.04289223916
+train loss 7.96985783286
+train loss 6.70812627924
+train loss 6.81104644885
+train loss 6.61732944989
+train loss 7.66047749947
+train loss 6.98229235986
+train loss 7.37386086836
+train loss 6.6825163299
+train loss 7.58559973088
+train loss 7.5414183671
+train loss 7.50165120728
+train loss 6.92843887465
+train loss 7.75417845625
+train loss 7.78089220505
+train loss 6.94247171882
+train loss 7.2544363416
+train loss 7.73132678649
+train loss 6.77469399909
+train loss 6.93722046032
+train loss 6.56279770928
+train loss 6.75075741003
+train loss 7.79572955908
+train loss 6.94969136603
+train loss 6.72267175192
+train loss 7.6591462736
+train loss 7.21727733852
+train loss 6.03831466621
+train loss 7.37556522976
+train loss 8.13604814788
+train loss 7.651250491
+train loss 6.97763688382
+train loss 6.82765307306
+train loss 7.62896403181
+train loss 8.17080672593
+train loss 7.53426576055
+train loss 6.98859103454
+train loss 7.2156726106
+train loss 7.03045955491
+train loss 7.32353628033
+train loss 6.98658281652
+train loss 6.87854796404
+train loss 7.18651316749
+train loss 7.08928142538
+train loss 7.0986788689
+train loss 7.30579113402
+train loss 7.30450229951
+train loss 7.84104500344
+train loss 7.70440719554
+train loss 7.29893513295
+train loss 6.60519015322
+train loss 6.22865452482
+train loss 8.00399460508
+train loss 7.42206938561
+train loss 7.09309834652
+train loss 7.09181804727
+train loss 7.09103813328
+train loss 6.65869656922
+train loss 7.46187673888
+train loss 6.8212702148
+train loss 6.56197914556
+train loss 7.68475155923
+train loss 6.88341956785
+train loss 6.97617721224
+train loss 7.03159779621
+train loss 6.82165188443
+train loss 6.80014796114
+train loss 6.95572991177
+train loss 7.51947531619
+train loss 6.90002022733
+train loss 7.06528349137
+train loss 8.15658218521
+train loss 7.32274507965
+train loss 7.27902884098
+train loss 7.52601928565
+train loss 7.13704952375
+train loss 6.95481687568
+train loss 7.48653584211
+train loss 7.09724975572
+train loss 6.53227300138
+train loss 7.90315524303
+train loss 7.39310675015
+train loss 6.87274131831
+train loss 7.6015081376
+train loss 7.12882641167
+train loss 6.98516024458
+train loss 7.80554930525
+train loss 7.10261397615
+train loss 7.2060608211
+train loss 7.55681777571
+train loss 6.91353508879
+train loss 6.98323346533
+train loss 7.18864008786
+train loss 7.93678454474
+train loss 7.25794878887
+train loss 6.32249176525
+train loss 6.48195542189
+train loss 6.98261245732
+train loss 6.83185125205
+train loss 6.64238822597
+train loss 6.83155680995
+train loss 6.48901781026
+train loss 6.99270386713
+train loss 6.81975379809
+train loss 6.45391972977
+train loss 7.05414383726
+train loss 7.10382153848
+train loss 7.23290621111
+train loss 6.176482937
+train loss 6.76908365605
+train loss 7.6843637746
+train loss 7.86223948517
+train loss 6.40039727553
+train loss 7.60996312146
+train loss 7.21135789904
+train loss 6.87969428728
+train loss 6.19614642142
+train loss 5.86804849476
+train loss 6.81165284391
+train loss 6.87780406086
+train loss 6.96298074249
+train loss 7.83377785323
+train loss 7.34448758551
+train loss 6.78340913356
+train loss 6.9199086582
+train loss 7.24524096833
+train loss 7.00460503697
+train loss 6.66274373337
+train loss 7.01090502819
+train loss 6.21839223513
+train loss 6.98120557885
+train loss 7.22135858687
+train loss 6.9953505158
+train loss 7.02493104801
+train loss 6.58208664944
+train loss 7.51688276101
+train loss 7.70691830269
+train loss 6.81509516561
+train loss 6.83283040606
+train loss 6.53973086153
+train loss 7.28009027779
+train loss 6.96826081947
+train loss 6.96708974727
+train loss 6.81988973206
+train loss 6.97540505742
+train loss 7.16691304951
+train loss 6.79166391568
+train loss 7.85777075517
+train loss 6.87363389058
+train loss 6.77443782525
+train loss 7.76934937385
+train loss 6.69077583034
+train loss 6.57223198699
+train loss 6.99754414328
+train loss 7.12154447159
+train loss 7.2023650204
+train loss 7.46122738602
+train loss 7.05730004874
+train loss 7.34973915836
+train loss 7.08563490229
+train loss 6.42185103953
+train loss 6.96033870903
+train loss 7.63166144536
+train loss 6.3798734319
+train loss 7.54276651467
+train loss 6.4818697104
+train loss 6.8117684255
+train loss 7.61850331578
+train loss 6.51539290547
+train loss 7.62191970445
+train loss 7.12091075035
+train loss 7.19039445106
+train loss 6.24113542129
+train loss 7.36939501437
+train loss 7.55365016635
+train loss 7.15522540618
+train loss 7.42362102428
+train loss 6.84957985355
+train loss 7.42471156366
+train loss 7.59601205754
+train loss 6.65034778738
+train loss 6.81827274608
+train loss 7.17698170472
+train loss 7.26922120074
+train loss 6.50413885293
+train loss 6.84980261506
+train loss 7.21213941847
+train loss 7.11130870452
+train loss 7.27641411557
+train loss 7.28334377955
+train loss 6.76374651485
+train loss 7.65607262322
+train loss 7.82079142142
+train loss 7.63813758553
+train loss 6.32667532927
+train loss 7.43840149709
+train loss 7.10358564995
+train loss 6.98687761774
+train loss 7.68019148394
+train loss 7.54297726175
+train loss 8.17698070012
+train loss 6.48833696143
+train loss 7.05367773567
+train loss 7.08504028552
+train loss 7.6697985755
+train loss 7.13955560111
+train loss 6.78413455872
+train loss 7.66879809853
+train loss 6.8287668821
+train loss 7.47504447268
+train loss 7.36910507989
+train loss 6.82670609623
+train loss 6.97793232133
+train loss 7.32040154439
+train loss 7.23626871297
+train loss 7.4329432162
+train loss 7.40849281286
+train loss 6.81299366733
+train loss 6.58466936418
+train loss 7.25399414982
+train loss 6.92560827018
+train loss 7.09370408385
+train loss 8.24983067301
+train loss 6.72406315316
+train loss 7.12001134577
+train loss 7.15587577021
+train loss 6.83095689925
+train loss 7.61592753026
+train loss 7.33571199803
+train loss 8.04879661177
+train loss 7.32859100356
+train loss 7.12706139364
+train loss 7.65634299506
+train loss 6.9936809886
+train loss 6.71729755822
+train loss 6.84605013003
+train loss 7.52296707749
+train loss 7.98487108753
+train loss 7.69423848985
+train loss 6.50513360832
+train loss 7.4639936418
+train loss 7.35370706496
+train loss 7.85686975601
+train loss 6.47104506788
+train loss 7.64461395292
+train loss 7.49372407153
+train loss 7.21958971599
+train loss 6.96764016091
+train loss 6.11801825
+train loss 7.47517267499
+train loss 6.86233609354
+train loss 6.76689693103
+train loss 6.6147151883
+train loss 6.79648786216
+train loss 6.91578480527
+train loss 7.26613306219
+train loss 7.43197834656
+train loss 6.5498603172
+train loss 6.98300131195
+train loss 6.30134343875
+train loss 6.80161136728
+train loss 7.05904797002
+train loss 7.02288840969
+train loss 7.52355014201
+train loss 6.31780559607
+train loss 7.22043615683
+train loss 7.58157575401
+train loss 6.28059541388
+train loss 7.20719877186
+train loss 6.48430852196
+train loss 6.64708801172
+train loss 6.77224777333
+train loss 7.02867816864
+train loss 6.39868614776
+train loss 6.99137086554
+train loss 7.07889480994
+train loss 6.7941048599
+train loss 6.60607880567
+train loss 6.37003296181
+train loss 7.42405386096
+train loss 7.29996366714
+train loss 7.73417248663
+train loss 7.80494904642
+train loss 7.80776909706
+train loss 7.62342169929
+train loss 6.37558337386
+train loss 6.98169587698
+train loss 7.29323006329
+train loss 6.80777820226
+train loss 6.39896954876
+train loss 6.73211855262
+train loss 6.85443727106
+train loss 6.71746985539
+train loss 7.12666142142
+train loss 7.32076063281
+train loss 6.54135469388
+train loss 7.10311310468
+train loss 6.57486551517
+train loss 6.07135196451
+train loss 6.53211078469
+train loss 7.5975135001
+train loss 7.289122743
+train loss 6.81075177947
+train loss 6.3837820933
+train loss 6.23396594368
+train loss 6.99388643358
+train loss 7.68287433367
+train loss 7.2774163219
+train loss 6.89290460154
+train loss 6.79237248336
+train loss 7.22052344095
+train loss 6.80458886631
+train loss 7.29490351686
+train loss 6.64188831292
+train loss 7.22394467251
+train loss 7.13248646533
+train loss 6.71810594868
+train loss 7.42164859931
+train loss 7.13402401387
+train loss 6.69128496227
+train loss 6.94717973161
+train loss 7.05644228824
+train loss 6.50843288011
+train loss 7.54977533115
+train loss 7.82261410417
+train loss 6.51842978297
+train loss 8.00274777052
+train loss 6.3766779886
+train loss 6.62747075654
+train loss 6.47281086165
+train loss 7.10366031633
+train loss 6.9271062578
+train loss 6.76869520814
+train loss 6.10068103757
+train loss 6.72191444538
+train loss 6.73934734944
+train loss 6.10084058988
+train loss 7.07944682611
+train loss 7.74388220349
+train loss 6.67897477213
+train loss 7.90706897821
+train loss 7.39355541176
+train loss 7.26127559285
+train loss 7.96231223272
+train loss 6.61288397774
+train loss 7.09997529965
+train loss 7.90538333443
+train loss 7.56926600651
+train loss 6.82658425055
+train loss 6.63941853482
+train loss 6.77085995372
+train loss 7.18295127882
+train loss 7.47424702788
+train loss 7.82150665216
+train loss 6.66399881171
+train loss 7.27644809009
+train loss 6.73193441702
+train loss 5.65661792164
+train loss 7.06223349512
+train loss 7.17544318558
+train loss 7.13710317351
+train loss 7.64327414936
+train loss 7.12568843652
+train loss 6.66330496287
+train loss 7.40620553695
+train loss 7.18425908798
+train loss 7.4061438817
+train loss 6.77965059069
+train loss 6.96433145768
+train loss 6.95899911194
+train loss 6.91532667963
+train loss 7.4371532009
+train loss 7.31874161446
+train loss 6.94057945305
+train loss 7.54699481384
+train loss 6.87372256846
+train loss 6.37368494464
+train loss 6.70052546324
+train loss 6.77395428282
+train loss 7.02251510885
+train loss 6.57533221255
+train loss 8.08219281008
+train loss 7.17989894162
+train loss 6.90028362319
+train loss 7.275952969
+train loss 6.22100545002
+train loss 6.42967134761
+train loss 8.65809938744
+train loss 7.06399901841
+train loss 6.87073348729
+train loss 6.7483979302
+train loss 6.71102142204
+train loss 7.29688524969
+train loss 6.20730591977
+train loss 7.23902992916
+train loss 6.42035309638
+train loss 6.84059140193
+train loss 5.77281737166
+train loss 8.8332034513
+train loss 7.07141892281
+train loss 7.24419185805
+train loss 6.50677730005
+train loss 6.54580893284
+train loss 6.57947408184
+train loss 7.54186221378
+train loss 7.15548282641
+train loss 7.59127448287
+train loss 7.44351661807
+train loss 7.24051435347
+train loss 7.24546054149
+train loss 7.7264944864
+train loss 7.52671847853
+train loss 6.86913593911
+train loss 7.51795801473
+train loss 6.80627662806
+train loss 6.62480498204
+train loss 7.52817888081
+train loss 7.67372679096
+train loss 7.34345826284
+train loss 6.0193511348
+train loss 6.99843941774
+train loss 6.78824095762
+train loss 7.02928732595
+train loss 7.07406228635
+train loss 6.74482087793
+train loss 7.59901933595
+train loss 7.18847140208
+train loss 7.16695837837
+train loss 7.91257631483
+train loss 7.7631071625
+train loss 7.64936275407
+train loss 7.24724215452
+train loss 7.3731134721
+train loss 7.71067080144
+train loss 6.80796021722
+train loss 7.06841193415
+train loss 6.25829222196
+train loss 6.918760059
+train loss 6.36519354557
+train loss 6.55811016219
+train loss 7.02685159666
+train loss 7.0480379276
+train loss 7.34634268955
+train loss 7.06072319198
+train loss 7.19385257005
+train loss 6.84579620396
+train loss 6.60934835413
+train loss 6.49136915677
+train loss 6.71465887983
+train loss 6.91712515768
+train loss 7.37761762987
+train loss 7.48528210218
+train loss 6.84505735727
+train loss 6.60029908834
+train loss 6.42725542038
+train loss 7.47326763698
+train loss 7.03542284061
+train loss 7.03773500614
+train loss 7.03732973872
+train loss 6.71525877782
+train loss 6.17336122536
+train loss 7.74990812802
+train loss 6.86911555583
+train loss 7.4051968396
+train loss 7.53421282669
+train loss 7.01104704789
+train loss 6.23443463199
+train loss 6.90629665566
+train loss 7.67239523231
+train loss 6.75175729799
+train loss 7.19172197501
+train loss 7.56663393396
+train loss 7.02187017095
+train loss 6.90683861033
+train loss 7.06907837921
+train loss 8.19898272863
+train loss 7.12924183395
+train loss 6.58814865573
+train loss 7.98090634048
+train loss 7.02439135432
+train loss 6.90109303762
+train loss 7.45589831695
+train loss 6.77811690493
+train loss 6.55821233432
+train loss 7.08799229941
+train loss 6.08394045652
+train loss 6.915358227
+train loss 6.44456389068
+train loss 8.40645583223
+train loss 7.25253496813
+train loss 6.30687160737
+train loss 6.76482588461
+train loss 6.38960956347
+train loss 7.17121658988
+train loss 8.23583333925
+train loss 7.22888998046
+train loss 6.7697304468
+train loss 6.29494075308
+train loss 7.42962429491
+train loss 7.15910861609
+train loss 7.20785071915
+train loss 6.19593787692
+train loss 6.5732848278
+train loss 6.4878465026
+train loss 6.8374710298
+train loss 7.0871359361
+train loss 7.27200020221
+train loss 7.25752229247
+train loss 6.28630101537
+train loss 6.13303063021
+train loss 7.21487680306
+train loss 6.81258968924
+train loss 7.01490785115
+train loss 6.5348484733
+train loss 6.90597642652
+train loss 6.95571450009
+train loss 6.89447595393
+train loss 6.8148250187
+train loss 6.64047421738
+train loss 6.7880143715
+train loss 5.96547423907
+train loss 7.88311563947
+train loss 6.90826116713
+train loss 8.15594256915
+train loss 7.35806446584
+train loss 7.01641489921
+train loss 6.9615603644
+train loss 6.92140746187
+train loss 6.85898491221
+train loss 7.32866039302
+train loss 7.38863980173
+train loss 7.05087797249
+train loss 6.83012670264
+train loss 6.09079738442
+train loss 7.00289317327
+train loss 6.8939439202
+train loss 7.41011816629
+train loss 6.35204834937
+train loss 7.06737234088
+train loss 7.91750267984
+train loss 6.99264277934
+train loss 7.0426475556
+train loss 7.55724257989
+train loss 7.18613573973
+train loss 6.48390541763
+train loss 7.31503872993
+train loss 6.52657558242
+train loss 6.94269804875
+train loss 6.32184748684
+train loss 7.39072559066
+train loss 6.45028820069
+train loss 7.20307513798
+train loss 7.73095128056
+train loss 8.22221026608
+train loss 5.98400835319
+train loss 7.2203916436
+train loss 6.69465507617
+train loss 6.25433234161
+train loss 6.81777136872
+train loss 6.3089278016
+train loss 7.07456919717
+train loss 7.92181423134
+train loss 7.09158181337
+train loss 7.11548341979
+train loss 7.12102727585
+train loss 6.68842493182
+train loss 7.348969398
+train loss 6.77001450611
+train loss 7.04431152796
+train loss 7.45242659574
+train loss 6.60733983125
+train loss 6.77528579605
+train loss 6.68550537127
+train loss 6.05552394824
+train loss 7.47007234392
+train loss 6.75972373465
+train loss 6.19432826818
+train loss 6.6229795059
+train loss 6.51734971464
+train loss 7.16639779843
+train loss 7.52326939545
+train loss 6.8764256504
+train loss 6.98944990056
+train loss 6.66755447355
+train loss 6.87607067991
+train loss 6.78967206826
+train loss 7.77943138378
+train loss 6.41700240701
+train loss 6.73988287705
+train loss 7.10756280289
+train loss 7.57997933005
+train loss 5.67219390569
+train loss 6.24992800484
+train loss 6.99438995894
+train loss 7.1636685175
+train loss 6.93970595644
+train loss 6.37881855515
+train loss 7.00654556925
+train loss 7.16849949352
+train loss 6.6887935658
+train loss 7.04761013211
+train loss 7.68881578847
+train loss 6.57005565842
+train loss 7.97423045151
+train loss 6.9926280164
+train loss 7.23567745349
+train loss 7.64531580946
+train loss 6.73497559958
+train loss 7.01272621008
+train loss 6.77313801896
+train loss 7.90711212605
+train loss 7.35360142108
+train loss 6.5680525686
+train loss 6.68095388931
+train loss 6.98758706718
+train loss 6.36075488108
+train loss 5.69260497161
+train loss 7.74970387507
+train loss 7.53961348848
+train loss 7.65017619173
+train loss 6.74078683964
+train loss 7.48716847024
+train loss 6.9291131053
+train loss 7.2671666645
+train loss 7.37050022836
+train loss 6.78397720731
+train loss 7.52894285787
+train loss 6.88305393124
+train loss 7.65956295582
+train loss 7.20210918107
+train loss 7.13399653404
+train loss 6.69739904485
+train loss 6.11301850591
+train loss 7.05243215266
+train loss 7.21684345821
+train loss 7.23564453085
+train loss 6.15545554776
+train loss 6.5856070147
+train loss 5.91026247418
+train loss 7.09311438154
+train loss 6.85318503295
+train loss 7.29244568325
+train loss 6.96962328886
+train loss 7.90686982748
+train loss 7.71989733662
+train loss 6.83989321962
+train loss 6.65946539638
+train loss 6.48558919717
+train loss 6.61116197774
+train loss 6.23339921297
+train loss 6.8109599547
+train loss 6.68550173211
+train loss 6.88878451453
+train loss 7.49184087536
+train loss 6.88224497503
+train loss 7.48233139733
+train loss 6.8673971391
+train loss 6.80791550608
+train loss 6.59128623547
+train loss 6.6746873846
+train loss 7.36391631133
+train loss 7.83347696021
+train loss 6.7093695711
+train loss 6.49869788375
+train loss 7.23406183662
+train loss 7.30308405362
+train loss 8.24951742742
+train loss 6.39024390845
+train loss 6.53445634853
+train loss 7.50170510076
+train loss 6.96169535177
+train loss 6.9241073754
+train loss 6.63761712596
+train loss 7.04992857001
+train loss 6.3104408261
+train loss 6.34692834928
+train loss 7.40766275343
+train loss 7.15417714356
+train loss 7.03636475618
+train loss 6.88121973452
+train loss 6.47677399884
+train loss 7.32488854387
+train loss 7.22300098049
+train loss 6.77270711161
+train loss 6.69213577867
+train loss 7.14221350893
+train loss 7.01131281821
+train loss 6.59103471893
+train loss 6.20877844052
+train loss 6.98477725183
+train loss 6.59860073788
+train loss 7.67023119284
+train loss 6.43167293412
+train loss 6.4552095872
+train loss 7.46560016681
+train loss 7.15975155597
+train loss 7.16061708367
+train loss 7.39644211592
+train loss 6.90135325735
+train loss 6.79981703879
+train loss 7.00459031324
+train loss 7.52919575318
+train loss 6.69760248359
+train loss 6.66704764749
+train loss 7.09484558432
+train loss 6.98634491464
+train loss 7.53342564001
+train loss 6.90016068452
+train loss 6.64121996007
+train loss 7.18232435021
+train loss 6.6855952443
+train loss 6.77997309004
+train loss 6.20136917586
+train loss 6.03185065999
+train loss 7.10895978375
+train loss 8.1379291727
+train loss 6.72009280141
+train loss 7.09212405069
+train loss 6.91201972333
+train loss 7.13786693591
+train loss 6.41548377999
+train loss 6.79652046048
+train loss 6.9941488774
+train loss 6.79838617352
+train loss 7.40891762131
+train loss 7.02959663336
+train loss 6.75791581177
+train loss 7.04144390504
+train loss 5.74216067057
+train loss 6.57285840315
+train loss 5.99170101546
+train loss 6.30116857001
+train loss 7.40897748352
+train loss 7.33163676412
+train loss 7.11490200982
+train loss 6.4024903976
+train loss 6.90000466509
+train loss 6.80828566952
+train loss 6.7428203642
+train loss 7.46234131604
+train loss 6.45510351118
+train loss 7.1614595072
+train loss 7.03846421225
+train loss 6.77590796908
+train loss 6.53788781251
+train loss 7.29445476379
+train loss 6.63345640502
+train loss 7.15461213099
+train loss 6.92286942091
+train loss 7.29950774861
+train loss 7.02155639523
+train loss 7.52516515489
+train loss 7.17611448607
+train loss 6.89043216054
+train loss 6.59081556537
+train loss 7.26417107176
+train loss 7.2163563388
+train loss 6.23650790874
+train loss 6.50520186716
+train loss 6.98041360236
+train loss 6.55175210277
+train loss 7.38169396785
+train loss 6.17534988572
+train loss 5.9154681077
+train loss 7.23351364045
+train loss 7.10462811443
+train loss 6.39130736147
+train loss 6.73187573801
+train loss 6.8381012305
+train loss 7.32692633262
+train loss 6.88919237386
+train loss 6.704811538
+train loss 6.20598138186
+train loss 6.96513927485
+train loss 6.26302562973
+train loss 6.18993063166
+train loss 6.871519597
+train loss 6.47677868396
+train loss 6.91099804105
+train loss 7.03124998049
+train loss 6.0746074374
+train loss 6.57557937306
+train loss 7.13983366504
+train loss 6.96570114512
+train loss 7.105176885
+train loss 6.39477000405
+train loss 6.37728736232
+train loss 7.30794368418
+train loss 7.58743016604
+train loss 6.86880898601
+train loss 6.84940302211
+train loss 6.64633973602
+train loss 6.99345455111
+train loss 6.52234501298
+train loss 6.58231541879
+train loss 7.6866977516
+train loss 7.02680431497
+train loss 7.45783912203
+train loss 7.50396796716
+train loss 6.50417069757
+train loss 6.83742354447
+train loss 6.66558173711
+train loss 7.4243530776
+train loss 6.7528220656
+train loss 6.89567948187
+train loss 6.60982275587
+train loss 6.90420894834
+train loss 6.65791597239
+train loss 6.40171390056
+train loss 7.44585168297
+train loss 6.76493255461
+train loss 6.59094806359
+train loss 7.30986512816
+train loss 6.53332024735
+train loss 7.51556584406
+train loss 7.36081482706
+train loss 7.53730701312
+train loss 7.85407118388
+train loss 6.4921336685
+train loss 7.25995087662
+train loss 6.45207060957
+train loss 6.421627198
+train loss 7.08135705882
+train loss 7.01843521111
+train loss 6.5342833534
+train loss 6.77892619842
+train loss 7.65799684653
+train loss 7.38457153463
+train loss 6.91772125151
+train loss 6.91585711898
+train loss 7.10749375132
+train loss 7.23599126319
+train loss 6.82332658766
+train loss 7.1335908648
+train loss 7.28285071112
+train loss 6.63908506931
+train loss 6.49717508289
+train loss 6.57878636487
+train loss 6.99566403796
+train loss 6.79754390638
+train loss 6.65503257031
+train loss 7.26186944496
+train loss 6.55253644635
+train loss 7.28052807079
+train loss 6.98083784989
+train loss 7.33437459252
+train loss 6.58651649631
+train loss 6.39675879519
+train loss 7.47842880225
+train loss 7.47680192113
+train loss 7.04007021646
+train loss 7.16570293811
+train loss 6.8265720661
+train loss 7.31674073414
+train loss 6.78314019879
+train loss 7.33405772586
+train loss 7.41678167055
+train loss 8.0415184394
+train loss 6.74493863343
+train loss 7.1936620199
+train loss 7.31991249797
+train loss 6.53043721511
+train loss 7.8381064433
+train loss 6.953102984
+train loss 6.75920695502
+train loss 6.93130512685
+train loss 7.209940746
+train loss 6.89238447512
+train loss 6.8998264106
+train loss 6.19097991884
+train loss 6.38398102674
+train loss 7.20430613429
+train loss 7.57789444116
+train loss 6.98877079069
+train loss 7.07851340887
+train loss 7.14445456138
+train loss 6.50489922333
+train loss 7.32539494322
+train loss 6.5328647794
+train loss 6.91372564778
+train loss 6.97612656543
+train loss 7.15729747343
+train loss 6.6302470483
+train loss 7.34735214638
+train loss 7.06032184719
+train loss 6.86354771606
+train loss 6.43121371818
+train loss 6.60942530093
+train loss 6.64499003435
+train loss 7.39267279486
+train loss 7.09980000282
+train loss 7.51548071517
+train loss 6.7271814269
+train loss 6.95516691539
+train loss 7.0061558792
+train loss 6.68156438256
+train loss 6.74952732826
+train loss 7.21246522693
+train loss 6.27249361687
+train loss 6.73005578817
+train loss 6.81170834323
+train loss 7.1357899356
+train loss 6.68262643992
+train loss 6.59714758015
+train loss 7.01253021914
+train loss 6.94660262719
+train loss 6.63608524628
+train loss 6.34778569972
+train loss 6.88535698339
+train loss 7.27363780887
+train loss 7.09282864671
+train loss 6.01461361418
+train loss 6.61729178816
+train loss 7.28751501341
+train loss 7.19590574614
+train loss 6.06125838751
+train loss 5.96125851587
+train loss 7.57749948846
+train loss 5.83705702521
+train loss 6.55465129041
+train loss 6.21821579032
+train loss 6.9946874799
+train loss 6.95442611908
+train loss 7.18533709427
+train loss 6.47142587957
+train loss 6.77181338764
+train loss 7.35180183127
+train loss 6.31601955802
+train loss 6.15381324685
+train loss 7.52991536576
+train loss 7.45045769265
+train loss 6.6029791966
+train loss 6.99350429299
+train loss 7.36145528265
+train loss 7.01316630968
+train loss 6.25992979603
+train loss 6.9028640502
+train loss 6.17827332316
+train loss 7.49215552443
+train loss 7.24488274112
+train loss 7.35918068857
+train loss 6.6479634141
+train loss 7.08334097329
+train loss 7.15703929527
+train loss 6.66645670806
+train loss 7.91661200702
+train loss 7.0873724193
+train loss 7.37247358208
+train loss 6.60378273466
+train loss 7.23841465396
+train loss 6.97744662503
+train loss 6.32484682423
+train loss 7.29021859286
+train loss 6.95146951404
+train loss 6.96440796393
+train loss 6.5986460461
+train loss 6.60827047692
+train loss 7.90420493762
+train loss 6.87245183429
+train loss 7.63375251569
+train loss 7.25220332176
+train loss 7.33601469992
+train loss 6.17760808989
+train loss 6.19913394836
+train loss 6.55931743344
+train loss 7.01134064081
+train loss 6.26607170657
+train loss 7.08930172939
+train loss 5.787955886
+train loss 6.92944212099
+train loss 6.57199745743
+train loss 7.27219021798
+train loss 6.97724421339
+train loss 6.97723061698
+train loss 7.04983976632
+train loss 7.41197314187
+train loss 7.28035671005
+train loss 6.46104245266
+train loss 6.54182913719
+train loss 6.78238247116
+train loss 6.96326399431
+train loss 6.75235992005
+train loss 5.76066139724
+train loss 8.02225331471
+train loss 7.14334652639
+train loss 7.31239127265
+train loss 7.27414611377
+train loss 7.25104973436
+train loss 6.87630964629
+train loss 7.39968960435
+train loss 7.13813719621
+train loss 7.12434214402
+train loss 7.75075443794
+train loss 7.52241644528
+train loss 6.30701493618
+train loss 6.17484706731
+train loss 7.36920558057
+train loss 7.06695979186
+train loss 6.02855109028
+train loss 6.06512276187
+train loss 6.42623973008
+train loss 6.54190217537
+train loss 6.45541075948
+train loss 5.60736159752
+train loss 6.43510829631
+train loss 6.74552198847
+train loss 6.97915728109
+train loss 7.16279109476
+train loss 6.30943987115
+train loss 7.07200740857
+train loss 6.6587529984
+train loss 6.99106477682
+train loss 5.89438300277
+train loss 6.23539554576
+train loss 6.44735166223
+train loss 6.51228867238
+train loss 6.65839021387
+train loss 5.90231171904
+train loss 6.66917753128
+train loss 6.80495528396
+train loss 7.52812616601
+train loss 6.8622674979
+train loss 6.68046490034
+train loss 6.49081345336
+train loss 7.05987040957
+train loss 6.36503831284
+train loss 6.81149841687
+train loss 6.4454317127
+train loss 6.57802625151
+train loss 6.85889185955
+train loss 6.84747106163
+train loss 6.92332860353
+train loss 6.89243274251
+train loss 6.17286306637
+train loss 7.20503214681
+train loss 6.99462651437
+train loss 6.78841024152
+train loss 6.51931238352
+train loss 7.36592200581
+train loss 6.765978851
+train loss 7.04916276593
+train loss 6.82152723878
+train loss 6.44947879921
+train loss 5.88364593439
+train loss 7.07371534468
+train loss 6.2008446808
+train loss 6.63875454981
+train loss 7.29642842154
+train loss 6.56387022367
+train loss 6.62591347694
+train loss 7.23680004887
+train loss 7.1410264761
+train loss 6.19129745423
+train loss 6.22322099231
+train loss 6.27695919015
+train loss 6.49798605957
+train loss 7.04592397079
+train loss 5.82738980489
+train loss 7.30596096187
+train loss 6.92191008261
+train loss 5.87893829212
+train loss 6.67519941496
+train loss 6.49055089243
+train loss 6.79591341526
+train loss 6.52169574341
+train loss 7.16979193363
+train loss 6.76482693213
+train loss 6.95451290358
+train loss 7.8401652464
+train loss 7.19089998799
+train loss 7.41997768216
+train loss 6.81564608196
+train loss 6.96598230789
+train loss 7.13347547351
+train loss 7.72209549863
+train loss 7.16309489354
+train loss 7.80367376093
+train loss 7.97940113515
+train loss 6.83071189744
+train loss 6.67559204387
+train loss 6.79877527581
+train loss 6.47056179886
+train loss 7.1486650238
+train loss 7.46845148393
+train loss 6.78569590021
+train loss 7.87961169739
+train loss 6.86089892289
+train loss 6.80656888357
+train loss 6.65459958818
+train loss 7.03959537929
+train loss 6.93091029972
+train loss 7.10832046428
+train loss 6.85154937845
+train loss 7.14245471072
+train loss 6.59410603499
+train loss 7.54147407448
+train loss 6.44358587131
+train loss 6.92517419952
+train loss 6.98890338396
+train loss 6.68893736974
+train loss 7.14812376585
+train loss 7.82650898249
+train loss 7.05797624168
+train loss 6.78031368675
+train loss 6.59368453417
+train loss 6.24809865683
+train loss 6.81258222134
+train loss 7.1094241177
+train loss 6.35962006395
+train loss 6.4823731517
+train loss 6.54792926356
+train loss 6.54805416072
+train loss 6.38282744959
+train loss 6.40622950468
+train loss 6.66254340345
+train loss 6.20568056763
+train loss 7.28513789358
+train loss 6.30384829127
+train loss 6.51725852356
+train loss 6.5204973623
+train loss 7.86865668888
+train loss 6.1822601846
+train loss 7.05650291332
+train loss 7.27436912874
+train loss 6.7282214383
+train loss 6.53515238135
+train loss 6.39663659831
+train loss 6.5632538734
+train loss 6.61565402585
+train loss 6.44815093608
+train loss 7.05520237359
+train loss 6.51527471943
+train loss 7.57230737821
+train loss 5.59270219778
+train loss 7.09036642467
+train loss 6.71692569641
+train loss 7.07228154143
+train loss 7.54957084018
+train loss 7.03290611876
+train loss 6.47763154838
+train loss 6.27213896574
+train loss 7.09742603466
+train loss 6.97013952182
+train loss 7.38347023251
+train loss 6.82294093046
+train loss 7.26096707683
+train loss 6.58707333088
+train loss 6.22578504176
+train loss 6.68943500517
+train loss 7.60222246712
+train loss 7.51605121389
+train loss 7.12194778265
+train loss 6.66679315481
+train loss 7.1932624564
+train loss 6.25916551168
+train loss 7.00006280393
+train loss 7.06660238689
+train loss 6.53667019973
+train loss 6.67881713964
+train loss 7.23331015943
+train loss 7.11819122263
+train loss 6.71142054597
+train loss 7.13304894018
+train loss 7.58639116247
+train loss 7.38085482477
+train loss 6.61344345402
+train loss 7.21246442265
+train loss 6.17800194858
+train loss 7.0035037813
+train loss 6.33543775502
+train loss 6.70391800435
+train loss 6.92396970187
+train loss 6.32204553368
+train loss 6.47916970369
+train loss 5.91091948503
+train loss 5.72962950133
+train loss 6.73541338012
+train loss 7.16130499084
+train loss 7.33255025509
+train loss 7.74129102238
+train loss 6.83172642571
+train loss 6.80902779818
+train loss 6.85226618737
+train loss 7.26829918767
+train loss 7.03235557843
+train loss 7.68782298332
+train loss 6.87950693364
+train loss 6.9016057219
+train loss 6.53432867698
+train loss 6.54420039133
+train loss 7.19405634266
+train loss 5.75402759054
+train loss 6.0889496074
+train loss 6.06724148647
+train loss 7.09955015886
+train loss 7.41065364306
+train loss 6.7066534225
+train loss 7.18756359936
+train loss 7.11800677368
+train loss 7.19361563431
+train loss 6.66519361327
+train loss 6.87609462085
+train loss 6.37690921749
+train loss 6.86600815632
+train loss 7.51860559556
+train loss 7.37602486263
+train loss 6.95850833924
+train loss 6.89982826214
+train loss 6.7118877463
+train loss 7.37197432026
+train loss 7.33642991076
+train loss 6.30614826749
+train loss 6.26805352249
+train loss 6.80108160095
+train loss 7.23567012822
+train loss 7.03485879919
+train loss 6.36204173655
+train loss 7.00055843182
+train loss 6.62003041581
+train loss 8.06800194937
+train loss 6.91106664615
+train loss 7.6636203645
+train loss 8.06898757204
+train loss 6.25127848641
+train loss 7.18775628325
+train loss 6.64729115595
+train loss 7.09704900257
+train loss 7.43355344072
+train loss 6.54419812173
+train loss 6.75124682438
+train loss 7.0074270509
+train loss 6.05487029882
+train loss 6.9394299084
+train loss 6.52077772417
+train loss 7.0413891771
+train loss 6.76935514982
+train loss 7.2349015408
+train loss 6.97116444191
+train loss 6.84595015282
+train loss 6.8517550869
+train loss 7.11680054908
+train loss 7.0113704177
+train loss 5.65542375666
+train loss 5.76087570705
+train loss 7.06534096317
+train loss 7.11602574725
+train loss 6.55173811881
+train loss 7.4632882024
+train loss 6.7601732313
+train loss 6.68471337972
+train loss 6.73939587831
+train loss 7.23080228596
+train loss 5.88038982471
+train loss 6.5368606156
+train loss 6.9833393892
+train loss 6.91294479849
+train loss 6.80998917005
+train loss 6.61539876963
+train loss 7.1520167238
+train loss 6.21987668998
+train loss 6.83173242069
+train loss 6.96831477964
+train loss 6.74637037873
+train loss 7.1332712134
+train loss 7.10034407835
+train loss 7.12703252163
+train loss 6.61467058209
+train loss 6.81084735795
+train loss 6.98397570939
+train loss 6.6664800573
+train loss 6.77061599179
+train loss 6.3543330221
+train loss 6.11982113455
+train loss 6.88886485018
+train loss 6.94097539678
+train loss 6.45722203781
+train loss 7.11938867019
+train loss 6.07802196619
+train loss 7.3281025079
+train loss 6.52249456885
+train loss 7.8999328833
+train loss 6.85683064438
+train loss 6.09319396557
+train loss 6.1565578145
+train loss 7.0527510069
+train loss 7.2809562044
+train loss 6.58294152726
+train loss 6.86918015096
+train loss 7.84571820426
+train loss 7.37646131039
+train loss 6.4975302514
+train loss 6.11393556948
+train loss 6.64096881004
+train loss 6.16639014878
+train loss 6.6967734049
+train loss 6.49291788447
+train loss 6.74068268084
+train loss 6.50483020871
+train loss 6.52690627213
+train loss 6.63235402107
+train loss 7.1148486965
+train loss 6.99096074853
+train loss 6.22355652779
+train loss 7.18283781875
+train loss 6.68411736524
+train loss 7.50860050204
+train loss 6.15303874261
+train loss 7.01789527373
+train loss 6.82847111395
+train loss 6.724016873
+train loss 6.28754975112
+train loss 6.75909055985
+train loss 7.90763725242
+train loss 6.12591370009
+train loss 7.21615761006
+train loss 7.0054644247
+train loss 6.5488627856
+train loss 7.35302174999
+train loss 6.70279505853
+train loss 7.69023288617
+train loss 6.20080581906
+train loss 7.02222250762
+train loss 7.17076962432
+train loss 7.05998423207
+train loss 6.07920054184
+train loss 7.27197567657
+train loss 6.56922954501
+train loss 7.12678541443
+train loss 6.39653496439
+train loss 7.04521637285
+train loss 7.28220819721
+train loss 6.85408154252
+train loss 6.55480440996
+train loss 6.53205653001
+train loss 7.48726978723
+train loss 6.74653562968
+train loss 6.44756914051
+train loss 7.46811539827
+train loss 6.42372513846
+train loss 6.86116687595
+train loss 6.70952022903
+train loss 6.62158539914
+train loss 6.8099890434
+train loss 6.66311185381
+train loss 7.3124623744
+train loss 6.23437244617
+train loss 6.93887993681
+train loss 6.31196315661
+train loss 7.02721226859
+train loss 6.64835089402
+train loss 7.41700808745
+train loss 6.64247823199
+train loss 6.6500145921
+train loss 6.56354070918
+train loss 6.57034067779
+train loss 6.2340361849
+train loss 6.80920741394
+train loss 6.38130646884
+train loss 6.63380542279
+train loss 6.84545851584
+train loss 7.19539192928
+train loss 7.15773881635
+train loss 7.57269142196
+train loss 6.12213984036
+train loss 6.36787025192
+train loss 6.33186636663
+train loss 5.99733060619
+train loss 6.99539368155
+train loss 6.72739226283
+train loss 7.04312771505
+train loss 6.92341281454
+train loss 6.92691516012
+train loss 6.49057000917
+train loss 6.29681290382
+train loss 6.69430552932
+train loss 7.01248905565
+train loss 6.95603759728
+train loss 7.66202804097
+train loss 6.79671284017
+train loss 7.1665630265
+train loss 7.09924421431
+train loss 6.35808983963
+train loss 7.05289413871
+train loss 7.20378442683
+train loss 7.10672996723
+train loss 7.29141729699
+train loss 6.85503858065
+train loss 6.22691363657
+train loss 6.87020591608
+train loss 7.03387351087
+train loss 6.39352855528
+train loss 6.49107217873
+train loss 6.76687250329
+train loss 6.30063733558
+train loss 6.86627948057
+train loss 7.28275510035
+train loss 7.79079449683
+train loss 6.8956560962
+train loss 7.40825198422
+train loss 6.39095899407
+train loss 7.18580495882
+train loss 7.39377151298
+train loss 6.88844859325
+train loss 6.75916722138
+train loss 6.82531290245
+train loss 6.75185641548
+train loss 7.97946130435
+train loss 6.6984598366
+train loss 7.22759363308
+train loss 6.80762671833
+train loss 6.85968963802
+train loss 5.80545120809
+train loss 7.23929335427
+train loss 7.29128544693
+train loss 7.12221285437
+train loss 6.58902165845
+train loss 6.17826433276
+train loss 7.18214245683
+train loss 6.37294495382
+train loss 7.00349583248
+train loss 6.92065721901
+train loss 6.49943468508
+train loss 7.38731622926
+train loss 7.37469231956
+train loss 7.4948061463
+train loss 6.86984094241
+train loss 6.95080220737
+train loss 6.73682478659
+train loss 6.34943717182
+train loss 6.57923282559
+train loss 6.72679078613
+train loss 6.9209400561
+train loss 6.7850324929
+train loss 7.32981886576
+train loss 7.29436581617
+train loss 7.03034479061
+train loss 6.79959479159
+train loss 6.23967368564
+train loss 6.4355758455
+train loss 7.36258637163
+train loss 7.01749129575
+train loss 7.24377068852
+train loss 6.94007870827
+train loss 6.37820281919
+train loss 5.88605992799
+train loss 7.55806990385
+train loss 6.20682067544
+train loss 7.19480549776
+train loss 5.85978717658
+train loss 7.19263425906
+train loss 7.1319612583
+train loss 6.25793260234
+train loss 7.45591181926
+train loss 6.95828036149
+train loss 7.20001446563
+train loss 6.67197994728
+train loss 7.51712159038
+train loss 6.72790172511
+train loss 7.14136970607
+train loss 7.25477618519
+train loss 7.05448796523
+train loss 7.4578645256
+train loss 6.54598660472
+train loss 7.58310150298
+train loss 6.75685575775
+train loss 7.0970533397
+train loss 6.42317406852
+train loss 7.80771327449
+train loss 7.6602040117
+train loss 7.00186952681
+train loss 6.88069173237
+train loss 7.17815672611
+train loss 6.55490110355
+train loss 7.60438641648
+train loss 6.79800954932
+train loss 7.22376699788
+train loss 7.2344068686
+train loss 7.11651550375
+train loss 6.33438665193
+train loss 6.84257294339
+train loss 7.76405611981
+train loss 7.09768192734
+train loss 7.10952066181
+train loss 6.25392440603
+train loss 7.2403970246
+train loss 6.6012975194
+train loss 6.90824528033
+train loss 7.03624176117
+train loss 6.68832376136
+train loss 6.71613229176
+train loss 6.92046416649
+train loss 7.05461658185
+train loss 6.51491095861
+train loss 6.41612779935
+train loss 6.29352533825
+train loss 6.71088304733
+train loss 6.75552487998
+train loss 6.67981375351
+train loss 7.19988239693
+train loss 7.08593888439
+train loss 7.30077081977
+train loss 6.45232440373
+train loss 7.68640140191
+train loss 7.25833391149
+train loss 7.13265291106
+train loss 7.05788383032
+train loss 6.84572613124
+train loss 7.10145358137
+train loss 6.15677666735
+train loss 7.07148132637
+train loss 6.54392342548
+train loss 6.02049410143
+train loss 6.60420782844
+train loss 6.96075489719
+train loss 7.39539532988
+train loss 7.45001606025
+train loss 7.05676324091
+train loss 6.78430246949
+train loss 7.34807971488
+train loss 7.14221473028
+train loss 6.11193371807
+train loss 7.08305436011
+train loss 5.93601951883
+train loss 7.25530072498
+train loss 6.85115224049
+train loss 6.21784785946
+train loss 6.69995876071
+train loss 7.26571172762
+train loss 7.1774147471
+train loss 7.17384910685
+train loss 6.10509495888
+train loss 7.29742612845
+train loss 7.34729172827
+train loss 7.17660177969
+train loss 6.71186194348
+train loss 8.05887086311
+train loss 6.90087884128
+train loss 6.15138369243
+train loss 6.93024805087
+train loss 6.98907230665
+train loss 6.38199859048
+train loss 6.82433726941
+train loss 6.29324524118
+train loss 7.55264512901
+train loss 6.18495472708
+train loss 6.58836229265
+train loss 7.21110751773
+train loss 7.33898203475
+train loss 7.11300133326
+train loss 6.64748543362
+train loss 6.5774628698
+train loss 7.30077035976
+train loss 5.80210520046
+train loss 7.00990696802
+train loss 7.76408652397
+train loss 6.4020509584
+train loss 6.73130492625
+train loss 7.58754861721
+train loss 6.82945031211
+train loss 6.28588585246
+train loss 7.0964451921
+train loss 6.71117224387
+train loss 5.45297330036
+train loss 6.58619874724
+train loss 6.65356297839
+train loss 6.49678293012
+train loss 7.02735119038
+train loss 6.50591048135
+train loss 6.19182313199
+train loss 6.74004176131
+train loss 6.63439919542
+train loss 7.53666586686
+train loss 6.40525458983
+train loss 7.09119341424
+train loss 7.89399753271
+train loss 7.68748740902
+train loss 6.59304623813
+train loss 7.37276222605
+train loss 7.66611752896
+train loss 7.08388823746
+train loss 6.87637932569
+train loss 7.12464384495
+train loss 7.69890600882
+train loss 6.80945973176
+train loss 6.87734322269
+train loss 7.09889519205
+train loss 6.37517773364
+train loss 6.28420896078
+train loss 6.88245357121
+train loss 7.39566064249
+train loss 6.57614870992
+train loss 6.44054084879
+train loss 6.87533708278
+train loss 6.99649091936
+train loss 6.81656762867
+train loss 6.50992282115
+train loss 6.45715675257
+train loss 6.29361399001
+train loss 6.0097648751
+train loss 6.63785152539
+train loss 6.89556799063
+train loss 7.08492963222
+train loss 6.04059477866
+train loss 6.1718012216
+train loss 7.08648700727
+train loss 6.67328947171
+train loss 5.99397072235
+train loss 7.54966026936
+train loss 6.75838352629
+train loss 6.08877608774
+train loss 6.6040250521
+train loss 6.63733141938
+train loss 6.48485440186
+train loss 6.6462449516
+train loss 7.1849181749
+train loss 6.39522616617
+train loss 6.88828954812
+train loss 7.20204957026
+train loss 6.84696483692
+train loss 6.84803340335
+train loss 6.27924064223
+train loss 7.04624305109
+train loss 7.09600646054
+train loss 6.92257607695
+train loss 6.29589343323
+train loss 7.40322214127
+train loss 7.38269002769
+train loss 6.88224878566
+train loss 6.61717273094
+train loss 7.01056292435
+train loss 6.6429975944
+train loss 6.54465081293
+train loss 6.77676592708
+train loss 6.71337131062
+train loss 6.03086134832
+train loss 6.51438541803
+train loss 5.91512512382
+train loss 6.66783246172
+train loss 5.70122525535
+train loss 6.94289023537
+train loss 7.06839619459
+train loss 7.60048799205
+train loss 6.27169336441
+train loss 6.7897759608
+train loss 6.57987338747
+train loss 6.80793141097
+train loss 6.66002287225
+train loss 6.63179090096
+train loss 6.14019297165
+train loss 7.1715236027
+train loss 6.95624817469
+train loss 6.32632058165
+trainINFO:Evaluating on development data
+INFO:New best score! Saving model in data/tmp-squad-train/20170316_170101
+INFO:f1: 0.180180042183 em:0.12
+INFO:Epoch 2 out of 10
+INFO:Best score so far: 0.180180042183
+ loss 7.52008356234
+train loss 6.50510318659
+train loss 6.61513478472
+train loss 6.96218381205
+train loss 6.35114476201
+train loss 7.0563553074
+train loss 6.93444217029
+train loss 6.89591389182
+train loss 6.55695332275
+train loss 6.47245887685
+train loss 6.25085048002
+train loss 6.15194087024
+train loss 6.83636612295
+train loss 6.93351605162
+train loss 7.66811696381
+train loss 7.4921061859
+train loss 6.70645621739
+train loss 6.41811793196
+train loss 7.04739524597
+train loss 6.40965730125
+train loss 6.46346946504
+train loss 7.27627739702
+train loss 7.24686780535
+train loss 6.22361398905
+train loss 7.67960608325
+train loss 6.15088995385
+train loss 6.61335255631
+train loss 6.9602554093
+train loss 6.5200319335
+train loss 7.24825916274
+train loss 6.75483628001
+train loss 7.8209043696
+train loss 7.55791035811
+train loss 7.14124966632
+train loss 6.70888466546
+train loss 7.18635699197
+train loss 6.66233102021
+train loss 6.80714174816
+train loss 5.94462727307
+train loss 7.79772719362
+train loss 6.66457230206
+train loss 7.18139600964
+train loss 6.86839937956
+train loss 5.92376595409
+train loss 6.88005047508
+train loss 6.79379566894
+train loss 6.35907733853
+train loss 7.41471652727
+train loss 7.20242410392
+train loss 7.22601825033
+train loss 7.19308062207
+train loss 6.50899918164
+train loss 7.09716371244
+train loss 6.82065638887
+train loss 7.3778868306
+train loss 6.20622754795
+train loss 7.40920914516
+train loss 7.12494746602
+train loss 6.82857245241
+train loss 6.01650175959
+train loss 6.83034289073
+train loss 6.33515477193
+train loss 6.5672257958
+train loss 6.08584769164
+train loss 7.04882984735
+train loss 6.7720729721
+train loss 7.15953317053
+train loss 6.19974809194
+train loss 7.20985669573
+train loss 6.01824877978
+train loss 6.72210296152
+train loss 7.20559681173
+train loss 5.92464061313
+train loss 7.25042807096
+train loss 6.47492917381
+train loss 7.16480706419
+train loss 7.27190529727
+train loss 7.22507988239
+train loss 6.9783036375
+train loss 6.39624265106
+train loss 7.04291907364
+train loss 5.90453217953
+train loss 6.92448560777
+train loss 6.12956632318
+train loss 5.63983454117
+train loss 7.91282400323
+train loss 7.29690845024
+train loss 6.54984290731
+train loss 6.97179374342
+train loss 7.03953710589
+train loss 7.55038478744
+train loss 6.57330738719
+train loss 7.44559701447
+train loss 7.50381255689
+train loss 6.90167503293
+train loss 6.89199958336
+train loss 6.62806745871
+train loss 7.36458403818
+train loss 6.30157650564
+train loss 7.66268372066
+train loss 7.46929999575
+train loss 5.61901066745
+train loss 7.26380450119
+train loss 7.09364442418
+train loss 6.66379563283
+train loss 7.43505861458
+train loss 7.13530057412
+train loss 6.72108728142
+train loss 6.40184656825
+train loss 6.48571784503
+train loss 6.59067425155
+train loss 8.57049869044
+
+
+
+train loss 7.14253368038
+train loss 6.75482846232
+train loss 7.6897473601
+train loss 7.5786363802
+train loss 7.12929011786
+train loss 6.22130469176
+train loss 6.86891018325
+train loss 7.59004090054
+train loss 7.35769839369
+train loss 7.21311663705
+train loss 7.30526027645
+train loss 6.37847381786
+train loss 6.13978570452
+train loss 7.77141734929
+train loss 5.61528466452
+train loss 7.07529652135
+train loss 7.01780843162
+train loss 6.15273080851
+train loss 5.95925308622
+train loss 7.4897485582
+train loss 6.87089920977
+train loss 6.935761192
+train loss 6.03437774738
+train loss 5.86986739558
+train loss 6.87691517531
+train loss 6.24771386903
+train loss 6.63911969611
+train loss 6.3538447641
+train loss 6.29765118924
+train loss 6.4829769367
+train loss 6.74771509521
+train loss 5.35512045725
+train loss 6.13020357903
+train loss 6.58388047697
+train loss 5.87278452774
+train loss 6.30270295361
+train loss 6.78622606319
+train loss 7.43465469416
+train loss 6.91435095386
+train loss 7.64109536266
+train loss 6.74582654292
+train loss 6.33258780935
+train loss 6.62513980279
+train loss 7.40204387879
+train loss 6.21974012867
+train loss 6.01871182347
+train loss 6.64345356004
+train loss 6.63937509306
+train loss 6.96759003251
+train loss 6.93826814897
+train loss 6.70659313187
+train loss 6.26493726296
+train loss 6.80626950506
+train loss 6.1850009064
+train loss 6.6409559661
+train loss 7.4669434182
+train loss 6.21091854366
+train loss 6.99272120437
+train loss 6.50506127342
+train loss 5.34699771524
+train loss 7.05505595929
+train loss 7.05286225286
+train loss 6.86352004522
+train loss 7.04162395081
+train loss 6.8381281107
+train loss 6.78264928762
+train loss 7.12391397532
+train loss 6.68533348875
+train loss 6.46574451407
+train loss 6.83680874249
+train loss 6.63849642933
+train loss 7.35436004941
+train loss 5.99451921147
+train loss 6.20977501391
+train loss 6.41232770621
+train loss 6.92086884507
+train loss 6.54467844175
+train loss 6.10300687442
+train loss 6.47092378659
+train loss 7.30720790363
+train loss 6.69922655147
+train loss 7.10670351012
+train loss 5.8137574235
+train loss 6.473670497
+train loss 6.36110390666
+train loss 6.61208206047
+train loss 7.59385689128
+train loss 6.21115485321
+train loss 6.06603412725
+train loss 6.48965300423
+train loss 7.54772549895
+train loss 7.11769958891
+train loss 6.43927133103
+train loss 5.97650527172
+train loss 7.78306460897
+train loss 6.93015531114
+train loss 7.04936168726
+train loss 6.18185936785
+train loss 5.97851272991
+train loss 6.34122882579
+train loss 5.78727852714
+train loss 6.76321753448
+train loss 6.90545959424
+train loss 6.58533169712
+train loss 6.65002691089
+train loss 6.84717827525
+train loss 7.19861821044
+train loss 7.42773661227
+train loss 7.61366053557
+train loss 6.89357837984
+train loss 7.17077591659
+train loss 7.12340604619
+train loss 6.60127450825
+train loss 6.5127879445
+train loss 6.35083135859
+train loss 6.62965101576
+train loss 6.25732024045
+train loss 5.8839195598
+train loss 5.8779506462
+train loss 6.49529373619
+train loss 5.82494236368
+train loss 6.69949207766
+train loss 7.14309076041
+train loss 6.22284102519
+train loss 7.19797706514
+train loss 6.79142528274
+train loss 6.13741155672
+train loss 7.12596636177
+train loss 6.84320044932
+train loss 6.60889275246
+train loss 5.79124727923
+train loss 6.63123590302
+train loss 6.07723306971
+train loss 5.32859182695
+train loss 6.89968773944
+train loss 6.75082499445
+train loss 6.77397530235
+train loss 6.11888017145
+train loss 6.97307034001
+train loss 7.18766465174
+train loss 6.28420449082
+train loss 6.13080678275
+train loss 6.17448411403
+train loss 6.42698950139
+train loss 6.36453347872
+train loss 6.62249832475
+train loss 6.80022164017
+train loss 7.29197092448
+train loss 6.59347377122
+train loss 6.47124295328
+train loss 6.90267908669
+train loss 6.87642401635
+train loss 6.3307173922
+train loss 7.34304810921
+train loss 5.73692983847
+train loss 6.35970798905
+train loss 6.52992989123
+train loss 6.95260098561
+train loss 6.7912758015
+train loss 7.22450968832
+train loss 6.5424591033
+train loss 6.48459505079
+train loss 6.98303617366
+train loss 6.9660262354
+train loss 6.12590991253
+train loss 7.17173494244
+train loss 6.91409053505
+train loss 6.74025654619
+train loss 7.03893500464
+train loss 6.33969480995
+train loss 6.82622277582
+train loss 7.22652104691
+train loss 5.89444140336
+train loss 7.32128834293
+train loss 6.42750220798
+train loss 6.956447628
+train loss 7.51498232407
+train loss 6.58842338946
+train loss 5.82397018661
+train loss 6.09792738743
+train loss 6.32048524644
+train loss 6.24890076713
+train loss 6.18157678916
+train loss 6.35126666792
+train loss 7.02525104198
+train loss 5.72757777094
+train loss 6.51520765181
+train loss 6.50860614275
+train loss 7.07358352586
+train loss 7.65682087144
+train loss 6.27905774432
+train loss 6.37367105708
+train loss 7.67789419791
+train loss 5.7648398992
+train loss 6.59817536385
+train loss 7.17827212305
+train loss 7.18098992259
+train loss 6.6381423597
+train loss 6.9317519563
+train loss 6.6355324612
+train loss 5.68551903745
+train loss 5.98926368377
+train loss 6.70873744404
+train loss 7.63637311077
+train loss 6.21838230227
+train loss 6.68006043505
+train loss 7.11347814407
+train loss 6.77080749741
+train loss 7.25942264083
+train loss 6.83833408308
+train loss 6.58240065043
+train loss 6.95761524236
+train loss 6.30976033049
+train loss 6.89485197592
+train loss 6.38887166744
+train loss 5.88184775414
+train loss 5.55411917418
+train loss 6.76974804209
+train loss 6.09970143593
+train loss 6.95128661606
+train loss 6.63487117372
+train loss 6.94272746017
+train loss 6.22320097532
+train loss 6.99496792593
+train loss 6.50493113707
+train loss 5.8660039686
+train loss 6.36886084284
+train loss 7.35976486576
+train loss 6.2514616869
+train loss 6.0536038009
+train loss 6.31773444245
+train loss 7.2493195506
+train loss 6.80768913698
+train loss 6.65493543649
+train loss 7.26212745216
+train loss 7.41988802911
+train loss 6.29680495343
+train loss 6.23505555196
+train loss 6.77462310675
+train loss 6.52947676978
+train loss 7.14773669435
+train loss 6.85210040969
+train loss 6.74187248188
+train loss 7.76127763738
+train loss 6.98571263449
+train loss 6.47167583492
+train loss 5.98817436623
+train loss 6.41183443177
+train loss 6.19682612868
+train loss 7.37342405654
+train loss 6.32579877247
+train loss 6.27857862855
+train loss 7.23690864638
+train loss 7.08545583031
+train loss 6.39603520588
+train loss 6.57638041972
+train loss 7.1288522219
+train loss 6.20538897885
+train loss 7.75157047034
+train loss 6.73382568676
+train loss 6.09362862524
+train loss 6.48179620573
+train loss 6.95765518078
+train loss 6.14501718344
+train loss 6.55025216925
+train loss 6.58344830633
+train loss 6.11293935486
+train loss 7.20898537338
+train loss 7.07806722106
+train loss 6.23033187762
+train loss 7.19813135639
+train loss 6.75319121907
+train loss 6.48671915386
+train loss 6.65873017407
+train loss 5.86418213667
+train loss 7.36001856216
+train loss 6.67651188491
+train loss 6.36870777248
+train loss 5.84319001737
+train loss 7.0430815061
+train loss 7.49280748402
+train loss 6.9115872639
+train loss 7.11126191887
+train loss 7.26002313212
+train loss 7.30188430342
+train loss 5.37037932494
+train loss 6.72269522965
+train loss 7.55033144683
+train loss 6.42037129601
+train loss 6.42996673206
+train loss 6.77763333801
+train loss 6.22807789152
+train loss 6.62585142067
+train loss 6.87435596102
+train loss 7.081565328
+train loss 6.31453496884
+train loss 7.39818565649
+train loss 7.07404512639
+train loss 6.60782204402
+train loss 6.87677246509
+train loss 6.7000539939
+train loss 6.24872957071
+train loss 6.47923084647
+train loss 7.23719497224
+train loss 6.84705970347
+train loss 6.88677260873
+train loss 7.03989700627
+train loss 6.08928603043
+train loss 6.45205477617
+train loss 7.10486456045
+train loss 6.62560248037
+train loss 6.30854578296
+train loss 7.34981360805
+train loss 6.71938536027
+train loss 6.07793073185
+train loss 6.74115961581
+train loss 6.33809911594
+train loss 7.5888607672
+train loss 5.71541896629
+train loss 6.98261588154
+train loss 6.96170882767
+train loss 6.39923011087
+train loss 7.66494004369
+train loss 5.64844381863
+train loss 6.26494952708
+train loss 6.57460757402
+train loss 6.71177643234
+train loss 6.68432574824
+train loss 6.16865114741
+train loss 6.00500408165
+train loss 6.95513431252
+train loss 6.56691431635
+train loss 6.78088838537
+train loss 6.94862769348
+train loss 6.39461590511
+train loss 6.92117611376
+train loss 6.36395755579
+train loss 7.00238723861
+train loss 7.13318378167
+train loss 6.47591593606
+train loss 6.89736753198
+train loss 6.9187852631
+train loss 6.98143084946
+train loss 6.30773157078
+train loss 6.29011340357
+train loss 7.46337277149
+train loss 6.25634492188
+train loss 7.24353462822
+train loss 6.97341442677
+train loss 7.15375112359
+train loss 6.10903001937
+train loss 6.75663684512
+train loss 6.37296942217
+train loss 6.91669394773
+train loss 6.27175135856
+train loss 7.21529105807
+train loss 6.5923052267
+train loss 6.78939083432
+train loss 7.41725451947
+train loss 6.3430261627
+train loss 7.37755305226
+train loss 6.7862448961
+train loss 6.83919696761
+train loss 6.82808061151
+train loss 6.70844615835
+train loss 6.29166966253
+train loss 6.71189528526
+train loss 6.92664114653
+train loss 5.94470128426
+train loss 6.41821704256
+train loss 6.14306010598
+train loss 6.10937425699
+train loss 7.34641735384
+train loss 6.22563168588
+train loss 6.23744223297
+train loss 6.12167495476
+train loss 7.00506043598
+train loss 6.88915474667
+train loss 5.11420252205
+train loss 7.09409047445
+train loss 6.90033774048
+train loss 6.71711365165
+train loss 6.18179124242
+train loss 6.52576212763
+train loss 6.76069265205
+train loss 6.56632322205
+train loss 6.57222809371
+train loss 6.94557111829
+train loss 5.98992600224
+train loss 6.07438157459
+train loss 7.17723738236
+train loss 6.96371901616
+train loss 7.27907582491
+train loss 6.5554845597
+train loss 5.95030973981
+train loss 7.02557830867
+train loss 6.93633084557
+train loss 6.50841265856
+train loss 6.61921629594
+train loss 6.67008248528
+train loss 6.57822229727
+train loss 6.71773961948
+train loss 6.7240195703
+train loss 6.68207367758
+train loss 6.22551747599
+train loss 6.45169081914
+train loss 5.97351587265
+train loss 7.09937701112
+train loss 6.98763581752
+train loss 6.53646239257
+train loss 6.43976133835
+train loss 6.78787414693
+train loss 6.59073990785
+train loss 6.7373305218
+train loss 6.86514060135
+train loss 6.84892877385
+train loss 6.87573486187
+train loss 6.88454257882
+train loss 6.1559983656
+train loss 6.80115691681
+train loss 6.71056099782
+train loss 6.55795869317
+train loss 6.72406176041
+train loss 7.04422285527
+train loss 7.28057681471
+train loss 6.51483339555
+train loss 5.98369460855
+train loss 6.01876860116
+train loss 6.73348775172
+train loss 6.26357286572
+train loss 6.89512047331
+train loss 7.50483562797
+train loss 6.1672360766
+train loss 5.95032255819
+train loss 6.95272695376
+train loss 6.32487661734
+train loss 5.92615403512
+train loss 6.39538599726
+train loss 7.07438685133
+train loss 6.46214163573
+train loss 7.32978251278
+train loss 6.06831285786
+train loss 5.83763308354
+train loss 7.1095116678
+train loss 5.87240210037
+train loss 6.05697262833
+train loss 6.72640867133
+train loss 6.33091884206
+train loss 6.7124751706
+train loss 7.35121458482
+train loss 6.7154934326
+train loss 7.08416335998
+train loss 6.37317936264
+train loss 5.30098618316
+train loss 7.33761227585
+train loss 6.89819696692
+train loss 6.4314257943
+train loss 6.35587565788
+train loss 7.44251081554
+train loss 7.274824165
+train loss 6.31731627031
+train loss 7.66242952686
+train loss 6.51385795592
+train loss 5.93563145282
+train loss 6.5070218765
+train loss 6.94797607393
+train loss 5.98592751757
+train loss 6.49043181692
+train loss 7.15518223108
+train loss 7.13562324028
+train loss 7.2348399285
+train loss 6.22668217044
+train loss 6.58411255631
+train loss 6.65426574826
+train loss 7.62271635061
+train loss 5.68599276102
+train loss 6.71255095027
+train loss 6.95351897414
+train loss 7.37631132255
+train loss 6.95381753235
+train loss 6.6138986084
+train loss 5.99910434439
+train loss 6.7072617313
+train loss 7.3334579173
+train loss 6.3527624257
+train loss 6.64729640192
+train loss 6.936228884
+train loss 6.9788422247
+train loss 6.73001962593
+train loss 6.25479122174
+train loss 6.29727227544
+train loss 7.27456439844
+train loss 7.45644949946
+train loss 6.84549225164
+train loss 6.65304045433
+train loss 6.96997929679
+train loss 6.44084751507
+train loss 7.31661593496
+train loss 6.37889004995
+train loss 6.15052787547
+train loss 7.24315512392
+train loss 6.66898165317
+train loss 6.71565218099
+train loss 6.75008442152
+train loss 6.50199072656
+train loss 6.63356078843
+train loss 6.04369813605
+train loss 7.58921057779
+train loss 6.42505751257
+train loss 7.01455514168
+train loss 6.31502922254
+train loss 6.55097713704
+train loss 6.77507181256
+train loss 6.45716184781
+train loss 6.46704606141
+train loss 6.71148124527
+train loss 6.95382602518
+train loss 6.39612272394
+train loss 6.10935484286
+train loss 5.69049205111
+train loss 6.87166378035
+train loss 6.63970118309
+train loss 6.33635220316
+train loss 6.4930767005
+train loss 6.23499519277
+train loss 5.75150131861
+train loss 7.25059077917
+train loss 6.36463413748
+train loss 6.70009813695
+train loss 6.6797619952
+train loss 7.50897257811
+train loss 6.48231295023
+train loss 6.61528595535
+train loss 7.28694274264
+train loss 6.65262971281
+train loss 6.9820013539
+train loss 6.82034279329
+train loss 6.22393653859
+train loss 6.31355075197
+train loss 6.4097826347
+train loss 6.85679660712
+train loss 6.21992643486
+train loss 5.99477776163
+train loss 5.43156525465
+train loss 6.75778088718
+train loss 6.59844855016
+train loss 7.31205333692
+train loss 7.09854327964
+train loss 5.8475599376
+train loss 6.7670039033
+train loss 6.11653315516
+train loss 6.86296857049
+train loss 7.59547920798
+train loss 6.91596905918
+train loss 6.36416318217
+train loss 7.42227854362
+train loss 6.17546132143
+train loss 6.93765258894
+train loss 6.16386415661
+train loss 6.9420637056
+train loss 6.1631174407
+train loss 6.90599570664
+train loss 6.33288694484
+train loss 6.4088616465
+train loss 5.53348532474
+train loss 6.19072257085
+train loss 6.78402954523
+train loss 6.53808266399
+train loss 7.12985702882
+train loss 5.99111208237
+train loss 5.0693120597
+train loss 6.59507483981
+train loss 6.99714701431
+train loss 6.15071681457
+train loss 6.69980993558
+train loss 6.03398107769
+train loss 6.32043803871
+train loss 6.25242944442
+train loss 6.42310918572
+train loss 6.81570616566
+train loss 7.50355053514
+train loss 6.89285718683
+train loss 6.28685603698
+train loss 7.23777646343
+train loss 7.03304282719
+train loss 6.30573575904
+train loss 6.82951490383
+train loss 6.35327767823
+train loss 6.64669888693
+train loss 6.26973377153
+train loss 6.59734556093
+train loss 7.75856401161
+train loss 6.72050652109
+train loss 6.4903955344
+train loss 6.51617196949
+train loss 6.7962277126
+train loss 6.30718938101
+train loss 6.32680523517
+train loss 6.81735155078
+train loss 5.21172682605
+train loss 5.91003855896
+train loss 6.82219384585
+train loss 6.65649588356
+train loss 6.5692837745
+train loss 7.52255470313
+train loss 6.66147116409
+train loss 7.14319410549
+train loss 6.67993629075
+train loss 6.84053666522
+train loss 5.51283825611
+train loss 6.38497453775
+train loss 6.85063053293
+train loss 6.57106809879
+train loss 6.38104011204
+train loss 7.27033296539
+train loss 6.78809167911
+train loss 6.78270903624
+train loss 5.7443356695
+train loss 7.01649461347
+train loss 6.84177919271
+train loss 6.57187706052
+train loss 5.60107309537
+train loss 6.17617815866
+train loss 7.41218925469
+train loss 6.35216160273
+train loss 6.50907900958
+train loss 6.32652041133
+train loss 6.91602541257
+train loss 7.20777905396
+train loss 7.15845336909
+train loss 6.91093274013
+train loss 6.14591443539
+train loss 7.45917906453
+train loss 6.08229577144
+train loss 5.46424417972
+train loss 6.93336548519
+train loss 7.04967288066
+train loss 6.96814367164
+train loss 6.68215895795
+train loss 7.46098299634
+train loss 6.63037611454
+train loss 6.49243955533
+train loss 7.33974021855
+train loss 6.97157271917
+train loss 6.25435229519
+train loss 5.83174393227
+train loss 6.96807319763
+train loss 6.1052553358
+train loss 6.33739293361
+train loss 6.74444075911
+train loss 7.09025673124
+train loss 6.99957536379
+train loss 6.17469062129
+train loss 6.27315367782
+train loss 6.58688695741
+train loss 6.75761731317
+train loss 6.75890205008
+train loss 6.26646640976
+train loss 6.08291945975
+train loss 6.32139667224
+train loss 5.38456823262
+train loss 7.22792189495
+train loss 6.07008197398
+train loss 7.56733956319
+train loss 6.50495023366
+train loss 6.837046937
+train loss 7.3755806177
+train loss 5.72876672726
+train loss 6.77039396472
+train loss 7.27962674423
+train loss 6.24895076611
+train loss 7.05053244105
+train loss 6.37985306188
+train loss 5.52889733207
+train loss 7.00658905382
+train loss 6.7691501687
+train loss 7.18920286544
+train loss 5.90443370944
+train loss 6.14801074637
+train loss 6.43175942142
+train loss 5.93637352987
+train loss 6.16515501004
+train loss 6.32309673515
+train loss 6.24078254861
+train loss 6.98504653436
+train loss 6.6906593301
+train loss 6.69870958346
+train loss 6.19544207313
+train loss 6.85144841647
+train loss 6.15082152838
+train loss 7.04881878717
+train loss 5.8578628933
+train loss 6.83835338329
+train loss 6.992144137
+train loss 6.68876497717
+train loss 6.58041824449
+train loss 6.19712147512
+train loss 5.98221005483
+train loss 6.80586089084
+train loss 6.8749121316
+train loss 6.9678819686
+train loss 6.46899308187
+train loss 6.3496485727
+train loss 6.47489414436
+train loss 5.89331963413
+train loss 7.46772076643
+train loss 6.29536558629
+train loss 6.85604625471
+train loss 7.1026144589
+train loss 6.78342080157
+train loss 6.43847381905
+train loss 6.4182362914
+train loss 7.05081407575
+train loss 6.37615965939
+train loss 6.17116845874
+train loss 7.06162026736
+train loss 6.83390131089
+train loss 7.32024358203
+train loss 6.39256092959
+train loss 5.99824715166
+train loss 6.27792525208
+train loss 6.22522274642
+train loss 6.77344214706
+train loss 6.21531766253
+train loss 6.27547766149
+train loss 6.41588021718
+train loss 6.13410447987
+train loss 7.29772474762
+train loss 6.73876028217
+train loss 5.91607485341
+train loss 6.359884032
+train loss 5.98083426893
+train loss 7.13210468511
+train loss 6.7511343563
+train loss 6.99150005696
+train loss 6.42270957194
+train loss 7.32563443431
+train loss 6.97344145165
+train loss 6.34435318124
+train loss 7.12681548892
+train loss 6.93889898033
+train loss 6.7744075207
+train loss 6.36558733662
+train loss 6.49658117718
+train loss 6.79079862257
+train loss 6.99948904332
+train loss 6.48060025304
+train loss 6.55480455978
+train loss 6.2879082016
+train loss 6.38652055059
+train loss 6.79466275075
+train loss 6.43296174808
+train loss 6.39202414976
+train loss 6.9391225187
+train loss 6.8158914891
+train loss 6.18551767806
+train loss 6.95978926899
+train loss 6.6711013126
+train loss 6.13719320177
+train loss 5.92442593965
+train loss 6.55352436084
+train loss 7.01208379764
+train loss 6.39822454092
+train loss 6.26457151669
+train loss 6.43891291928
+train loss 6.19256756941
+train loss 6.41540698913
+train loss 6.27304451035
+train loss 6.11182421324
+train loss 6.45826976765
+train loss 6.35653915888
+train loss 6.50082924806
+train loss 7.04591036262
+train loss 6.89707376664
+train loss 7.54865639071
+train loss 7.09019623983
+train loss 6.09666310994
+train loss 5.63701667717
+train loss 6.00392947817
+train loss 6.75961801462
+train loss 6.71000176794
+train loss 6.74320862296
+train loss 6.68138892478
+train loss 6.60476127142
+train loss 6.50178811842
+train loss 6.96135008256
+train loss 6.5075708424
+train loss 6.84832254165
+train loss 6.91675408656
+train loss 6.4578463906
+train loss 7.33782559292
+train loss 6.11696232591
+train loss 6.37845917816
+train loss 6.28317897981
+train loss 7.06828917941
+train loss 7.61564029562
+train loss 7.4403071922
+train loss 7.07951711921
+train loss 6.26684393454
+train loss 5.82480247737
+train loss 6.89939043407
+train loss 7.28942224263
+train loss 6.3980108943
+train loss 6.7592559537
+train loss 6.90320508048
+train loss 7.4252691395
+train loss 6.5682912015
+train loss 6.53413932872
+train loss 6.1809429356
+train loss 6.30777421927
+train loss 5.69590994197
+train loss 7.05637646631
+train loss 6.30470675476
+train loss 6.55333618741
+train loss 5.8346460228
+train loss 6.99640279323
+train loss 6.95493505185
+train loss 7.48671014426
+train loss 7.19535363729
+train loss 6.63949797207
+train loss 6.59481296532
+train loss 6.1432043748
+train loss 6.37007922091
+train loss 6.53991667014
+train loss 7.20589257138
+train loss 7.14882916699
+train loss 6.57284522518
+train loss 6.01866901682
+train loss 6.42687058989
+train loss 6.95226977548
+train loss 6.71262729282
+train loss 6.2345642945
+train loss 6.9775237037
+train loss 6.97670537332
+train loss 6.82084708335
+train loss 5.75231735174
+train loss 6.8591081517
+train loss 6.97097484407
+train loss 5.85798180229
+train loss 6.36737992611
+train loss 6.08152615229
+train loss 6.50511821511
+train loss 6.70023971406
+train loss 5.88302821046
+train loss 7.02355376646
+train loss 6.43457712571
+train loss 6.18946987286
+train loss 7.24120318456
+train loss 5.7959572753
+train loss 7.21516763251
+train loss 7.26981161943
+train loss 6.75370464474
+train loss 7.04397694974
+train loss 7.02523572456
+train loss 6.48296682128
+train loss 7.49209950473
+train loss 7.20752141337
+train loss 5.9588994806
+train loss 7.10614789119
+train loss 7.6855964073
+train loss 6.31448272844
+train loss 6.28885022543
+train loss 6.94536787751
+train loss 6.06941704151
+train loss 6.84422962595
+train loss 6.46466514615
+train loss 7.14396889013
+train loss 5.63379146508
+train loss 6.24901817298
+train loss 6.81991802973
+train loss 5.66489367729
+train loss 6.79213913884
+train loss 6.91375806487
+train loss 6.95140121148
+train loss 6.66499273301
+train loss 6.33711580525
+t
