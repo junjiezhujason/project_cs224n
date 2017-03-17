@@ -33,14 +33,15 @@ tf.app.flags.DEFINE_integer("print_every", 1, "How many iterations to do per pri
 tf.app.flags.DEFINE_integer("keep", 0, "How many checkpoints to keep, 0 indicates keep all.")
 tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab file (default: ./data/squad/vocab.dat)")
 tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
-tf.app.flags.DEFINE_integer("max_question_length", 100, "Maximum question length to consider.")
-tf.app.flags.DEFINE_integer("max_context_length", 766, "Maximum context length to consider.")
+tf.app.flags.DEFINE_integer("max_question_length", 60, "Maximum question length to consider.")
+tf.app.flags.DEFINE_integer("max_context_length", 300, "Maximum context length to consider.")
 tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels that can be mapped to start-end postion in context.")
 tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
 tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
+tf.app.flags.DEFINE_string("preprocess_mode", "train", "train/eval.")
 
 FLAGS = tf.app.flags.FLAGS
 
