@@ -32,8 +32,8 @@ def load_dataset(source_dir, data_mode):
     valid_pfx = pjoin(source_dir, "val")
 
     if data_mode=="tiny":
-        max_train = 20
-        max_valid = 10
+        max_train = 100
+        max_valid = 23
 
     train = []
     valid = []
