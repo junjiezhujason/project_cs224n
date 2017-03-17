@@ -574,7 +574,7 @@ class QASystem(object):
                     logging.info("Ignoring sample with context length: "+str(len(c_sent)))
                     continue
                 elif self.config.preprocess_mode == 'eval':
-                    c_sent = c_sent[:self.config_max_content_length]
+                    c_sent = c_sent[:self.config.max_context_length]
                 else:
                     raise ValueError('Invalid value "%s" for flag preprocess_mode. Choose from train/eval' % self.config.preprocess_mode)
 
@@ -583,7 +583,7 @@ class QASystem(object):
                     logging.info("Ignoring sample with question length: "+str(len(q_sent)))
                     continue
                 elif self.config.preprocess_mode == 'eval':
-                    q_sent = q_sent[:self.config_max_question_length]
+                    q_sent = q_sent[:self.config.max_question_length]
                 else:
                     raise ValueError('Invalid value "%s" for flag preprocess_mode. Choose from train/eval' % self.config.preprocess_mode)
 

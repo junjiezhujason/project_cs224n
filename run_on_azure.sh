@@ -10,6 +10,6 @@ python code/train.py --model=baseline \
                      --max_context_length=300 \
                      --max_question_length=60 \
                      --data_size=full \
-                     --batch_size=32 \
+                     --batch_size=20 \
                      --learning_rate=0.03 \
                      --state_size=100
