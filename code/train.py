@@ -16,7 +16,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
+tf.app.flags.DEFINE_float("learning_rate", 0.03, "Learning rate.")
 tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
 tf.app.flags.DEFINE_integer("batch_size", 10, "Batch size to use during training.")
@@ -41,6 +41,7 @@ tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include f
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
 tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
+tf.app.flags.DEFINE_string("preprocess_mode", "train", "train/eval.")
 
 FLAGS = tf.app.flags.FLAGS
 
