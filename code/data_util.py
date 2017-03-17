@@ -32,8 +32,8 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
     valid_pfx = pjoin(source_dir, "val")
 
     if data_mode=="tiny":
-        max_train = 10
-        max_valid = 5
+        max_train = 100
+        max_valid = 10
 
     train = []
     valid = []
@@ -85,7 +85,7 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
                                     logging.info("Ignoring sample with question length: "+str(q_len))
                                     continue
                                 if c_len > max_c_toss:
-                                    logging.info("Ignoring sample with question length: "+str(c_len))
+                                    logging.info("Ignoring sample with context length: "+str(c_len))
                                     continue
 
                                 max_c_len = max(max_c_len, c_len)
