@@ -14,7 +14,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Decoder, Mixer
+from qa_model import Encoder, QASystem, Decoder, Mixer, QASystemMatchLSTM
 from preprocessing.squad_preprocess import data_from_json, maybe_download, squad_base_url, \
     invert_map, tokenize, token_idx_map
 import qa_data
@@ -40,13 +40,15 @@ tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab 
 tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 # Added
-tf.app.flags.DEFINE_integer("max_question_length", 100, "Maximum question length to consider.")
-tf.app.flags.DEFINE_integer("max_context_length", 1000, "Maximum context length to consider.")
+tf.app.flags.DEFINE_integer("max_question_length", 0, "Maximum question length to consider.")
+tf.app.flags.DEFINE_integer("max_context_length", 0, "Maximum context length to consider.")
 tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels that can be mapped to start-end postion in context.")
 tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("optimizer", "adam", "adam / sgd")
+tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
+tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
 
 def initialize_model(session, model, train_dir):
     ckpt = tf.train.get_checkpoint_state(train_dir)
@@ -213,13 +215,15 @@ def main(_):
     dataset = (context_tokens_data, context_data, context_len_data,
                question_tokens_data, question_data, question_len_data, question_uuid_data)
 
-    print('max question lengti is %d' % max(question_len_data))
-    print('max context_length is %d' % max(context_len_data))
+    print('max question length is %d' % max(question_len_data))
+    print('max context length is %d' % max(context_len_data))
     
     # FLAGS.max_context_length = max(context_len_data) #700 in this dataset.
     # For baseline, because the linear decoder weights dimension is max_length x state_size*2, it need to the max of both dataset
-    FLAGS.max_context_length = 766
-    FLAGS.max_question_length = max(question_len_data)
+    if FLAGS.max_context_length==0:
+        raise ValueError('max_context_length is set to be zero now. Please set it with --max_context_length flag.\n FYI the max length in training set is 766, in dev set is 700.')
+    if FLAGS.max_question_length==0:
+        raise ValueError('max_question_length is set to be zero now. Please set it with --max_question_length flag.\n')
 
     for i in range(10):
       logging.debug('context')
@@ -241,7 +245,10 @@ def main(_):
     mixer = Mixer()
     decoder = Decoder(FLAGS)
 
-    qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    if FLAGS.model == 'baseline':
+        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+    elif FLAGS.model == 'matchLSTM':
+        qa = QASystemMatchLSTM(FLAGS, embeddings)
 
     with tf.Session() as sess:
         train_dir = get_normalized_train_dir(FLAGS.train_dir)
