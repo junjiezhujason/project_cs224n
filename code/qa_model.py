@@ -565,12 +565,22 @@ class QASystem(object):
 	for q_sent, q_len, c_sent, c_len, lab in examples:
 
             if len(c_sent) > self.config.max_context_length:
-                logging.info("Ignoring sample with context length: "+str(len(c_sent)))
-                continue
+                if self.config.preprocess_mode == 'train':
+                    logging.info("Ignoring sample with context length: "+str(len(c_sent)))
+                    continue
+                elif self.config.preprocess_mode == 'eval':
+                    c_sent = c_sent[:self.config_max_content_length]
+                else:
+                    raise ValueError('Invalid value "%s" for flag preprocess_mode. Choose from train/eval' % self.config.preprocess_mode)
 
             if len(q_sent) > self.config.max_question_length:
-                logging.info("Ignoring sample with question length: "+str(len(q_sent)))
-                continue
+                if self.config.preprocess_mode == 'train':
+                    logging.info("Ignoring sample with question length: "+str(len(q_sent)))
+                    continue
+                elif self.config.preprocess_mode == 'eval':
+                    q_sent = q_sent[:self.config_max_question_length]
+                else:
+                    raise ValueError('Invalid value "%s" for flag preprocess_mode. Choose from train/eval' % self.config.preprocess_mode)
 
             # window selection
             # TODO: CHANGE LATER

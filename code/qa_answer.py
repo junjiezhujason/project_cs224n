@@ -49,6 +49,7 @@ tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("optimizer", "adam", "adam / sgd")
 tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
 tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
+tf.app.flags.DEFINE_string("preprocess_mode", "eval", "train/eval.")
 
 def initialize_model(session, model, train_dir):
     ckpt = tf.train.get_checkpoint_state(train_dir)

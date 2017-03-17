@@ -41,6 +41,7 @@ tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include f
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
 tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
+tf.app.flags.DEFINE_string("preprocess_mode", "train", "train/eval.")
 
 FLAGS = tf.app.flags.FLAGS
 
