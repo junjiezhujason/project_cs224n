@@ -10,6 +10,7 @@ from datetime import datetime
 
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
+from tensorflow.python.ops.rnn_cell import _linear
 import tensorflow as tf
 from tensorflow.python.ops import variable_scope as vs
 
@@ -18,10 +19,7 @@ from util import Progbar, minibatches
 
 from qa_data import PAD_ID, SOS_ID, UNK_ID
 
-
 logging.basicConfig(level=logging.INFO)
-
-
 
 def get_optimizer(opt):
     if opt == "adam":
@@ -217,12 +215,12 @@ class QASystem(object):
 
         self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
         self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.mask_placeholder = tf.placeholder(tf.float64, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
         self.preds = self.setup_system()
-        
         self.loss = self.setup_loss(self.preds)
 
         # ==== set up training/updating procedure ====
@@ -231,13 +229,13 @@ class QASystem(object):
 
         self.saver = tf.train.Saver()
 
-    
     # TODO: add label etc.
     def create_feed_dict(self, 
                          question_batch, 
                          question_length_batch, 
                          context_batch, 
                          context_length_batch,
+                         mask_batch=None,
                          labels_batch=None):
         feed_dict = {}
         feed_dict[self.question_placeholder] = question_batch
@@ -248,10 +246,56 @@ class QASystem(object):
             # labels_batch = np.transpose(labels_batch)
             feed_dict[self.start_labels_placeholder] = labels_batch[0]
             feed_dict[self.end_labels_placeholder] = labels_batch[1]
+        if mask_batch is not None:
+            feed_dict[self.mask_placeholder] = mask_batch
         return feed_dict
 
+    def attention_flow_layer(self, h, u, h_mask=None, u_mask=None):
+        # Query2Context
+        with tf.variable_scope("attn_layer"):
+            # create bi-attension layer
+            # N = tf.shape(self.context_length_placeholder)[0] # batch size
+            # JX = tf.shape(h)[1]  # maximum_context_length
+            JQ = self.config.max_question_length
+            JX = self.config.max_context_length
+            d = self.config.state_size*2
+
+	    xavier_init = tf.contrib.layers.xavier_initializer()
+	    zero_init = tf.constant_initializer(0)
+
+	    w_s = tf.get_variable('w_s', shape=(3*d, ), initializer=xavier_init, dtype=tf.float64)
+
+
+            h_aug = tf.tile(tf.expand_dims(h, 2), [1, 1, JQ, 1]) # [?, JX, JQ, d]
+            u_aug = tf.tile(tf.expand_dims(u, 1), [1, JX, 1, 1]) # [?. JX, JQ, d]
+	    h_dot_u = tf.multiply(h_aug,  u_aug)                 # [?. JX, JQ, d]
+
+            huhu = tf.concat(3, [h_aug, u_aug, h_dot_u])         # [?. JX, JQ, 3d]
+            
+            logging.info("h_aug:"+str(h_aug))
+            logging.info("u_aug:"+str(u_aug))
+            logging.info("h_dot_u:"+str(h_dot_u))
+            logging.info("huhu:"+str(huhu))
+
+            S_logits = tf.reshape(tf.matmul(tf.reshape(huhu, [-1, 3*d]), tf.expand_dims(w_s,1)), [-1, JX, JQ])  # S_logit to be [N, JX, JQ]
+	    logging.info("S_logits: "+str(S_logits))
+	     
+	    # u_a = softsel(u_aug, S_logits)	
+            a_t = tf.nn.softmax(S_logits, -1) # [N, JX, JQ] softmax on the question dimension
+            
+            # [N, JX, JQ] * [N, JQ, 2*d]
+            u_a = tf.matmul(a_t, u)
+	    logging.info("u_a: "+str(u_a)) 
+
+            p0 = tf.concat(2, [h, u_a, h * u_a])
+	    logging.info("p0: "+str(p0))
+
+        return p0
+
+    
+
     def setup_system(self):
-        """
+	"""
         After your modularized implementation of encoder and decoder
         you should call various functions inside encoder, decoder here
         to assemble your reading comprehension system!
@@ -273,16 +317,51 @@ class QASystem(object):
             context_length = self.context_length_placeholder  # TODO: name
             context_paragraph_repr, context_repr, c_state = self.encoder.encode(inputs=context,
                                                                   seq_len=context_length,
-                                                                  encoder_state_input=q_state)
+                                                                  encoder_state_input=None)
         # STEP3: Calculate an attention vector over the context paragraph representation based on the question
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
         # representation with the attention vector.
-#        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
+        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
-        # STEP5: Run a final LSTM that does a 2-class classification of these vectors as O or ANSWERs_idx, e_idx = self.decoder.decode(updated_context_paragraph_repr)
-        s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
+	logging.info("Question_paragraph_repr:"+str(question_paragraph_repr))
+	logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))
+	
+	attn_out = self.attention_flow_layer(context_paragraph_repr,question_paragraph_repr)
+	
+	s_idx, e_idx = self.simple_decoder(attn_out, self.config.state_size*6, self.config.max_context_length)
+        
+        # s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
         return s_idx, e_idx
+
+    def simple_decoder(self, H_in, d, con_len):
+	xavier_init = tf.contrib.layers.xavier_initializer()
+	zero_init = tf.constant_initializer(0)
+
+        with tf.variable_scope("simple_decoder"):
+            Wp_s = tf.get_variable('Wp_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
+            Wp_e = tf.get_variable('Wp_e', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
+            b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64)
+            b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float64)
+
+            with tf.variable_scope('answer_start'):
+                a_s  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_s, 1)), [-1, con_len]) + b_s
+            with tf.variable_scope('answer_scope'):
+                a_e  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_e, 1)), [-1, con_len]) + b_e
+        return a_s, a_e
+
+    def naive_decoder(self, H_r):
+	print("="*10)
+	print("NAIVE DECODER")
+        d = self.config.state_size*2
+        con_len = self.config.max_context_length
+        return self.simple_decoder(H_r, d, con_len)
+
+    def exp_mask(self, val):
+        """Give very negative number to unmasked elements in val.
+            Same shape as val, where some elements are very small (exponentially zero)
+        """
+        return tf.add(val, self.mask_placeholder)
 
     def setup_loss(self, preds):
         """
@@ -290,15 +369,23 @@ class QASystem(object):
         :return:
         """
         with vs.variable_scope("loss"):
-            pred_s, pred_e = preds
+            u_pred_s, u_pred_e = preds
+
+            pred_s = self.exp_mask(u_pred_s)
+            pred_e = self.exp_mask(u_pred_e)
+            # pred_s = u_pred_s
+            # pred_e = u_pred_e
             print("LOSS pred_s: "+str(pred_s))
             print("LOSS pred_e: "+str(pred_e))
             
-            loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
             loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
+
+            loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
+
             loss = loss_s + loss_e
         return tf.reduce_mean(loss)
-
+    
+        
     def setup_embeddings(self):
         """
         Loads distributed word representations based on placeholder tokens
@@ -306,6 +393,7 @@ class QASystem(object):
         """
         with vs.variable_scope("embeddings"):
             embedding_tensor = tf.Variable(self.pretrained_embeddings, trainable=False)
+            # embedding_tensor = tf.cast(self.pretrained_embeddings, tf.float64)
             question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
             context_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.context_placeholder)
             question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size * self.config.n_features])
@@ -436,8 +524,7 @@ class QASystem(object):
         f1 = np.mean(f1)
         em = np.mean(em)
 
-        if log:
-            logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, sample))
+        logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, sample))
 
         return f1, em
 
@@ -453,10 +540,10 @@ class QASystem(object):
 	# Use this zero vector when padding sequences.
 	zero_vector = [PAD_ID] * self.config.n_features
 	pad_len = max_length - len(sentence) 
-	mask = [True] * len(sentence)
+	mask = [0] * len(sentence)
 	if pad_len > 0: 
 	    p_sentence = sentence + [zero_vector] * pad_len 
-	    mask += [False] * pad_len
+	    mask += [-1e10] * pad_len
 	else:
 	    p_sentence = sentence[:max_length]
 	return p_sentence, mask
@@ -473,6 +560,15 @@ class QASystem(object):
 	# pad sequences
 	ret = []
 	for q_sent, q_len, c_sent, c_len, lab in examples:
+
+            if len(c_sent) > self.config.max_context_length:
+                logging.info("Ignoring sample with context length: "+str(len(c_sent)))
+                continue
+
+            if len(q_sent) > self.config.max_question_length:
+                logging.info("Ignoring sample with question length: "+str(len(q_sent)))
+                continue
+
             # window selection
             # TODO: CHANGE LATER
             q_sent = self.featurize_window(q_sent)
@@ -484,25 +580,31 @@ class QASystem(object):
             
             # padding
             p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
-            p_c_sent, _ = self.pad_sequence(c_sent, self.config.max_context_length)
-            ret.append([p_q_sent, q_len, p_c_sent, c_len, lab[0], lab[1]])	
+            p_c_sent, c_mask = self.pad_sequence(c_sent, self.config.max_context_length)
+            ret.append([p_q_sent, q_len, p_c_sent, c_len, c_mask, lab[0], lab[1]])	
         return np.array(ret)
     
 
-    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, start_labels_batch, end_labels_batch):
-        feed = self.create_feed_dict(q_batch, q_len_batch, c_batch, c_len_batch, labels_batch=[start_labels_batch, end_labels_batch])
+    def train_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch, start_labels_batch, end_labels_batch):
+        feed = self.create_feed_dict(q_batch, 
+                                     q_len_batch, 
+                                     c_batch, 
+                                     c_len_batch, 
+                                     mask_batch = mask_batch,
+ 				     labels_batch=[start_labels_batch, end_labels_batch])
        
         _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
         return loss
 
-    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch):
+    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch):
         """
         Return the predicted start index and end index (index NOT onehot).
         """
         feed = self.create_feed_dict(q_batch,
                                      q_len_batch,
                                      c_batch,
-                                     c_len_batch)
+                                     c_len_batch,
+                                     mask_batch=mask_batch)
         predictions = sess.run([tf.argmax(self.preds[0], axis=1),
                                 tf.argmax(self.preds[1], axis=1)], feed_dict=feed)
         # print(predictions)
@@ -528,10 +630,14 @@ class QASystem(object):
         #logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
         #logging.debug("Token-level scores:\n" + token_cm.summary())
         #logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
+        train_dataset = [train_examples, train_raw]
+        _, _ = self.evaluate_answer(sess, train_dataset)
 
+        logging.info("*"*20)
+        logging.info("Evaluating on training data")
         valid_examples = self.preprocess_question_answer(valid_set)
+        logging.info("*"*20)
         logging.info("Evaluating on development data")
-
         valid_dataset = [valid_examples,valid_raw]
         f1, em = self.evaluate_answer(sess, valid_dataset)
 
@@ -619,7 +725,6 @@ class QASystem(object):
             # Ignore predict
             batch_input = batch[:-2]
             preds_ = self.predict_on_batch(sess, *batch_input)
-
             pred += list((np.transpose(preds_)))     # pred for this batch
             true += list(np.transpose(batch[-2:])) # true for this batch
             # prog.update(i + 1, [])
@@ -649,6 +754,7 @@ class QASystemMatchLSTM(QASystem):
         # TMP TO REMOVE START
         self.config = args[0]  # FLAG 
         self.pretrained_embeddings = args[1] # embeddings
+        
 
         # TMP TO REMOVE END
         self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features))
@@ -659,6 +765,7 @@ class QASystemMatchLSTM(QASystem):
 
         self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
         self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
+        self.mask_placeholder = tf.placeholder(tf.float64, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -775,6 +882,8 @@ class QASystemMatchLSTM(QASystem):
         return H_r
 
     def setup_pointer_layer(self, H_r):
+        print("="*10)
+        print("Pointer Decoder")
         zero_init = tf.constant_initializer(0)
         xavier_init = tf.contrib.layers.xavier_initializer()
         state_size = self.config.state_size
@@ -847,24 +956,7 @@ class QASystemMatchLSTM(QASystem):
             # NOTE we only need beta_0 and beta_1 in the intermediate steps in the cell
         return beta_log 
 
-    def naive_decoder(self, H_r):
-        state_size = self.config.state_size
-        xavier_init = tf.contrib.layers.xavier_initializer()
-        max_context_length = self.config.max_context_length
-        zero_init = tf.constant_initializer(0)
-        Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, ), initializer=zero_init, dtype=tf.float64)
-        Wp_e = tf.get_variable('Wp_e', shape=(self.config.state_size*2, ), initializer=zero_init, dtype=tf.float64)
-        b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64)
-        b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float64)
 
-        with tf.variable_scope('answer_start'):
-            a_s  = tf.reshape(tf.matmul(tf.reshape(H_r, [-1, 2*self.config.state_size]), tf.expand_dims(Wp_s, 1)), [-1, max_context_length]) + b_s
-        with tf.variable_scope('answer_scope'):
-            a_e  = tf.reshape(tf.matmul(tf.reshape(H_r, [-1, 2*self.config.state_size]), tf.expand_dims(Wp_e, 1)), [-1, max_context_length]) + b_e
-        return a_s, a_e
-
-
-        
 
     def setup_system(self):
         H_p, H_q = self.setup_LSTM_preprocessing_layer()
@@ -872,17 +964,16 @@ class QASystemMatchLSTM(QASystem):
         print('H_p is ' + str(H_p))
         H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
 
-        """
-        beta_log_scores = self.setup_pointer_layer(H_r_fw)
-        # NOTE reconstruct vF + c as the predictions to input to the softmax_logit_loss
-        # split the data into two
-        pred_s, pred_e = tf.split(1, 2, beta_log_scores)
-        logging.debug("pred_s is "+str(pred_s))
-        logging.debug("pred_e is "+str(pred_e))
-        pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
-        pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
-        """
-        pred_s, pred_e = self.naive_decoder(H_r_fw)
+        if self.config.decoder_type == "naive":
+            pred_s, pred_e = self.naive_decoder(H_r_fw)
+        else:
+            beta_log_scores = self.setup_pointer_layer(H_r_fw)
+            pred_s, pred_e = tf.split(1, 2, beta_log_scores)
+            logging.debug("pred_s is "+str(pred_s))
+            logging.debug("pred_e is "+str(pred_e))
+            pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
+            pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
+
         
         logging.debug("pred_s is "+str(pred_s))
         logging.debug("pred_e is "+str(pred_e))

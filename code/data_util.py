@@ -6,7 +6,7 @@ Utility functions to process data.
 import os
 import pickle
 import logging
-from collections import Counter
+from collections import Counter, defaultdict
 import argparse
 
 from tensorflow.python.platform import gfile
@@ -32,8 +32,8 @@ def load_dataset(source_dir, data_mode):
     valid_pfx = pjoin(source_dir, "val")
 
     if data_mode=="tiny":
-        max_train = 20
-        max_valid = 10
+        max_train = 100
+        max_valid = 23
 
     train = []
     valid = []
@@ -97,3 +97,63 @@ def load_dataset(source_dir, data_mode):
 
     dataset = {"training":train, "validation":valid, "training_raw":train_raw, "validation_raw":valid_raw}
     return dataset, max_q_len, max_c_len
+
+def summarize_dataset(source_dir, out_dir, data_type="train"):
+
+    assert os.path.exists(source_dir)
+    assert os.path.exists(out_dir)
+    logger.info("Loading data")
+
+    data_pfx = pjoin(source_dir, data_type)
+    out_pfx = pjoin(out_dir, data_type)
+
+    # c_ids_path = data_pfx + ".ids.context"
+    c_raw_path = data_pfx + ".context" 
+    # q_ids_path = data_pfx + ".ids.question"
+    q_raw_path = data_pfx + ".question" 
+    label_path = data_pfx + ".span"
+
+    counter = 0
+
+    len_entry = []
+    first_word_dict = defaultdict(int) 
+
+    out_len_path = out_pfx + ".length"
+    our_first_word_path = out_pfx + ".firstword"
+
+    with gfile.GFile(out_len_path, mode="w") as out_file: 
+        with gfile.GFile(q_raw_path, mode="rb") as q_file:
+            with gfile.GFile(c_raw_path, mode="rb") as c_file:
+                with gfile.GFile(label_path, mode="rb") as l_file:
+                    for line in l_file:
+                        # compute label length
+                        label = map(int,line.strip().split(" "))
+                        a_len = label[1]-label[0]+1
+
+                        c_text = c_file.readline().strip().split(" ")
+                        q_text = q_file.readline().strip().split(" ")
+                        # print(q_text[0])
+
+                        first_word_dict[q_text[0]] += 1
+
+                        c_len = len(c_text)
+                        q_len = len(q_text)
+
+                        out_file.write("\t".join([str(q_len), str(c_len), str(a_len)])+"\n")
+                        
+                        counter += 1
+                        if counter % 10000 == 0:
+                            logger.info("read %d context lines" % counter)
+
+    min_freq = 100
+    for key in first_word_dict:
+        if first_word_dict[key] > min_freq :
+            print(key+": "+str(first_word_dict[key]))
+
+
+if __name__=="__main__":
+    data_dir="data/squad"
+    out_dir ="summary"
+    summarize_dataset(data_dir, out_dir)
+    # summarize_dataset(data_dir, out_dir, data_type="val")
+    

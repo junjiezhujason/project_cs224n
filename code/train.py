@@ -16,12 +16,12 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-tf.app.flags.DEFINE_float("learning_rate", 0.01, "Learning rate.")
+tf.app.flags.DEFINE_float("learning_rate", 0.03, "Learning rate.")
 tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
 tf.app.flags.DEFINE_integer("batch_size", 10, "Batch size to use during training.")
 tf.app.flags.DEFINE_integer("epochs", 10, "Number of epochs to train.")
-tf.app.flags.DEFINE_integer("state_size", 150, "Size of each model layer.")
+tf.app.flags.DEFINE_integer("state_size", 100, "Size of each model layer.")
 tf.app.flags.DEFINE_integer("output_size", 750, "The output size of your model.")
 tf.app.flags.DEFINE_integer("embedding_size", 100, "Size of the pretrained vocabulary.")
 tf.app.flags.DEFINE_string("data_dir", "data/squad", "SQuAD directory (default ./data/squad)")
@@ -39,7 +39,8 @@ tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels 
 tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
-tf.app.flags.DEFINE_string("datasize", "tiny", "tiny/full.")
+tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
+tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -90,7 +91,7 @@ def main(_):
 
     # Do what you need to load datasets from FLAGS.data_dir
     # dataset = load_dataset(FLAGS.data_dir, "full")
-    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, FLAGS.datasize)
+    dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, FLAGS.data_size)
     #FLAGS.max_context_length = max_c_len
     FLAGS.max_question_length = max_q_len
 
