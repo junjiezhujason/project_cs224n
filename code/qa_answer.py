@@ -26,11 +26,11 @@ logging.basicConfig(level=logging.INFO)
 
 FLAGS = tf.app.flags.FLAGS
 
-tf.app.flags.DEFINE_float("learning_rate", 0.001, "Learning rate.")
+tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
 tf.app.flags.DEFINE_integer("batch_size", 10, "Batch size to use during training.")
 tf.app.flags.DEFINE_integer("epochs", 0, "Number of epochs to train.")
-tf.app.flags.DEFINE_integer("state_size", 200, "Size of each model layer.")
+tf.app.flags.DEFINE_integer("state_size", 100, "Size of each model layer.")
 tf.app.flags.DEFINE_integer("embedding_size", 100, "Size of the pretrained vocabulary.")
 tf.app.flags.DEFINE_integer("output_size", 750, "The output size of your model.")
 tf.app.flags.DEFINE_integer("keep", 0, "How many checkpoints to keep, 0 indicates keep all.")
@@ -40,8 +40,8 @@ tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab 
 tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 # Added
-tf.app.flags.DEFINE_integer("max_question_length", 0, "Maximum question length to consider.")
-tf.app.flags.DEFINE_integer("max_context_length", 0, "Maximum context length to consider.")
+tf.app.flags.DEFINE_integer("max_question_length", 60, "Maximum question length to consider.")
+tf.app.flags.DEFINE_integer("max_context_length", 300, "Maximum context length to consider.")
 tf.app.flags.DEFINE_integer("label_size", 2, "Dimension of the predicted labels that can be mapped to start-end postion in context.")
 tf.app.flags.DEFINE_integer("n_features", 1, "Number of features to include for each word in the sentence.")
 tf.app.flags.DEFINE_integer("window_length", 1, "Number of features to include for each word in the sentence.")

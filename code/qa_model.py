@@ -220,7 +220,10 @@ class QASystem(object):
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
-        self.preds = self.setup_system()
+        # self.preds = self.setup_system()
+        u_pred_s, u_pred_e= self.setup_system()
+        self.preds = (self.exp_mask(u_pred_s), self.exp_mask(u_pred_e)) # mask the start end end predictions
+        
         self.loss = self.setup_loss(self.preds)
 
         # ==== set up training/updating procedure ====
@@ -371,10 +374,10 @@ class QASystem(object):
         with vs.variable_scope("loss"):
             u_pred_s, u_pred_e = preds
 
-            pred_s = self.exp_mask(u_pred_s)
-            pred_e = self.exp_mask(u_pred_e)
-            # pred_s = u_pred_s
-            # pred_e = u_pred_e
+            # pred_s = self.exp_mask(u_pred_s)
+            # pred_e = self.exp_mask(u_pred_e)
+            pred_s = u_pred_s
+            pred_e = u_pred_e
             print("LOSS pred_s: "+str(pred_s))
             print("LOSS pred_e: "+str(pred_e))
             
@@ -524,7 +527,7 @@ class QASystem(object):
         f1 = np.mean(f1)
         em = np.mean(em)
 
-        logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, sample))
+        logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, n_samples))
 
         return f1, em
 
@@ -630,14 +633,13 @@ class QASystem(object):
         #logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
         #logging.debug("Token-level scores:\n" + token_cm.summary())
         #logging.info("Entity level P/R/F1: %.2f/%.2f/%.2f", *entity_scores)
-        train_dataset = [train_examples, train_raw]
-        _, _ = self.evaluate_answer(sess, train_dataset)
+        if self.config.data_size == "tiny":
+            logging.info("*****Evaluating on training data*****")
+            train_dataset = [train_examples, train_raw]
+            _, _ = self.evaluate_answer(sess, train_dataset)
 
-        logging.info("*"*20)
-        logging.info("Evaluating on training data")
+        logging.info("*****Evaluating on validation data*****")
         valid_examples = self.preprocess_question_answer(valid_set)
-        logging.info("*"*20)
-        logging.info("Evaluating on development data")
         valid_dataset = [valid_examples,valid_raw]
         f1, em = self.evaluate_answer(sess, valid_dataset)
 
@@ -770,12 +772,12 @@ class QASystemMatchLSTM(QASystem):
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
             self.setup_embeddings()
-        self.preds = self.setup_system()
+        u_pred_s, u_pred_e= self.setup_system()
+        self.preds = (self.exp_mask(u_pred_s), self.exp_mask(u_pred_e)) # mask the start end end predictions
         self.loss = self.setup_loss(self.preds)
         optfn = get_optimizer(self.config.optimizer)
         self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
         self.saver = tf.train.Saver()
-
 
     def setup_LSTM_preprocessing_layer(self):
         """
