@@ -3,6 +3,7 @@ code/*.swp
 code/preprocessing/*pyc
 code/*.pyc
 data/
+run/
 download
 log/*
 train/
