@@ -201,6 +201,7 @@ class QASystem(object):
         # TMP TO REMOVE START
         self.config = args[0]  # FLAG 
         self.pretrained_embeddings = args[1] # embeddings
+        self.num_per_epoch = args[2]
 
         # self.saver = args[2]
 
@@ -230,8 +231,23 @@ class QASystem(object):
 
         # ==== set up training/updating procedure ====
         optfn = get_optimizer(self.config.optimizer)
-        self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
 
+        self.global_step = tf.contrib.framework.get_or_create_global_step()
+        num_batches_per_epoch = (self.num_per_epoch / self.config.batch_size)
+        self.decay_steps = int(num_batches_per_epoch * self.config.num_epochs_per_decay)
+
+        # Decay the learning rate exponentially based on the number of steps.
+        self.lr = tf.train.exponential_decay(self.config.learning_rate,
+                                             self.global_step,
+                                             self.decay_steps,
+                                             self.config.learning_rate_decay_factor,
+                                             staircase=True)
+        tf.summary.scalar('learning_rate', self.lr)
+
+        summaries = tf.get_collection(tf.GraphKeys.SUMMARIES)
+        self.summary_op = tf.summary.merge(summaries)
+
+        self.train_op = optfn(self.lr).minimize(self.loss, global_step=self.global_step)
         self.saver = tf.train.Saver()
 
     # TODO: add label etc.
@@ -441,15 +457,23 @@ class QASystem(object):
             pred_e = u_pred_e
             print("LOSS pred_s: "+str(pred_s))
             print("LOSS pred_e: "+str(pred_e))
-            
-            with vs.variable_scope("start_loss"):
-                loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
 
-            with vs.variable_scope("end_loss"):
+            with vs.variable_scope("start_loss"):
                 loss_s = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_s, labels=self.start_labels_placeholder)
 
+            with vs.variable_scope("end_loss"):
+                loss_e = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=pred_e, labels=self.end_labels_placeholder)
+
+            mean_loss_s = tf.reduce_mean(loss_s)
+            mean_loss_e = tf.reduce_mean(loss_e)
             loss = loss_s + loss_e
-        return tf.reduce_mean(loss)
+            mean_loss = tf.reduce_mean(loss)
+
+            tf.summary.scalar("cross_entropy_loss_start", mean_loss_s)
+            tf.summary.scalar("cross_entropy_loss_end", mean_loss_e)
+            tf.summary.scalar("cross_entropy_loss", mean_loss)
+
+        return mean_loss
     
         
     def setup_embeddings(self):
@@ -691,7 +715,12 @@ class QASystem(object):
                                      mask_batch = mask_batch,
  				     labels_batch=[start_labels_batch, end_labels_batch])
        
-        _, loss = sess.run([self.train_op, self.loss], feed_dict=feed)
+        _, loss, global_step = sess.run([self.train_op, self.loss, self.global_step], feed_dict=feed)
+
+        # TODO Maybe add logic to prevent saving every batch (might be slow)
+        summary_str = sess.run(self.summary_op, feed_dict=feed)
+        self.summary_writer.add_summary(summary_str, global_step)
+
         return loss
 
     def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch):
@@ -783,6 +812,8 @@ class QASystem(object):
         # so that you can use your trained model to make predictions, or
         # even continue training
         
+        self.summary_writer = tf.summary.FileWriter(train_dir, session.graph)
+
         results_path = os.path.join(train_dir, "{:%Y%m%d_%H%M%S}".format(datetime.now()))
         model_path = results_path 
 
@@ -809,7 +840,7 @@ class QASystem(object):
 		    logging.info("New best score! Saving model in %s", model_path)
                     logging.info("f1: "+str(score)+" em:"+str(em))
 
-                    self.saver.save(session, model_path)
+                    self.saver.save(session, model_path, global_step=self.global_step)
 	    print("")
 	#     if self.report:
 	# 	self.report.log_epoch()
@@ -859,6 +890,7 @@ class QASystemMatchLSTM(QASystem):
         # TMP TO REMOVE START
         self.config = args[0]  # FLAG 
         self.pretrained_embeddings = args[1] # embeddings
+        self.num_per_epoch = args[2]
         
 
         # TMP TO REMOVE END
@@ -879,7 +911,23 @@ class QASystemMatchLSTM(QASystem):
         self.preds = (self.exp_mask(u_pred_s), self.exp_mask(u_pred_e)) # mask the start end end predictions
         self.loss = self.setup_loss(self.preds)
         optfn = get_optimizer(self.config.optimizer)
-        self.train_op = optfn(self.config.learning_rate).minimize(self.loss)
+
+        self.global_step = tf.contrib.framework.get_or_create_global_step()
+        num_batches_per_epoch = (self.num_per_epoch / self.config.batch_size)
+        self.decay_steps = int(num_batches_per_epoch * self.config.num_epochs_per_decay)
+
+        # Decay the learning rate exponentially based on the number of steps.
+        self.lr = tf.train.exponential_decay(self.config.learning_rate,
+                                             self.global_step,
+                                             self.decay_steps,
+                                             self.config.learning_rate_decay_factor,
+                                             staircase=True)
+        tf.summary.scalar('learning_rate', self.lr)
+
+        summaries = tf.get_collection(tf.GraphKeys.SUMMARIES)
+        self.summary_op = tf.summary.merge(summaries)
+
+        self.train_op = optfn(self.lr).minimize(self.loss, global_step=self.global_step)
         self.saver = tf.train.Saver()
 
     def setup_LSTM_preprocessing_layer(self):

@@ -16,13 +16,16 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-tf.app.flags.DEFINE_float("learning_rate", 0.03, "Learning rate.")
+tf.app.flags.DEFINE_float("learning_rate", 0.03, "Initial learning rate for exponetial decay rate.")
+tf.app.flags.DEFINE_integer("num_epochs_per_decay", 6, "How many epochs before reducing learning rate.")
+tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.1, "Using step function hence //"
+                          """decayed_learning_rate = """
+                          """learning_rate *decay_rate ^ (global_step // decay_steps)""")
 tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
 tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
 tf.app.flags.DEFINE_integer("batch_size", 10, "Batch size to use during training.")
 tf.app.flags.DEFINE_integer("epochs", 10, "Number of epochs to train.")
 tf.app.flags.DEFINE_integer("state_size", 100, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("output_size", 750, "The output size of your model.")
 tf.app.flags.DEFINE_integer("embedding_size", 100, "Size of the pretrained vocabulary.")
 tf.app.flags.DEFINE_string("data_dir", "data/squad", "SQuAD directory (default ./data/squad)")
 tf.app.flags.DEFINE_string("train_dir", "train", "Training directory to save the model parameters (default: ./train).")
@@ -116,10 +119,13 @@ def main(_):
     mixer = Mixer()
     decoder = Decoder(FLAGS)
 
+    # TODO VERY HACKY since this could be inconsistent with what qa.train uses
+    num_per_epoch = len(dataset['training'])
+    print("num_per_epoch: {}".format(num_per_epoch))
     if FLAGS.model == 'baseline':
-        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings, num_per_epoch)
     elif FLAGS.model == 'matchLSTM':
-        qa = QASystemMatchLSTM(FLAGS, embeddings)
+        qa = QASystemMatchLSTM(FLAGS, embeddings, num_per_epoch)
     # saver = tf.train.Saver()
 
     if not os.path.exists(FLAGS.log_dir):
