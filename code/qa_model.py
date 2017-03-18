@@ -297,6 +297,17 @@ class QASystem(object):
                 a_e  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_e, 1)), [-1, con_len]) + b_e
         return a_s, a_e
 
+    def simple_linear(self, H_in, d_len, c_len, bias=False):
+        xavier_init = tf.contrib.layers.xavier_initializer()
+        zero_init = tf.constant_initializer(0)
+        with tf.variable_scope("linear"):
+            Wp = tf.get_variable('Wp', shape=(d_len, ), initializer=xavier_init, dtype=tf.float64) 
+            y = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d_len]), tf.expand_dims(Wp, 1)), [-1, c_len])
+            if bias:
+                b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64) 
+                y = y + b_s 
+        return y
+
     def lstm_decoder(self, H_in, d, con_len):
         """
         Args:
@@ -309,22 +320,20 @@ class QASystem(object):
         logging.info("d:"+str(d))
         logging.info("con_len:"+str(con_len))
 
-        def lstm_decoder_cell(H_in, d):
+        def lstm_decoder_cell(H_in, d, c_len):
             """Helper function to create a lstm decoder."""
-            Wp = tf.get_variable('Wp', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
-            # implement a lstm with H_in as input and H_out where H_out will be used for the end position prediction
             cell = tf.nn.rnn_cell.LSTMCell(num_units=d, state_is_tuple=True)
             H_out, _ = tf.nn.dynamic_rnn(cell=cell,
                                         inputs=H_in,
                                         sequence_length=self.context_length_placeholder,
                                         dtype=tf.float64)
-            a  = tf.reshape(tf.matmul(tf.reshape(H_out, [-1, d]), tf.expand_dims(Wp, 1)), [-1, con_len]) #  + b_s
-            return a
+            y = self.simple_linear(H_out, d, c_len) 
+            return y 
 
         with tf.variable_scope("answer_start_decoder"):
-            a_s = lstm_decoder_cell(H_in, d)
+            a_s = self.simple_linear(H_in, d, con_len) # lstm_decoder_cell(H_in, d)
         with tf.variable_scope("answer_end_decoder"):
-            a_e = lstm_decoder_cell(H_in, d)
+            a_e = lstm_decoder_cell(H_in, d, con_len)
         return a_s, a_e
 
     def naive_decoder(self, H_r, simple=True):
@@ -434,6 +443,7 @@ class QASystem(object):
             if (n_samples == sample):
                 break
 
+            """
             if self.config.data_size == "tiny":
                 input_ques_i = input_raw[i][0]
                 raw_ques = ' '.join(input_ques_i)
@@ -444,6 +454,7 @@ class QASystem(object):
                     print("*** TRUE INDEX:  "+str(true_labels))
                     print("*** PRED ANSWER: "+pred_answer)
                     print("*** PRED INDEX:  "+str(pred_labels))
+            """
 
         f1 = np.mean(f1)
         em = np.mean(em)
