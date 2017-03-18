@@ -152,28 +152,65 @@ def generate_answers(sess, model, dataset, rev_vocab):
     """
     answers = {}
 
-    context_tokens_data, context_data, context_len_data, question_tokens_data, question_data, question_len_data, question_uuid_data = dataset
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
+    
+    context_data_truncated = []
+    context_len_data_truncated = []
+    question_data_truncated = []
+    question_len_data_truncated = []
+    data_size = len(context_data)
+    # Split the string of index in context_data nad question_data, and convert them to integer
+    # create truncated version of context and question
+    for i in range(data_size):
+        context_data[i] = context_data[i].split()
+        context_data[i] = [int(word_idx_as_str) for word_idx_as_str in context_data[i]]
+        if len(context_data[i]) > FLAGS.max_context_length:
+            context_data_truncated.append(context_data[i][:FLAGS.max_context_length])
+            context_len_data_truncated.append(FLAGS.max_context_length)
+        else:
+            context_data_truncated.append(context_data[i])
+            context_len_data_truncated.append(len(context_data[i]))
+
+        question_data[i] = question_data[i].split()
+        question_data[i] = [int(word_idx_as_str) for word_idx_as_str in question_data[i]]
+        if len(question_data[i]) > FLAGS.max_question_length:
+            question_data_truncated.append(question_data[i][:FLAGS.max_question_length])
+            question_len_data_truncated.append(FLAGS.max_question_length)
+        else:
+            question_data_truncated.append(question_data[i])
+            question_len_data_truncated.append(len(question_data[i]))
+
+
+
 
 
     # Pad input data with model.preprocess_question_answer
-    fake_label = [None, None]
-    data_set = [(question_data[i].split(), question_len_data[i], context_data[i].split(), context_len_data[i], fake_label) for i in xrange(len(question_data))]
-    padded_inputs = model.preprocess_question_answer(data_set) # 6 lists
+    fake_label = [0, 0]
+    data_set = [(question_data_truncated[i], 
+                 question_len_data_truncated[i], 
+                 context_data_truncated[i],
+                 context_len_data_truncated[i], 
+                 fake_label) for i in xrange(20)]
+    padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
     outputs = model.output(sess, padded_inputs)
     for i, output_res in enumerate(outputs):
         _, pred_labels = output_res
         start_idx = pred_labels[0]
         end_idx = pred_labels[1]
-        context_len = context_len_data[i]
+        context_len = context_len_data_truncated[i]
         
-        if (start_idx >= context_len) or (end_idx < start_idx):
-            answer = ''
+        if (start_idx >= context_len):
+            print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
+            answer = '\<EXCEED\>'
+        elif (end_idx < start_idx):
+            answer = '\<REVERSED\>'
         else:
             # TOCHECK how are their golden answer generated?
             # Use rev_vocab to reverse look up vocab from index token
-            answer = ' '.join([rev_vocab[int(vocab_idx)] for vocab_idx in context_data[i].split()[start_idx: end_idx]])
+            answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx]])
             # Use original context
-            # answer = ' '.join(context_tokens_data[i][start_idx: end_idx])
+            # answer = ' '.join(conext_tokens_data[i][start_idx: end_idx])
+        print('Answer is %s' % answer)
         answers[question_uuid_data[i]] = answer
     return answers
 
@@ -229,16 +266,10 @@ def main(_):
 
     dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
     dev_filename = os.path.basename(FLAGS.dev_path)
-    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = prepare_dev(dev_dirname, dev_filename, vocab)
-    # Get data length
-    context_len_data = [len(context.split()) for context in context_data]
-    question_len_data = [len(question.split()) for question in question_data]
+    dataset = prepare_dev(dev_dirname, dev_filename, vocab)
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
 
-    dataset = (context_tokens_data, context_data, context_len_data,
-               question_tokens_data, question_data, question_len_data, question_uuid_data)
 
-    print('max question length is %d' % max(question_len_data))
-    print('max context length is %d' % max(context_len_data))
     
     # FLAGS.max_context_length = max(context_len_data) #700 in this dataset.
     # For baseline, because the linear decoder weights dimension is max_length x state_size*2, it need to the max of both dataset
@@ -247,7 +278,7 @@ def main(_):
     if FLAGS.max_question_length==0:
         raise ValueError('max_question_length is set to be zero now. Please set it with --max_question_length flag.\n')
 
-    for i in range(10):
+    for i in range(1):
       logging.debug('context')
       logging.debug(' '.join(context_tokens_data[i]))
       logging.debug('context_data')
@@ -276,6 +307,7 @@ def main(_):
     with tf.Session() as sess:
         train_dir = get_normalized_train_dir(FLAGS.train_dir)
         initialize_model(sess, qa, train_dir)
+        print('About to start generate_answers')
         answers = generate_answers(sess, qa, dataset, rev_vocab)
 
         # write to json file to root dir
