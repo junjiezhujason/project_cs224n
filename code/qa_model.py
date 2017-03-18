@@ -320,7 +320,7 @@ class QASystem(object):
         logging.info("="*10+"Model Layer"+"="*10)
         # takes an input of (N, context_len, d) 
         cell = tf.nn.rnn_cell.LSTMCell(num_units=d_in, state_is_tuple=True)
-        cell = tf.nn.rnn_cell.MultiRNNCell([cell]*2, state_is_tuple=True)
+        # cell = tf.nn.rnn_cell.MultiRNNCell([cell]*2, state_is_tuple=True)
         hidden_states, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
                                                            cell_bw=cell,
                                                            inputs=H_in,
