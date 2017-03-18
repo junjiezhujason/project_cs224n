@@ -12,6 +12,7 @@ import argparse
 from tensorflow.python.platform import gfile
 import numpy as np
 from os.path import join as pjoin
+import tensorflow as tf
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -22,6 +23,10 @@ def load_glove_embeddings(glove_path):
     logger.info("Loading glove embedding")
     logger.info("Dimension: {}".format(glove.shape[1]))
     logger.info("Vocabulary: {}" .format(glove.shape[0]))
+    logger.info("dtype of glove is: %s" % type(glove))
+    logger.info("dtype of glove is: %s" % type(glove[0][0]))
+    glove = tf.to_float(glove)
+    logger.info("glove is: " + str(glove) )
     return glove
 
 def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
