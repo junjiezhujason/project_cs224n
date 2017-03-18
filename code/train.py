@@ -8,7 +8,7 @@ import json
 import tensorflow as tf
 import numpy as np
 
-from qa_model import Encoder, QASystem, Mixer, Decoder, QASystemMatchLSTM
+from qa_model import Encoder, QASystem, QASystemMatchLSTM
 from os.path import join as pjoin
 from data_util import load_glove_embeddings, load_dataset
 
@@ -121,15 +121,15 @@ def main(_):
     # return
 
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
-    mixer = Mixer()
-    decoder = Decoder(FLAGS)
+    # mixer = Mixer()
+    # decoder = Decoder(FLAGS)
 
     with tf.device("/gpu:{}".format(FLAGS.gpu_id)):
         # TODO VERY HACKY since this could be inconsistent with what qa.train uses
         num_per_epoch = len(dataset['training'])
         print("num_per_epoch: {}".format(num_per_epoch))
         if FLAGS.model == 'baseline':
-            qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings, num_per_epoch)
+            qa = QASystem(encoder, FLAGS, embeddings, num_per_epoch)
         elif FLAGS.model == 'matchLSTM':
             qa = QASystemMatchLSTM(FLAGS, embeddings, num_per_epoch)
         # saver = tf.train.Saver()

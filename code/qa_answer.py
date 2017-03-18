@@ -14,7 +14,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Decoder, Mixer, QASystemMatchLSTM
+from qa_model import Encoder, QASystem, QASystemMatchLSTM
 from preprocessing.squad_preprocess import data_from_json, maybe_download, squad_base_url, \
     invert_map, tokenize, token_idx_map
 import qa_data
@@ -30,7 +30,8 @@ FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config flags")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
-tf.app.flags.DEFINE_string("train_path", "", "Path to the training directory where the checkpoint is saved")
+tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
+# tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
 # tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
 # tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
@@ -41,7 +42,6 @@ tf.app.flags.DEFINE_string("train_path", "", "Path to the training directory whe
 # tf.app.flags.DEFINE_integer("output_size", 750, "The output size of your model.")
 # tf.app.flags.DEFINE_integer("keep", 0, "How many checkpoints to keep, 0 indicates keep all.")
 # tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab file (default: ./data/squad/vocab.dat)")
-# tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 # Added
 # tf.app.flags.DEFINE_integer("max_question_length", 60, "Maximum question length to consider.")
 # tf.app.flags.DEFINE_integer("max_context_length", 300, "Maximum context length to consider.")
@@ -264,13 +264,14 @@ def main(_):
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
     embeddings = load_glove_embeddings(embed_path)
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
-    mixer = Mixer()
-    decoder = Decoder(FLAGS)
 
+    # mixer = Mixer()
+    # decoder = Decoder(FLAGS)
     if FLAGS.model == 'baseline':
-        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+        qa = QASystem(encoder, FLAGS, embeddings, 1)
     elif FLAGS.model == 'matchLSTM':
-        qa = QASystemMatchLSTM(FLAGS, embeddings)
+        qa = QASystemMatchLSTM(FLAGS, embeddings, 1)
+
 
     with tf.Session() as sess:
         train_dir = get_normalized_train_dir(FLAGS.train_dir)
