@@ -72,7 +72,7 @@ class Encoder(object):
                                                                  sequence_length=seq_len,
                                                                  initial_state_fw=state_fw,
                                                                  initial_state_bw=state_bw,
-                                                                 dtype=tf.float64)
+                                                                 dtype=tf.float32)
 
         # Concatenate two end hidden vectors for the final encoded
         # representation of inputs
@@ -85,6 +85,7 @@ class Encoder(object):
         concat_final_state = tf.concat(1, [final_fw_m_state, final_bw_m_state])
         logging.debug('Shape of concatenated BiRNN final hiden state is %s' % str(concat_final_state))
         return concat_hidden_states, concat_final_state, final_state
+
 
 class QASystem(object):
     def __init__(self, encoder, *args):
@@ -120,7 +121,7 @@ class QASystem(object):
 
         self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
         self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
-        self.mask_placeholder = tf.placeholder(tf.float64, (None, self.config.max_context_length))
+        self.mask_placeholder = tf.placeholder(tf.float32, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -182,14 +183,14 @@ class QASystem(object):
         JP = self.config.max_context_length
         JQ = self.config.max_question_length
 
-        with tf.variable_scope("attn_layer"):
+        with tf.variable_scope("Attention_Layer"):
 
             xavier_init = tf.contrib.layers.xavier_initializer()
             zero_init = tf.constant_initializer(0)
             
             if simple:
-                W_s = tf.get_variable('Ws_s', shape=(2*d, d), initializer=xavier_init, dtype=tf.float64)
-                b_s = tf.get_variable('bs_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
+                W_s = tf.get_variable('Ws_s', shape=(2*d, d), initializer=xavier_init, dtype=tf.float32)
+                b_s = tf.get_variable('bs_s', shape=(d, ), initializer=xavier_init, dtype=tf.float32)
 
                 QT = tf.transpose(Q, [0,2,1])
                 A = tf.nn.softmax(_batch_mat_mul(h, QT))
@@ -208,7 +209,7 @@ class QASystem(object):
                 embed_dim = d
 
             else:
-                w_s = tf.get_variable('w_s', shape=(3*d, ), initializer=xavier_init, dtype=tf.float64)
+                w_s = tf.get_variable('w_s', shape=(3*d, ), initializer=xavier_init, dtype=tf.float32)
 
                 h_aug = tf.tile(tf.expand_dims(h, 2), [1, 1, JQ, 1]) # [?, JP, JQ, d]
                 u_aug = tf.tile(tf.expand_dims(u, 1), [1, JP, 1, 1]) # [?. JP, JQ, d]
@@ -248,7 +249,7 @@ class QASystem(object):
 
         # STEP1: Run a BiLSTM over the question, concatenate the two end hidden
         # vectors and call that the question representation.
-        with tf.variable_scope('question_BiLSTM'):
+        with tf.variable_scope('Question_BiLSTM'):
             question_length = self.question_length_placeholder  # TODO: name
             question_paragraph_repr, question_repr, q_state = self.encoder.encode(inputs=question,
                                                                     seq_len=question_length,
@@ -256,7 +257,7 @@ class QASystem(object):
 
         # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
         # question representation.
-        with tf.variable_scope('ccontext_BiLSTM'): 
+        with tf.variable_scope('Context_BiLSTM'): 
             context_length = self.context_length_placeholder  # TODO: name
             context_paragraph_repr, context_repr, c_state = self.encoder.encode(inputs=context,
                                                                   seq_len=context_length,
@@ -269,15 +270,22 @@ class QASystem(object):
         logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))
         
         encoded_embed_dim = 2 * self.config.state_size
-        attn_out, attn_embed_dim = self.attention_flow_layer(context_paragraph_repr,
-                                                             question_paragraph_repr,
-                                                             encoded_embed_dim)
         
+        # attention layer
+        attn_out, attn_embed_dim = self.attention_flow_layer(context_paragraph_repr, question_paragraph_repr, encoded_embed_dim)
+        logging.info("attn_out:"+str(attn_out))
         # s_idx, e_idx = self.simple_decoder(attn_out, self.config.state_size*6, self.config.max_context_length)
-        max_context_length = self.config.max_context_length
-        s_idx, e_idx = self.lstm_decoder(attn_out, attn_embed_dim, max_context_length)
         
-        # s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
+        # modeling layer multiple stacked LSTMs
+        model_layer_out, model_embed_dim = self.model_layer(attn_out, attn_embed_dim)
+        logging.info("model_layer_out:"+str(model_layer_out))
+
+        # decoding layer
+        max_context_length = self.config.max_context_length
+        s_idx, e_idx = self.lstm_decoder(model_layer_out, model_embed_dim, max_context_length)
+
+        # s_idx, e_idx = self.lstm_decoder(attn_out, attn_embed_dim, max_context_length)
+        
         return s_idx, e_idx
 
     def simple_decoder(self, H_in, d, con_len):
@@ -286,10 +294,10 @@ class QASystem(object):
         zero_init = tf.constant_initializer(0)
 
         with tf.variable_scope("simple_decoder"):
-            Wp_s = tf.get_variable('Wp_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
-            Wp_e = tf.get_variable('Wp_e', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
-            b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64)
-            b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float64)
+            Wp_s = tf.get_variable('Wp_s', shape=(d, ), initializer=xavier_init, dtype=tf.float32)
+            Wp_e = tf.get_variable('Wp_e', shape=(d, ), initializer=xavier_init, dtype=tf.float32)
+            b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float32)
+            b_e  = tf.get_variable('b_e', shape=(), initializer=zero_init, dtype=tf.float32)
 
             with tf.variable_scope('answer_start'):
                 a_s  = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d]), tf.expand_dims(Wp_s, 1)), [-1, con_len]) + b_s
@@ -301,18 +309,29 @@ class QASystem(object):
         xavier_init = tf.contrib.layers.xavier_initializer()
         zero_init = tf.constant_initializer(0)
         with tf.variable_scope("linear"):
-            Wp = tf.get_variable('Wp', shape=(d_len, ), initializer=xavier_init, dtype=tf.float64) 
+            Wp = tf.get_variable('Wp', shape=(d_len, ), initializer=xavier_init, dtype=tf.float32) 
             y = tf.reshape(tf.matmul(tf.reshape(H_in, [-1, d_len]), tf.expand_dims(Wp, 1)), [-1, c_len])
             if bias:
-                b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float64) 
+                b_s  = tf.get_variable('b_s', shape=(), initializer=zero_init, dtype=tf.float32) 
                 y = y + b_s 
         return y
 
+    def model_layer(self, H_in, d_in):
+        logging.info("="*10+"Model Layer"+"="*10)
+        # takes an input of (N, context_len, d) 
+        cell = tf.nn.rnn_cell.LSTMCell(num_units=d_in, state_is_tuple=True)
+        cell = tf.nn.rnn_cell.MultiRNNCell([cell]*2, state_is_tuple=True)
+        hidden_states, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
+                                                           cell_bw=cell,
+                                                           inputs=H_in,
+                                                           sequence_length=self.context_length_placeholder,
+                                                           dtype=tf.float32)
+        print("Deep LSTM output: "+str(hidden_states))
+
+        concat_hidden_states = tf.concat(2, hidden_states)
+        return concat_hidden_states, d_in*2
+
     def lstm_decoder(self, H_in, d, con_len):
-        """
-        Args:
-        con_len is self.config.max_context_length
-        """
         logging.info("="*10+"LSTM Decoder"+"="*10)
         xavier_init = tf.contrib.layers.xavier_initializer()
         zero_init = tf.constant_initializer(0)
@@ -326,7 +345,7 @@ class QASystem(object):
             H_out, _ = tf.nn.dynamic_rnn(cell=cell,
                                         inputs=H_in,
                                         sequence_length=self.context_length_placeholder,
-                                        dtype=tf.float64)
+                                        dtype=tf.float32)
             y = self.simple_linear(H_out, d, c_len) 
             return y 
 
@@ -393,7 +412,7 @@ class QASystem(object):
         """
         with vs.variable_scope("embeddings"):
             embedding_tensor = tf.Variable(self.pretrained_embeddings, trainable=False)
-            # embedding_tensor = tf.cast(self.pretrained_embeddings, tf.float64)
+            # embedding_tensor = tf.cast(self.pretrained_embeddings, tf.float32)
             question_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.question_placeholder)
             context_embedding_lookup = tf.nn.embedding_lookup(embedding_tensor, self.context_placeholder)
             question_embeddings = tf.reshape(question_embedding_lookup, [-1, self.config.max_question_length, self.config.embedding_size * self.config.n_features])
@@ -735,7 +754,7 @@ class QASystemMatchLSTM(QASystem):
 
         self.start_labels_placeholder=tf.placeholder(tf.int64,(None,))
         self.end_labels_placeholder=tf.placeholder(tf.int64,(None,))
-        self.mask_placeholder = tf.placeholder(tf.float64, (None, self.config.max_context_length))
+        self.mask_placeholder = tf.placeholder(tf.float32, (None, self.config.max_context_length))
 
         # ==== assemble pieces ====
         with tf.variable_scope("qa", initializer=tf.uniform_unit_scaling_initializer(1.0)):
@@ -786,7 +805,7 @@ class QASystemMatchLSTM(QASystem):
             H_p, _ = tf.nn.dynamic_rnn(cell=cell_p,
                                        inputs=passage,
                                        sequence_length=p_len,
-                                       dtype=tf.float64)
+                                       dtype=tf.float32)
 
         # LSTM Preprocessing Layer for question
         with tf.variable_scope('q'):
@@ -794,7 +813,7 @@ class QASystemMatchLSTM(QASystem):
             H_q, _ = tf.nn.dynamic_rnn(cell=cell_q,
                                        inputs=question,
                                        sequence_length=q_len,
-                                       dtype=tf.float64)
+                                       dtype=tf.float32)
 
         return H_p, H_q
 
@@ -805,12 +824,12 @@ class QASystemMatchLSTM(QASystem):
         max_question_length = self.config.max_question_length
       
         with tf.variable_scope('match_LSTM'):
-            W_q = tf.get_variable('W_q', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
-            W_p = tf.get_variable('W_p', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
-            W_r = tf.get_variable('W_r', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
-            b_p = tf.get_variable('b_p', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
-            w = tf.get_variable('w', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
-            b = tf.get_variable('b', shape=(), initializer=zero_init, dtype=tf.float64)
+            W_q = tf.get_variable('W_q', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
+            W_p = tf.get_variable('W_p', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
+            W_r = tf.get_variable('W_r', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
+            b_p = tf.get_variable('b_p', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float32)
+            w = tf.get_variable('w', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float32)
+            b = tf.get_variable('b', shape=(), initializer=zero_init, dtype=tf.float32)
 
         # ========================================================
         #  MatchLSTMCell class
@@ -860,7 +879,7 @@ class QASystemMatchLSTM(QASystem):
                                                      cell_bw=cell,
                                                      inputs=H_p,
                                                      sequence_length=self.context_length_placeholder,
-                                                     dtype=tf.float64)
+                                                     dtype=tf.float32)
             logging.debug('H_r_tuple is' + str(H_r_tuple))
 
         H_r = tf.concat(2, H_r_tuple)
@@ -876,11 +895,11 @@ class QASystemMatchLSTM(QASystem):
         max_context_length = self.config.max_context_length
       
         with tf.variable_scope('ansptr_LSTM'):
-            V = tf.get_variable('V', shape=(2*self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
-            W_a = tf.get_variable('W_a', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float64)
-            b_a = tf.get_variable('b_a', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
-            v =     tf.get_variable('v', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float64)
-            c_v = tf.get_variable('c_v', shape=(), initializer=zero_init, dtype=tf.float64)
+            V = tf.get_variable('V', shape=(2*self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
+            W_a = tf.get_variable('W_a', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
+            b_a = tf.get_variable('b_a', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float32)
+            v =     tf.get_variable('v', shape=(self.config.state_size, ), initializer=zero_init, dtype=tf.float32)
+            c_v = tf.get_variable('c_v', shape=(), initializer=zero_init, dtype=tf.float32)
 
         # ========================================================
         #  AnswerPointerCell class
@@ -936,7 +955,7 @@ class QASystemMatchLSTM(QASystem):
             beta_log, _ = tf.nn.dynamic_rnn(cell=cell,
                                        inputs=input_dummy, # NOTE this input shouldn't matter? 
                                        sequence_length=seq_len_2, # only unroll twice
-                                       dtype=tf.float64)
+                                       dtype=tf.float32)
 
             logging.debug('beta_log' + str(beta_log))
             # NOTE we only need beta_0 and beta_1 in the intermediate steps in the cell
