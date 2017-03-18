@@ -861,7 +861,7 @@ class QASystemMatchLSTM(QASystem):
                 # h_p is (?, L), a is (?, Q), H_q is (?, Q, L)
                 # a reshape to (?, 1, Q), multipe to create (?, 1, L), then
                 # reshape to (?, L)
-                z_part2 = tf.reshape(tf.matmul(tf.expand_dims(a, 1), H_q), [-1, state_size])
+                z_part2 = tf.reshape(_batch_mat_mul(tf.expand_dims(a, 1), H_q), [-1, state_size])
                 logging.debug('z_part2 is ' + str(z_part2))
 
                 z = tf.concat_v2([h_p, z_part2], axis=1)
@@ -872,7 +872,6 @@ class QASystemMatchLSTM(QASystem):
         #  =======================================================
 
         with tf.variable_scope('match_LSTM'):
-            print("\n"*3)
             print(H_p)
             cell = MatchLSTMCell(num_units=self.config.state_size, state_is_tuple=True)
             H_r_tuple, _ = tf.nn.bidirectional_dynamic_rnn(cell_fw=cell,
@@ -968,16 +967,23 @@ class QASystemMatchLSTM(QASystem):
         print('H_q is ' + str(H_q))
         print('H_p is ' + str(H_p))
         H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
+        H_r_fw_dim = self.config.state_size * 2
 
-        if self.config.decoder_type == "naive":
-            pred_s, pred_e = self.naive_decoder(H_r_fw)
-        else:
+
+        if self.config.decoder_type == "pointer":
             beta_log_scores = self.setup_pointer_layer(H_r_fw)
             pred_s, pred_e = tf.split(1, 2, beta_log_scores)
             logging.debug("pred_s is "+str(pred_s))
             logging.debug("pred_e is "+str(pred_e))
             pred_s = tf.reshape(pred_s, [-1,self.config.max_context_length])
             pred_e = tf.reshape(pred_e, [-1,self.config.max_context_length])
+        else:
+            max_context_length = self.config.max_context_length
+            # model_layer_out, model_embed_dim = self.model_layer(H_r_fw, H_r_fw_dim)
+            # logging.info("model_layer_out:"+str(model_layer_out))
+            # decoding layer
+            # pred_s, pred_e= self.lstm_decoder(model_layer_out, model_embed_dim, max_context_length)
+            pred_s, pred_e= self.lstm_decoder(H_r_fw, H_r_fw_dim, max_context_length)
 
         
         logging.debug("pred_s is "+str(pred_s))
