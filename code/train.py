@@ -151,10 +151,12 @@ def main(_):
         config.allow_soft_placement = True
 
         with tf.Session(config=config) as sess:
-            load_train_dir = get_normalized_train_dir(FLAGS.load_train_dir or FLAGS.train_dir)
+            # load_train_dir = get_normalized_train_dir(FLAGS.load_train_dir or FLAGS.train_dir)
+            load_train_dir = os.path.abspath(FLAGS.train_dir)
             initialize_model(sess, qa, load_train_dir)
 
-            save_train_dir = get_normalized_train_dir(FLAGS.train_dir)
+            # save_train_dir = get_normalized_train_dir(FLAGS.train_dir)
+            save_train_dir = os.path.abspath(FLAGS.train_dir)
             qa.train(sess, dataset, save_train_dir)
 
             # qa.evaluate_answer(sess, dataset, vocab, FLAGS.evaluate, log=True)
