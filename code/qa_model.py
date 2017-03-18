@@ -33,33 +33,6 @@ def get_optimizer(opt):
         assert (False)
     return optfn
 
-
-class Mixer(object):
-    def __init__(self):
-        pass
-
-    def mix(self, question_repr, context_paragraph_repr):
-        """
-        3. Calculate an attention vector over the context paragraph representation based on the question
-        representation, or compare the last hidden state of question to all computed paragraph hidden states
-        4. Compute a new vector for each context paragraph position that multiplies context-paragraph
-        representation with the attention vector.
-
-        Args:
-            question_repr: the last hidden state of encoded question
-            context_paragraph_repr: all hidden states of encoded context
-        Return:
-            new context_paragraph_repr weighted by attention
-        """
-        logging.debug('='*10 + 'Mixer' + '='*10)
-        logging.debug('Context paragraph is %s' % str(context_paragraph_repr))
-        logging.debug('Question is %s' % str(question_repr))
-        a = tf.nn.softmax(tf.matmul(context_paragraph_repr, tf.expand_dims(question_repr, -1)))
-        logging.debug('Attention vector is %s' % str(a))
-        new_context_paragraph_repr = context_paragraph_repr * a
-        logging.debug('New context paragraph is %s' % str(new_context_paragraph_repr))
-        return new_context_paragraph_repr
-
 class Encoder(object):
     def __init__(self, size, vocab_dim):
         self.size = size
@@ -114,78 +87,8 @@ class Encoder(object):
         return concat_hidden_states, concat_final_state, final_state
 
 
-class Decoder(object):
-    def __init__(self, flag):
-        self.config=flag
-
-    def decode(self, knowledge_rep):
-        """
-        takes in a knowledge representation
-        and output a probability estimation over
-        all paragraph tokens on which token should be
-        the start of the answer span, and which should be
-        the end of the answer span.
-
-        Run a final LSTM that does a 2-class classification of these vectors as O or ANSWER.
-
-        :param knowledge_rep: it is a representation of the paragraph and question,
-                              decided by how you choose to implement the encoder
-        :return:
-        """
-        logging.debug('='*10 + 'Decoder' + '='*10)
-        logging.debug('Input knowledge_rep is %s' % str(knowledge_rep))
-
-        if self.config.model == 'baseline':
-            # as = Wahp + W ahq + ba
-            # ae = Wehp + W ehq + be
-            q, p = knowledge_rep
-            logging.debug('Input knowledge_rep q is %s' % str(q))
-            logging.debug('Input knowledge_rep p is %s' % str(p))
-
-            xavier_init = tf.contrib.layers.xavier_initializer()
-            zero_init = tf.constant_initializer(0)
-            Wp_s = tf.get_variable('Wp_s', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float32)
-            Wp_e = tf.get_variable('Wp_e', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float32)
-            Wq_s = tf.get_variable('Wq_s', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float32)
-            Wq_e = tf.get_variable('Wq_e', shape=(self.config.state_size*2, self.config.max_context_length), initializer=xavier_init, dtype=tf.float32)
-            b_s  = tf.get_variable('b_s', shape=(self.config.max_context_length, ), initializer=zero_init, dtype=tf.float32)
-            b_e  = tf.get_variable('b_e', shape=(self.config.max_context_length, ), initializer=zero_init, dtype=tf.float32)
-            with tf.variable_scope('answer_start'):
-                a_s = tf.matmul(p, Wp_s) + tf.matmul(q, Wq_s) + b_s
-            with tf.variable_scope('answer_scope'):
-                a_e = tf.matmul(p, Wp_e) + tf.matmul(q, Wq_e) + b_e
-            return a_s, a_e
-"""
-        cell = tf.nn.rnn_cell.LSTMCell(num_units=1, state_is_tuple=True)
-        hidden_states, final_state = tf.nn.dynamic_rnn(cell=cell,
-                                                       inputs=knowledge_rep,
-                                                       dtype=tf.float32)
-        logging.debug('hidden_states is %s' % str(hidden_states))
-        xavier_init = tf.contrib.layers.xavier_initializer()
-        zero_init = tf.constant_initializer(0)
-        b = tf.get_variable('b', shape=(1, ), initializer=zero_init, dtype=tf.float32)
-        preds = tf.reduce_mean(tf.sigmoid(hidden_states + b), 2)
-        logging.debug('preds is %s' % str(preds))
-        # True = Answer, False = Others
-        preds = tf.greater_equal(preds, 0.5)
-        logging.debug('preds is %s' % str(preds))
-
-        # TODO: figure out how to get the index
-        # Index for start of answer is where first 'A' appears
-        # s_idx = preds.index(True)
-        def true_index(t):
-            return tf.reduce_min(tf.where(tf.equal(t, True)))
-        s_idx = tf.map_fn(true_index, preds, dtype=tf.int64)
-        logging.debug('s_idx is %s' % str(s_idx))
-
-        # Index for end of answer
-        # e_idx = preds[s_idx:].index(False) + s_idx
-        e_idx = s_idx
-        return s_idx, e_idx
-"""
-
 class QASystem(object):
-    def __init__(self, encoder, mixer, decoder, *args):
+    def __init__(self, encoder, *args):
         """
         Initializes your System
 
@@ -195,8 +98,7 @@ class QASystem(object):
         """
 
         self.encoder = encoder
-        self.mixer = mixer
-        self.decoder = decoder
+
         # ==== set up placeholder tokens ========
         # TMP TO REMOVE START
         self.config = args[0]  # FLAG 
@@ -363,8 +265,6 @@ class QASystem(object):
         # STEP3: Calculate an attention vector over the context paragraph representation based on the question
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
-        # representation with the attention vector.
-        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
         logging.info("Question_paragraph_repr:"+str(question_paragraph_repr))
         logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))
@@ -492,85 +392,6 @@ class QASystem(object):
             context_embeddings = tf.reshape(context_embedding_lookup, [-1, self.config.max_context_length, self.config.embedding_size * self.config.n_features])
         return question_embeddings, context_embeddings
 
-    def optimize(self, session, train_x, train_y):
-        """
-        Takes in actual data to optimize your model
-        This method is equivalent to a step() function
-        :return:
-        """
-        input_feed = {}
-
-        # fill in this feed_dictionary like:
-        # input_feed['train_x'] = train_x
-
-        output_feed = []
-
-        outputs = session.run(output_feed, input_feed)
-
-        return outputs
-
-    def test(self, session, valid_x, valid_y):
-        """
-        in here you should compute a cost for your validation set
-        and tune your hyperparameters according to the validation set performance
-        :return:
-        """
-        input_feed = {}
-
-        # fill in this feed_dictionary like:
-        # input_feed['valid_x'] = valid_x
-
-        output_feed = []
-
-        outputs = session.run(output_feed, input_feed)
-
-        return outputs
-
-    def decode(self, session, test_x):
-        """
-        Returns the probability distribution over different positions in the paragraph
-        so that other methods like self.answer() will be able to work properly
-        :return:
-        """
-        input_feed = {}
-
-        # fill in this feed_dictionary like:
-        # input_feed['test_x'] = test_x
-
-        output_feed = []
-
-        outputs = session.run(output_feed, input_feed)
-
-        return outputs
-
-    def answer(self, session, test_x):
-
-        yp, yp2 = self.decode(session, test_x)
-
-        a_s = np.argmax(yp, axis=1)
-        a_e = np.argmax(yp2, axis=1)
-
-        return (a_s, a_e)
-
-    def validate(self, sess, valid_dataset):
-        """
-        Iterate through the validation dataset and determine what
-        the validation cost is.
-
-        This method calls self.test() which explicitly calculates validation cost.
-
-        How you implement this function is dependent on how you design
-        your data iteration function
-
-        :return:
-        """
-        valid_cost = 0
-
-        for valid_x, valid_y in valid_dataset:
-          valid_cost = self.test(sess, valid_x, valid_y)
-
-
-        return valid_cost
 
     def evaluate_answer(self, session, dataset, sample=100, log=False):
         """
