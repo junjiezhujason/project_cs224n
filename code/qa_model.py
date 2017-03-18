@@ -283,12 +283,12 @@ class QASystem(object):
 
         with tf.variable_scope("attn_layer"):
 
-	    xavier_init = tf.contrib.layers.xavier_initializer()
-	    zero_init = tf.constant_initializer(0)
+            xavier_init = tf.contrib.layers.xavier_initializer()
+            zero_init = tf.constant_initializer(0)
             
             if simple:
-	        W_s = tf.get_variable('Ws_s', shape=(2*d, d), initializer=xavier_init, dtype=tf.float64)
-	        b_s = tf.get_variable('bs_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
+                W_s = tf.get_variable('Ws_s', shape=(2*d, d), initializer=xavier_init, dtype=tf.float64)
+                b_s = tf.get_variable('bs_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
 
                 QT = tf.transpose(Q, [0,2,1])
                 A = tf.nn.softmax(_batch_mat_mul(h, QT))
@@ -323,7 +323,7 @@ class QASystem(object):
                 S_logits = tf.reshape(tf.matmul(tf.reshape(huhu, [-1, 3*d]), tf.expand_dims(w_s,1)), [-1, JP, JQ])  # S_logit to be [N, JP, JQ]
                 logging.info("S_logits: "+str(S_logits))
                  
-                # u_a = softsel(u_aug, S_logits)	
+                # u_a = softsel(u_aug, S_logits)        
                 a_t = tf.nn.softmax(S_logits, -1) # [N, JP, JQ] softmax on the question dimension
                 
                 # [N, JP, JQ] * [N, JQ, 2*d]
@@ -337,7 +337,7 @@ class QASystem(object):
         return P_out, embed_dim
     
     def setup_system(self):
-	"""
+        """
         After your modularized implementation of encoder and decoder
         you should call various functions inside encoder, decoder here
         to assemble your reading comprehension system!
@@ -366,25 +366,25 @@ class QASystem(object):
         # representation with the attention vector.
         updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
-	logging.info("Question_paragraph_repr:"+str(question_paragraph_repr))
-	logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))
-	
+        logging.info("Question_paragraph_repr:"+str(question_paragraph_repr))
+        logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))
+        
         encoded_embed_dim = 2 * self.config.state_size
-	attn_out, attn_embed_dim = self.attention_flow_layer(context_paragraph_repr,
+        attn_out, attn_embed_dim = self.attention_flow_layer(context_paragraph_repr,
                                                              question_paragraph_repr,
                                                              encoded_embed_dim)
-	
-	# s_idx, e_idx = self.simple_decoder(attn_out, self.config.state_size*6, self.config.max_context_length)
+        
+        # s_idx, e_idx = self.simple_decoder(attn_out, self.config.state_size*6, self.config.max_context_length)
         max_context_length = self.config.max_context_length
-	s_idx, e_idx = self.lstm_decoder(attn_out, attn_embed_dim, max_context_length)
+        s_idx, e_idx = self.lstm_decoder(attn_out, attn_embed_dim, max_context_length)
         
         # s_idx, e_idx = self.decoder.decode((question_repr, context_repr))
         return s_idx, e_idx
 
     def simple_decoder(self, H_in, d, con_len):
         logging.info("="*10+"Simple Decoder"+"="*10)
-	xavier_init = tf.contrib.layers.xavier_initializer()
-	zero_init = tf.constant_initializer(0)
+        xavier_init = tf.contrib.layers.xavier_initializer()
+        zero_init = tf.constant_initializer(0)
 
         with tf.variable_scope("simple_decoder"):
             Wp_s = tf.get_variable('Wp_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
@@ -400,11 +400,11 @@ class QASystem(object):
 
     def lstm_decoder(self, H_in, d, con_len):
         logging.info("="*10+"LSTM Decoder"+"="*10)
-	xavier_init = tf.contrib.layers.xavier_initializer()
-	zero_init = tf.constant_initializer(0)
-	logging.info("H_in:"+str(H_in))
-	logging.info("d:"+str(d))
-	logging.info("con_len:"+str(con_len))
+        xavier_init = tf.contrib.layers.xavier_initializer()
+        zero_init = tf.constant_initializer(0)
+        logging.info("H_in:"+str(H_in))
+        logging.info("d:"+str(d))
+        logging.info("con_len:"+str(con_len))
 
         with tf.variable_scope("lstm_decoder"):
             Wp_s = tf.get_variable('Wp_s', shape=(d, ), initializer=xavier_init, dtype=tf.float64)
@@ -427,8 +427,8 @@ class QASystem(object):
         return a_s, a_e
 
     def naive_decoder(self, H_r, simple=True):
-	print("="*10)
-	print("NAIVE DECODER")
+        print("="*10)
+        print("NAIVE DECODER")
         d = self.config.state_size*2
         con_len = self.config.max_context_length
         if simple:
@@ -631,23 +631,23 @@ class QASystem(object):
         return f1, em
 
     def pad_sequence(self, sentence, max_length):
-	"""Ensures a seqeunce is of length @max_length by padding it and truncating the rest of the sequence.
-	Args:
-	    sentence: list of featurized words
-	    max_length: the desired length for all input/output sequences.
-	Returns:
-	    a new sentence and  mask
-	    Each of sentence', mask are of length @max_length.
-	"""
-	# Use this zero vector when padding sequences.
-	zero_vector = [PAD_ID] * self.config.n_features
-	pad_len = max_length - len(sentence) 
-	mask = [0.0] * len(sentence)
-	if pad_len > 0: 
-	    p_sentence = sentence + [zero_vector] * pad_len 
-	    mask += [-1e10] * pad_len
-	else:
-	    p_sentence = sentence[:max_length]
+        """Ensures a seqeunce is of length @max_length by padding it and truncating the rest of the sequence.
+        Args:
+            sentence: list of featurized words
+            max_length: the desired length for all input/output sequences.
+        Returns:
+            a new sentence and  mask
+            Each of sentence', mask are of length @max_length.
+        """
+        # Use this zero vector when padding sequences.
+        zero_vector = [PAD_ID] * self.config.n_features
+        pad_len = max_length - len(sentence) 
+        mask = [0.0] * len(sentence)
+        if pad_len > 0: 
+            p_sentence = sentence + [zero_vector] * pad_len 
+            mask += [-1e10] * pad_len
+        else:
+            p_sentence = sentence[:max_length]
         
         # DOUBLE_CHECKED THAT PADDING IS WORKING
         # print("")
@@ -655,7 +655,7 @@ class QASystem(object):
         # print(p_sentence)
         # print(mask)
 
-	return p_sentence, mask
+        return p_sentence, mask
 
     def featurize_window(self, sentence, window_size=1):
         # sentence_ = []
@@ -666,9 +666,9 @@ class QASystem(object):
         return sentence_
 
     def preprocess_question_answer(self, examples):
-	# pad sequences
-	ret = []
-	for q_sent, q_len, c_sent, c_len, lab in examples:
+        # pad sequences
+        ret = []
+        for q_sent, q_len, c_sent, c_len, lab in examples:
 
             # TODO HANDLE THIS HERE DOUBLE CHECK WITH YIFEI
             """
@@ -703,7 +703,7 @@ class QASystem(object):
             # padding
             p_q_sent, _ = self.pad_sequence(q_sent, self.config.max_question_length)
             p_c_sent, c_mask = self.pad_sequence(c_sent, self.config.max_context_length)
-            ret.append([p_q_sent, q_len, p_c_sent, c_len, c_mask, lab[0], lab[1]])	
+            ret.append([p_q_sent, q_len, p_c_sent, c_len, c_mask, lab[0], lab[1]])      
         return np.array(ret)
     
 
@@ -713,7 +713,7 @@ class QASystem(object):
                                      c_batch, 
                                      c_len_batch, 
                                      mask_batch = mask_batch,
- 				     labels_batch=[start_labels_batch, end_labels_batch])
+                                     labels_batch=[start_labels_batch, end_labels_batch])
        
         _, loss, global_step = sess.run([self.train_op, self.loss, self.global_step], feed_dict=feed)
 
@@ -829,23 +829,23 @@ class QASystem(object):
         valid_raw = dataset['validation_raw']
 
         best_score = 0.
-	for epoch in range(self.config.epochs):
-	    logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
+        for epoch in range(self.config.epochs):
+            logging.info("Epoch %d out of %d", epoch + 1, self.config.epochs)
             logging.info("Best score so far: "+str(best_score))
-	    score, em = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
-	    if score > best_score:
-		best_score = score
-	        print("")
-		if self.saver:
-		    logging.info("New best score! Saving model in %s", model_path)
+            score, em = self.run_epoch(session, train_set, valid_set, train_raw, valid_raw)
+            if score > best_score:
+                best_score = score
+                print("")
+                if self.saver:
+                    logging.info("New best score! Saving model in %s", model_path)
                     logging.info("f1: "+str(score)+" em:"+str(em))
 
                     self.saver.save(session, model_path, global_step=self.global_step)
-	    print("")
-	#     if self.report:
-	# 	self.report.log_epoch()
-	# 	self.report.save()
-	return best_score
+            print("")
+        #     if self.report:
+        #       self.report.log_epoch()
+        #       self.report.save()
+        return best_score
 
     def output(self, sess, inputs):
         """
