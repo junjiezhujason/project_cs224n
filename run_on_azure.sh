@@ -8,9 +8,9 @@ TDIR=${MDIR}/train
 
 source .env/bin/activate
 
-rm -r train/
 rm -r data/tmp-squad-train 
-rm -r log/
+# rm -r train/
+# rm -r log/
 
 # create folder for experiment
 mkdir -p ${MDIR} 
@@ -20,7 +20,7 @@ python code/train.py --model=baseline \
                      --decoder_type=naive \
                      --data_size=full \
                      --batch_size=32 \
-                     --learning_rate=0.03 \
-                     --state_size=50 \ 
+                     --learning_rate=0.003 \
+                     --state_size=50 \
                      --log_dir=${LDIR} \
                      --train_dir=${TDIR} 

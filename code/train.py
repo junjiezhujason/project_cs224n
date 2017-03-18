@@ -95,14 +95,17 @@ def get_normalized_train_dir(train_dir):
 
 def main(_):
 
+    print(vars(FLAGS))
+    # assert False
+
     # Do what you need to load datasets from FLAGS.data_dir
     # dataset = load_dataset(FLAGS.data_dir, "full")
     dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, 
                                                  FLAGS.data_size,
                                                  FLAGS.max_question_length,
                                                  FLAGS.max_context_length)
-    #FLAGS.max_context_length = max_c_len
-    FLAGS.max_question_length = max_q_len
+    # FLAGS.max_context_length = max_c_len
+    # FLAGS.max_question_length = max_q_len
 
 
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
