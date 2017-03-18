@@ -65,6 +65,7 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
         label_path = data_pfx + ".span"
 
         counter = 0
+        ignore_counter= 0
 
         with gfile.GFile(q_raw_path, mode="rb") as r_q_file:
             with gfile.GFile(c_raw_path, mode="rb") as r_c_file:
@@ -82,10 +83,10 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
                                 q_len = len(question)
 
                                 if q_len > max_q_toss:
-                                    logging.info("Ignoring sample with question length: "+str(q_len))
+                                    ignore_counter += 1
                                     continue
                                 if c_len > max_c_toss:
-                                    logging.info("Ignoring sample with context length: "+str(c_len))
+                                    ignore_counter += 1
                                     continue
 
                                 max_c_len = max(max_c_len, c_len)
@@ -103,7 +104,11 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
                                 if data_mode=="tiny": 
                                     if counter==max_entry:
                                         break
-        logger.info("read %d questions in total" % counter)
+
+        logger.info("Ignored %d questions/contexts in total" % ignore_counter)
+        assert counter>0, "No questions/contexts left (likely filtered out)"
+
+        logger.info("read %d questions/contexts in total" % counter)
         logger.info("maximum question length %d" % max_q_len)
         logger.info("maximum context length %d" % max_c_len)
 

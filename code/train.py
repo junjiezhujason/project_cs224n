@@ -45,6 +45,8 @@ tf.app.flags.DEFINE_string("model", "baseline", "Model to use.")
 tf.app.flags.DEFINE_string("decoder_type", "pointer", "pointer/naive.")
 tf.app.flags.DEFINE_string("data_size", "tiny", "tiny/full.")
 tf.app.flags.DEFINE_string("preprocess_mode", "train", "train/eval.")
+tf.app.flags.DEFINE_integer("gpu_id", 0, "Which GPU to use.")
+tf.app.flags.DEFINE_float("gpu_fraction", 0.5, "Fraction of the GPU memory to allocate.")
 
 FLAGS = tf.app.flags.FLAGS
 
@@ -119,35 +121,40 @@ def main(_):
     mixer = Mixer()
     decoder = Decoder(FLAGS)
 
-    # TODO VERY HACKY since this could be inconsistent with what qa.train uses
-    num_per_epoch = len(dataset['training'])
-    print("num_per_epoch: {}".format(num_per_epoch))
-    if FLAGS.model == 'baseline':
-        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings, num_per_epoch)
-    elif FLAGS.model == 'matchLSTM':
-        qa = QASystemMatchLSTM(FLAGS, embeddings, num_per_epoch)
-    # saver = tf.train.Saver()
+    with tf.device("/gpu:{}".format(FLAGS.gpu_id)):
+        # TODO VERY HACKY since this could be inconsistent with what qa.train uses
+        num_per_epoch = len(dataset['training'])
+        print("num_per_epoch: {}".format(num_per_epoch))
+        if FLAGS.model == 'baseline':
+            qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings, num_per_epoch)
+        elif FLAGS.model == 'matchLSTM':
+            qa = QASystemMatchLSTM(FLAGS, embeddings, num_per_epoch)
+        # saver = tf.train.Saver()
 
-    if not os.path.exists(FLAGS.log_dir):
-        os.makedirs(FLAGS.log_dir)
-    file_handler = logging.FileHandler(pjoin(FLAGS.log_dir, "log.txt"))
-    logging.getLogger().addHandler(file_handler)
+        if not os.path.exists(FLAGS.log_dir):
+            os.makedirs(FLAGS.log_dir)
+        file_handler = logging.FileHandler(pjoin(FLAGS.log_dir, "log.txt"))
+        logging.getLogger().addHandler(file_handler)
 
-    print(vars(FLAGS))
-    with open(os.path.join(FLAGS.log_dir, "flags.json"), 'w') as fout:
-        json.dump(FLAGS.__flags, fout)
+        print(vars(FLAGS))
+        with open(os.path.join(FLAGS.log_dir, "flags.json"), 'w') as fout:
+            json.dump(FLAGS.__flags, fout)
 
-    np.random.seed(1234)
-    tf.set_random_seed(1234)
+        np.random.seed(1234)
+        tf.set_random_seed(1234)
 
-    with tf.Session() as sess:
-        load_train_dir = get_normalized_train_dir(FLAGS.load_train_dir or FLAGS.train_dir)
-        initialize_model(sess, qa, load_train_dir)
+        config = tf.ConfigProto()
+        config.gpu_options.per_process_gpu_memory_fraction = FLAGS.gpu_fraction
+        config.allow_soft_placement = True
 
-        save_train_dir = get_normalized_train_dir(FLAGS.train_dir)
-        qa.train(sess, dataset, save_train_dir)
+        with tf.Session(config=config) as sess:
+            load_train_dir = get_normalized_train_dir(FLAGS.load_train_dir or FLAGS.train_dir)
+            initialize_model(sess, qa, load_train_dir)
 
-        # qa.evaluate_answer(sess, dataset, vocab, FLAGS.evaluate, log=True)
+            save_train_dir = get_normalized_train_dir(FLAGS.train_dir)
+            qa.train(sess, dataset, save_train_dir)
+
+            # qa.evaluate_answer(sess, dataset, vocab, FLAGS.evaluate, log=True)
 
 if __name__ == "__main__":
     tf.app.run()
