@@ -5,8 +5,7 @@ MDIR=run/${NAME}
 LDIR=${MDIR}/log
 TDIR=${MDIR}/train
 
-source .env/bin/activate
-
+# source .env/bin/activate
 # rm -r data/tmp-squad-train 
 # rm -r train/
 # rm -r log/
