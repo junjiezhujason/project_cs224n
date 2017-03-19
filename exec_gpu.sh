@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=exp012
+NAME=exp013
 MDIR=run/${NAME}
 LDIR=${MDIR}/log
 TDIR=${MDIR}/train
@@ -13,16 +13,16 @@ TDIR=${MDIR}/train
 # create folder for experiment
 mkdir -p ${MDIR} 
 
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 python code/train.py --log_dir=${LDIR} \
                      --train_dir=${TDIR} \
                      --data_size=full \
                      --model=matchLSTM \
-                     --decoder_type=pointer \
+                     --decoder_type=naive \
                      --epochs=15 \
                      --batch_size=64 \
-                     --learning_rate=0.0001 \
+                     --learning_rate=0.0005 \
                      --state_size=150 \
-                     --gpu_fraction=0.5 \
+                     --gpu_fraction=1.0 \
                      --num_epochs_per_decay=7 \
 
