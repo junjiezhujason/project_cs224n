@@ -19,6 +19,7 @@ from preprocessing.squad_preprocess import data_from_json, maybe_download, squad
     invert_map, tokenize, token_idx_map
 import qa_data
 from data_util import load_glove_embeddings
+from evaluate import exact_match_score, f1_score
 
 import logging
 
@@ -31,6 +32,7 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config flags")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
+tf.app.flags.DEFINE_bool("eval_on_train", True, "Run qa_answer to evaluate on train.")
 # tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
 # tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
@@ -65,6 +67,7 @@ def initialize_model(session, model, train_dir):
         logging.info("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
     else:
+        assert False, 'Cannot restore chkpt'
         logging.info("Created model with fresh parameters.")
         session.run(tf.global_variables_initializer())
         logging.info('Num params: %d' % sum(v.get_shape().num_elements() for v in tf.trainable_variables()))
@@ -94,6 +97,11 @@ def read_dataset(dataset, tier, vocab):
     query_data = []
     question_uuid_data = []
 
+    if FLAGS.eval_on_train:
+        s_labels = []
+        e_labels = []
+        true_answers = []
+
     for articles_id in tqdm(range(len(dataset['data'])), desc="Preprocessing {}".format(tier)):
         article_paragraphs = dataset['data'][articles_id]['paragraphs']
         for pid in range(len(article_paragraphs)):
@@ -120,7 +128,16 @@ def read_dataset(dataset, tier, vocab):
                 context_tokens_data.append(context_tokens)
                 question_tokens_data.append(question_tokens)
 
+                if FLAGS.eval_on_train:
+                    answer = qas[qid]['answers'][0]['text'].split()
+                    # Wrong because qas[qid]['answers'][0]['answer_start'] is the token, not index
+                    #s_labels.append(qas[qid]['answers'][0]['answer_start'])
+                    #e_labels.append(qas[qid]['answers'][0]['answer_start'] + len(answer) - 1)
+                    true_answers.append(answer)
+    if FLAGS.eval_on_train:
+        return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data, s_labels, e_labels, true_answers
     return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data
+
 
 
 def prepare_dev(prefix, dev_filename, vocab):
@@ -128,9 +145,95 @@ def prepare_dev(prefix, dev_filename, vocab):
     dev_dataset = maybe_download(squad_base_url, dev_filename, prefix)
 
     dev_data = data_from_json(os.path.join(prefix, dev_filename))
+
+    if FLAGS.eval_on_train:
+        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers= read_dataset(dev_data, 'train', vocab)
+        return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers
     context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = read_dataset(dev_data, 'dev', vocab)
 
     return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data
+
+
+def evaluate_answers(sess, model, dataset):
+    answers = {}
+
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+    
+    context_data_truncated = []
+    context_len_data_truncated = []
+    question_data_truncated = []
+    question_len_data_truncated = []
+    data_size = len(context_data)
+    # Split the string of index in context_data nad question_data, and convert them to integer
+    # create truncated version of context and question
+    for i in range(data_size):
+        context_data[i] = context_data[i].split()
+        context_data[i] = [int(word_idx_as_str) for word_idx_as_str in context_data[i]]
+        if len(context_data[i]) > FLAGS.max_context_length:
+            context_data_truncated.append(context_data[i][:FLAGS.max_context_length])
+            context_len_data_truncated.append(FLAGS.max_context_length)
+        else:
+            context_data_truncated.append(context_data[i])
+            context_len_data_truncated.append(len(context_data[i]))
+
+        question_data[i] = question_data[i].split()
+        question_data[i] = [int(word_idx_as_str) for word_idx_as_str in question_data[i]]
+        if len(question_data[i]) > FLAGS.max_question_length:
+            question_data_truncated.append(question_data[i][:FLAGS.max_question_length])
+            question_len_data_truncated.append(FLAGS.max_question_length)
+        else:
+            question_data_truncated.append(question_data[i])
+            question_len_data_truncated.append(len(question_data[i]))
+
+
+    # Pad input data with model.preprocess_question_answer
+    data_start = 800
+    data_size_to_run = 300
+    f1 = []
+    em = []
+    data_set = [(question_data_truncated[i], 
+                 question_len_data_truncated[i], 
+                 context_data_truncated[i],
+                 context_len_data_truncated[i], 
+                 [None, None]) for i in xrange(data_start, data_start + data_size_to_run)] # TODO CHANGE ME
+    padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
+    outputs = model.output(sess, padded_inputs)
+    for i, output_res in enumerate(outputs):
+        true_labels, pred_labels = output_res
+        start_idx = pred_labels[0]
+        end_idx = pred_labels[1]
+        context_len = context_len_data_truncated[i]
+        
+        if (start_idx >= context_len):
+            print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
+            answer = '\<EXCEED\>'
+        elif (start_idx > end_idx):
+            # print(start_idx)
+            # print(end_idx)
+            answer = '\<REVERSED\>'
+        else:
+            # TOCHECK how are their golden answer generated?
+            # Use rev_vocab to reverse look up vocab from index token
+            # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
+            # Use original context
+             answer = ' '.join(context_tokens_data[data_start + i][start_idx: end_idx+1])
+        
+        print('='*100)
+        print(' '.join(question_tokens_data[data_start + i]))
+        print('Predicted answer is :%s' % answer)
+        print('Original True answer is :     %s' % ' '.join(true_answers[data_start + i]))
+        f1_single = f1_score(answer, ' '.join(true_answers[data_start + i]))
+        em_single = exact_match_score(answer, ' '.join(true_answers[data_start + i]))
+        f1.append(f1_single)
+        em.append(em_single)
+        print('f1 score on this data is ' + str(f1_single) + ', em score is ' + str(em_single))
+
+
+    f1 = np.mean(f1)
+    em = np.mean(em)
+
+    logging.info("F1: {}, EM: {}".format(f1, em))
+
 
 
 def generate_answers(sess, model, dataset, rev_vocab):
@@ -213,7 +316,7 @@ def generate_answers(sess, model, dataset, rev_vocab):
             # Use rev_vocab to reverse look up vocab from index token
             # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
             # Use original context
-            answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
+             answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
         print('Answer is %s' % answer)
         answers[question_uuid_data[i]] = answer
     return answers
@@ -267,11 +370,19 @@ def main(_):
 
     # ========= Load Dataset =========
     # You can change this code to load dataset in your own way
+    
+    # ============ EVAL_ON_TRAIN: START =============
+    if FLAGS.eval_on_train:
+        FLAGS.dev_path = "download/squad/dev-v1.1.json"
+        print('='*50 + '\nLoad train-v1.1.json for evalulating model.')
 
     dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
     dev_filename = os.path.basename(FLAGS.dev_path)
     dataset = prepare_dev(dev_dirname, dev_filename, vocab)
-    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
+    if FLAGS.eval_on_train:
+        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+    else:
+        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
 
 
     
@@ -313,6 +424,10 @@ def main(_):
         train_dir = FLAGS.train_dir 
         initialize_model(sess, qa, train_dir)
         print('About to start generate_answers')
+        if FLAGS.eval_on_train:
+            evaluate_answers(sess, qa, dataset)
+            return
+
         answers = generate_answers(sess, qa, dataset, rev_vocab)
 
         # write to json file to root dir
