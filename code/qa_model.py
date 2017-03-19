@@ -364,7 +364,7 @@ class QASystem(object):
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
         # representation with the attention vector.
-        updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
+        # updated_context_paragraph_repr = self.mixer.mix(question_repr, context_paragraph_repr)
 
         logging.info("Question_paragraph_repr:"+str(question_paragraph_repr))
         logging.info("Context_paragraph_repr:"+str(context_paragraph_repr))

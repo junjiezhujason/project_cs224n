@@ -14,7 +14,7 @@ import numpy as np
 from six.moves import xrange
 import tensorflow as tf
 
-from qa_model import Encoder, QASystem, Decoder, Mixer, QASystemMatchLSTM
+from qa_model import Encoder, QASystem, QASystemMatchLSTM
 from preprocessing.squad_preprocess import data_from_json, maybe_download, squad_base_url, \
     invert_map, tokenize, token_idx_map
 import qa_data
@@ -30,7 +30,8 @@ FLAGS = tf.app.flags.FLAGS
 
 tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config flags")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
-tf.app.flags.DEFINE_string("train_path", "", "Path to the training directory where the checkpoint is saved")
+tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
+# tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
 # tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
 # tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
@@ -41,7 +42,6 @@ tf.app.flags.DEFINE_string("train_path", "", "Path to the training directory whe
 # tf.app.flags.DEFINE_integer("output_size", 750, "The output size of your model.")
 # tf.app.flags.DEFINE_integer("keep", 0, "How many checkpoints to keep, 0 indicates keep all.")
 # tf.app.flags.DEFINE_string("vocab_path", "data/squad/vocab.dat", "Path to vocab file (default: ./data/squad/vocab.dat)")
-# tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 # Added
 # tf.app.flags.DEFINE_integer("max_question_length", 60, "Maximum question length to consider.")
 # tf.app.flags.DEFINE_integer("max_context_length", 300, "Maximum context length to consider.")
@@ -57,8 +57,10 @@ tf.app.flags.DEFINE_string("train_path", "", "Path to the training directory whe
 # tf.app.flags.DEFINE_string("log_dir", "log", "Path to store log and flag files (default: ./log)")
 
 def initialize_model(session, model, train_dir):
+    print(train_dir)
     ckpt = tf.train.get_checkpoint_state(train_dir)
     v2_path = ckpt.model_checkpoint_path + ".index" if ckpt else ""
+    print(v2_path)
     if ckpt and (tf.gfile.Exists(ckpt.model_checkpoint_path) or tf.gfile.Exists(v2_path)):
         logging.info("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
@@ -152,28 +154,67 @@ def generate_answers(sess, model, dataset, rev_vocab):
     """
     answers = {}
 
-    context_tokens_data, context_data, context_len_data, question_tokens_data, question_data, question_len_data, question_uuid_data = dataset
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
+    
+    context_data_truncated = []
+    context_len_data_truncated = []
+    question_data_truncated = []
+    question_len_data_truncated = []
+    data_size = len(context_data)
+    # Split the string of index in context_data nad question_data, and convert them to integer
+    # create truncated version of context and question
+    for i in range(data_size):
+        context_data[i] = context_data[i].split()
+        context_data[i] = [int(word_idx_as_str) for word_idx_as_str in context_data[i]]
+        if len(context_data[i]) > FLAGS.max_context_length:
+            context_data_truncated.append(context_data[i][:FLAGS.max_context_length])
+            context_len_data_truncated.append(FLAGS.max_context_length)
+        else:
+            context_data_truncated.append(context_data[i])
+            context_len_data_truncated.append(len(context_data[i]))
+
+        question_data[i] = question_data[i].split()
+        question_data[i] = [int(word_idx_as_str) for word_idx_as_str in question_data[i]]
+        if len(question_data[i]) > FLAGS.max_question_length:
+            question_data_truncated.append(question_data[i][:FLAGS.max_question_length])
+            question_len_data_truncated.append(FLAGS.max_question_length)
+        else:
+            question_data_truncated.append(question_data[i])
+            question_len_data_truncated.append(len(question_data[i]))
+
+
+
 
 
     # Pad input data with model.preprocess_question_answer
     fake_label = [None, None]
-    data_set = [(question_data[i].split(), question_len_data[i], context_data[i].split(), context_len_data[i], fake_label) for i in xrange(len(question_data))]
-    padded_inputs = model.preprocess_question_answer(data_set) # 6 lists
+    data_set = [(question_data_truncated[i], 
+                 question_len_data_truncated[i], 
+                 context_data_truncated[i],
+                 context_len_data_truncated[i], 
+                 fake_label) for i in xrange(data_size)] # TODO CHANGE ME
+    padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
     outputs = model.output(sess, padded_inputs)
     for i, output_res in enumerate(outputs):
         _, pred_labels = output_res
         start_idx = pred_labels[0]
         end_idx = pred_labels[1]
-        context_len = context_len_data[i]
+        context_len = context_len_data_truncated[i]
         
-        if (start_idx >= context_len) or (end_idx < start_idx):
-            answer = ''
+        if (start_idx >= context_len):
+            print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
+            answer = '\<EXCEED\>'
+        elif (start_idx > end_idx):
+            # print(start_idx)
+            # print(end_idx)
+            answer = '\<REVERSED\>'
         else:
             # TOCHECK how are their golden answer generated?
             # Use rev_vocab to reverse look up vocab from index token
-            answer = ' '.join([rev_vocab[int(vocab_idx)] for vocab_idx in context_data[i].split()[start_idx: end_idx]])
+            # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
             # Use original context
-            # answer = ' '.join(context_tokens_data[i][start_idx: end_idx])
+            answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
+        print('Answer is %s' % answer)
         answers[question_uuid_data[i]] = answer
     return answers
 
@@ -229,16 +270,10 @@ def main(_):
 
     dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
     dev_filename = os.path.basename(FLAGS.dev_path)
-    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = prepare_dev(dev_dirname, dev_filename, vocab)
-    # Get data length
-    context_len_data = [len(context.split()) for context in context_data]
-    question_len_data = [len(question.split()) for question in question_data]
+    dataset = prepare_dev(dev_dirname, dev_filename, vocab)
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
 
-    dataset = (context_tokens_data, context_data, context_len_data,
-               question_tokens_data, question_data, question_len_data, question_uuid_data)
 
-    print('max question length is %d' % max(question_len_data))
-    print('max context length is %d' % max(context_len_data))
     
     # FLAGS.max_context_length = max(context_len_data) #700 in this dataset.
     # For baseline, because the linear decoder weights dimension is max_length x state_size*2, it need to the max of both dataset
@@ -247,7 +282,7 @@ def main(_):
     if FLAGS.max_question_length==0:
         raise ValueError('max_question_length is set to be zero now. Please set it with --max_question_length flag.\n')
 
-    for i in range(10):
+    for i in range(1):
       logging.debug('context')
       logging.debug(' '.join(context_tokens_data[i]))
       logging.debug('context_data')
@@ -264,17 +299,20 @@ def main(_):
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
     embeddings = load_glove_embeddings(embed_path)
     encoder = Encoder(size=FLAGS.state_size, vocab_dim=FLAGS.embedding_size)
-    mixer = Mixer()
-    decoder = Decoder(FLAGS)
 
+    # mixer = Mixer()
+    # decoder = Decoder(FLAGS)
     if FLAGS.model == 'baseline':
-        qa = QASystem(encoder, mixer, decoder, FLAGS, embeddings)
+        qa = QASystem(encoder, None, None, FLAGS, embeddings, 1)
     elif FLAGS.model == 'matchLSTM':
-        qa = QASystemMatchLSTM(FLAGS, embeddings)
+        qa = QASystemMatchLSTM(FLAGS, embeddings, 1)
+
 
     with tf.Session() as sess:
-        train_dir = get_normalized_train_dir(FLAGS.train_dir)
+        # train_dir = get_normalized_train_dir(FLAGS.train_dir)
+        train_dir = FLAGS.train_dir 
         initialize_model(sess, qa, train_dir)
+        print('About to start generate_answers')
         answers = generate_answers(sess, qa, dataset, rev_vocab)
 
         # write to json file to root dir
