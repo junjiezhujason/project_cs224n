@@ -16,9 +16,9 @@ import tensorflow as tf
 
 from qa_model import Encoder, QASystem, QASystemMatchLSTM
 from preprocessing.squad_preprocess import data_from_json, maybe_download, squad_base_url, \
-    invert_map, tokenize, token_idx_map
+    invert_map, tokenize, token_idx_map, read_write_dataset
 import qa_data
-from data_util import load_glove_embeddings
+from data_util import load_glove_embeddings, load_dataset
 from evaluate import exact_match_score, f1_score
 
 import logging
@@ -33,6 +33,7 @@ tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config f
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
 tf.app.flags.DEFINE_bool("eval_on_train", False, "Run qa_answer to evaluate on train.")
+tf.app.flags.DEFINE_bool("load_from_json", True, "True for loading data straight from dev_path json file.")
 # tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
 # tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
@@ -134,7 +135,6 @@ def read_dataset(dataset, tier, vocab):
                         context_ids[i] = random.randint(0, rand_max-1)
                         context_ukn_word_cnt += 1
                         #print(context_tokens[i])
-                #print('Percentage of unknow is ' + str(context_ukn_word_cnt/context_word_cnt))
 
                 for i in xrange(len(question_ids)):
                     if int(question_ids[i]) == qa_data.UNK_ID:
@@ -153,9 +153,11 @@ def read_dataset(dataset, tier, vocab):
                     #s_labels.append(qas[qid]['answers'][0]['answer_start'])
                     #e_labels.append(qas[qid]['answers'][0]['answer_start'] + len(answer) - 1)
                     true_answers.append(answer)
-    print(sorted(context_lengths))
+    #print(sorted(context_lengths))
     context_lengths_over = [context_length>300 for context_length in context_lengths]
-    print(sum(context_lengths_over)/len(context_lengths))
+    print('+' * 100)
+    print('Percentage of questions with context over context_max_length is: ' + str(sum(context_lengths_over)/len(context_lengths)))
+    print('Percentage of unknow is ' + str(context_ukn_word_cnt/context_word_cnt))
 
     if FLAGS.eval_on_train:
         return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data, s_labels, e_labels, true_answers
@@ -207,7 +209,7 @@ def evaluate_answers(sess, model, dataset):
 
     # Pad input data with model.preprocess_question_answer
     data_start = 0
-    data_size_to_run = 500
+    data_size_to_run = data_size
     f1 = []
     em = []
     data_set = [(question_data_truncated[i], 
@@ -240,11 +242,11 @@ def evaluate_answers(sess, model, dataset):
 
         f1_single = f1_score(answer, ' '.join(true_answers[data_start + i]))
         em_single = exact_match_score(answer, ' '.join(true_answers[data_start + i]))
-        if f1_single != 1:
-            print('='*100)
-            print(' '.join(question_tokens_data[data_start + i]))
-            print('Predicted answer is     : %s' % answer)
-            print('Original True answer is : %s' % ' '.join(true_answers[data_start + i]))
+        #if f1_single != 1:
+        print('='*100)
+        print(' '.join(question_tokens_data[data_start + i]))
+        print('Predicted answer is     : %s' % answer)
+        print('Original True answer is : %s' % ' '.join(true_answers[data_start + i]))
         f1.append(f1_single)
         em.append(em_single)
         print('f1 score on this data is ' + str(f1_single) + ', em score is ' + str(em_single))
@@ -252,10 +254,10 @@ def evaluate_answers(sess, model, dataset):
 
     f1 = np.mean(f1)
     em = np.mean(em)
-
+    print('final f1 score is ' + str(f1) + ', em score is ' + str(em))
     logging.info("F1: {}, EM: {}".format(f1, em))
 
-
+    
 
 def generate_answers(sess, model, dataset, rev_vocab):
     """
@@ -360,22 +362,29 @@ def process_dev_json_to_files():
     download_prefix = os.path.dirname(os.path.abspath(FLAGS.dev_path)) # data/squad/
     dev_filename = os.path.basename(FLAGS.dev_path) # "dev-v1.1.json"
     # relative path to save the data
-    data_prefix = os.path.join("data", "squad", "qa_answer")
-
 
     print("Downloading datasets into {}".format(download_prefix))
-    print("Preprocessing datasets into {}".format(data_prefix))
+    print("Preprocessing datasets into {}".format(FLAGS.data_dir))
 
     if not os.path.exists(download_prefix):
         os.makedirs(download_prefix)
-    if not os.path.exists(data_prefix):
-        os.makedirs(data_prefix)
+    if not os.path.exists(FLAGS.data_dir):
+        os.makedirs(FLAGS.data_dir)
 
     maybe_download(squad_base_url, dev_filename, download_prefix, None)
     # Read data from dev json file
     dev_data = data_from_json(os.path.join(download_prefix, dev_filename))
-    # write data out to data_prefix location
-    dev_num_questions, dev_num_answers = read_write_dataset(dev_data, 'dev', data_prefix)
+    # write data out to FLAGS.data_dir location
+    dev_num_questions, dev_num_answers = read_write_dataset(dev_data, 'dev', FLAGS.data_dir)
+
+
+    dev_path = os.path.join(FLAGS.data_dir, "dev")
+    ## generate tokens
+    x_dev_dis_path = dev_path + ".ids.context"
+    y_dev_ids_path = dev_path + ".ids.question"
+    qa_data.data_to_token_ids(dev_path + ".context", x_dev_dis_path, FLAGS.vocab_path)
+    qa_data.data_to_token_ids(dev_path + ".question", y_dev_ids_path, FLAGS.vocab_path)
+
 
 def main(_):
 
@@ -395,7 +404,10 @@ def main(_):
     assert os.path.exists(FLAGS.train_dir), "train dir does not exist"
     # assert False
     
-    FLAGS.eval_on_train = True
+    FLAGS.eval_on_train = True 
+    FLAGS.load_from_json = True
+    FLAGS.data_size = 'tiny'
+    FLAGS.dev_path = "data/squad/dev-v1.1.json"
 
     vocab, rev_vocab = initialize_vocab(FLAGS.vocab_path)
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
@@ -408,42 +420,6 @@ def main(_):
     with open(os.path.join(FLAGS.log_dir, "flags.json"), 'w') as fout:
         json.dump(FLAGS.__flags, fout)
 
-    # ========= Load Dataset =========
-    # You can change this code to load dataset in your own way
-    
-    # ============ EVAL_ON_TRAIN: START =============
-    if FLAGS.eval_on_train:
-        FLAGS.dev_path = "download/squad/dev-v1.1.json"
-        print('='*50 + '\nLoad dev-v1.1.json for evalulating model.')
-
-    dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
-    dev_filename = os.path.basename(FLAGS.dev_path)
-    dataset = prepare_dev(dev_dirname, dev_filename, vocab)
-    if FLAGS.eval_on_train:
-        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
-    else:
-        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
-
-
-    
-    # FLAGS.max_context_length = max(context_len_data) #700 in this dataset.
-    # For baseline, because the linear decoder weights dimension is max_length x state_size*2, it need to the max of both dataset
-    if FLAGS.max_context_length==0:
-        raise ValueError('max_context_length is set to be zero now. Please set it with --max_context_length flag.\n FYI the max length in training set is 766, in dev set is 700.')
-    if FLAGS.max_question_length==0:
-        raise ValueError('max_question_length is set to be zero now. Please set it with --max_question_length flag.\n')
-
-    for i in range(1):
-      logging.debug('context')
-      logging.debug(' '.join(context_tokens_data[i]))
-      logging.debug('context_data')
-      logging.debug(context_data[i])
-      logging.debug('question')
-      logging.debug(' '.join(question_tokens_data[i]))
-      logging.debug('question_data')
-      logging.debug(question_data[i])
-      logging.debug('uuid_data')
-      logging.debug(question_uuid_data[i])
 
     # ========= Model-specific =========
     # You must change the following code to adjust to your model
@@ -459,21 +435,79 @@ def main(_):
         qa = QASystemMatchLSTM(FLAGS, embeddings, 1)
 
 
-    with tf.Session() as sess:
-        # train_dir = get_normalized_train_dir(FLAGS.train_dir)
-        train_dir = FLAGS.train_dir 
-        initialize_model(sess, qa, train_dir)
-        print('About to start generate_answers')
-        print(FLAGS.eval_on_train)
+    if FLAGS.load_from_json:
+        dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
+        dev_filename = os.path.basename(FLAGS.dev_path)
+        dataset = prepare_dev(dev_dirname, dev_filename, vocab)
         if FLAGS.eval_on_train:
-            evaluate_answers(sess, qa, dataset)
-            return
+            context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+        else:
+            context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
 
-        answers = generate_answers(sess, qa, dataset, rev_vocab)
+        for i in range(1):
+          logging.debug('context')
+          logging.debug(' '.join(context_tokens_data[i]))
+          logging.debug('context_data')
+          logging.debug(context_data[i])
+          logging.debug('question')
+          logging.debug(' '.join(question_tokens_data[i]))
+          logging.debug('question_data')
+          logging.debug(question_data[i])
+          logging.debug('uuid_data')
+          logging.debug(question_uuid_data[i])
 
-        # write to json file to root dir
-        with io.open('dev-prediction.json', 'w', encoding='utf-8') as f:
-            f.write(unicode(json.dumps(answers, ensure_ascii=False)))
+        with tf.Session() as sess:
+            # train_dir = get_normalized_train_dir(FLAGS.train_dir)
+            train_dir = FLAGS.train_dir 
+            initialize_model(sess, qa, train_dir)
+            print('About to start generate_answers')
+            print(FLAGS.eval_on_train)
+            
+            if FLAGS.eval_on_train:
+                evaluate_answers(sess, qa, dataset)
+                return
+            else:
+                answers = generate_answers(sess, qa, dataset, rev_vocab)
+
+                # write to json file to root dir
+                with io.open('dev-prediction.json', 'w', encoding='utf-8') as f:
+                    f.write(unicode(json.dumps(answers, ensure_ascii=False)))
+
+
+    else:
+        # load from files converted from json
+        FLAGS.data_dir = os.path.join("data", "squad", "qa_answer")
+        if (not os.path.isdir("/home/el")) or not os.listdir(FLAGS.data_dir):
+            process_dev_json_to_files()
+        else:
+            print('Data directory %s is not empty: ' % (FLAGS.data_dir, str(os.listdir(FLAGS.data_dir))))
+        dataset, max_q_len, max_c_len = load_dataset(FLAGS.data_dir, 
+                                                     FLAGS.data_size,
+                                                     FLAGS.max_question_length,
+                                                     FLAGS.max_context_length,
+                                                     ['dev'])
+
+        dev_set = dataset['dev']
+        print('Start running evaluate_answer on %d of data' % len(dev_set))
+        dev_examples = qa.preprocess_question_answer(dev_set)
+        dev_raw = dataset['dev_raw']
+        dev_uuid = dataset['dev_uuid']
+        dev_dataset = [dev_examples, dev_raw, dev_uuid]
+
+        with tf.Session() as sess:
+            train_dir = FLAGS.train_dir 
+            initialize_model(sess, qa, train_dir)
+            answers_model = qa.evaluate_answer(session=sess,
+                               dataset=dev_dataset,
+                               sample=len(dev_set),
+                               return_answer_dict=True)
+            # write to json file to root dir
+            with io.open('dev-prediction-model.json', 'w', encoding='utf-8') as f:
+                f.write(unicode(json.dumps(answers_model, ensure_ascii=False)))
+
+
+
+
 
 
 if __name__ == "__main__":

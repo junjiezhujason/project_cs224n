@@ -112,7 +112,8 @@ def read_write_dataset(dataset, tier, prefix):
     with open(os.path.join(prefix, tier +'.context'), 'w') as context_file,  \
          open(os.path.join(prefix, tier +'.question'), 'w') as question_file,\
          open(os.path.join(prefix, tier +'.answer'), 'w') as text_file, \
-         open(os.path.join(prefix, tier +'.span'), 'w') as span_file:
+         open(os.path.join(prefix, tier +'.span'), 'w') as span_file, \
+         open(os.path.join(prefix, tier +'.uuid'), 'w') as uuid_file:
 
         for articles_id in tqdm(range(len(dataset['data'])), desc="Preprocessing {}".format(tier)):
             article_paragraphs = dataset['data'][articles_id]['paragraphs']
@@ -135,6 +136,7 @@ def read_write_dataset(dataset, tier, prefix):
                     qn += 1
 
                     num_answers = range(1)
+                    question_uuid = qas[qid]['id']
 
                     for ans_id in num_answers:
                         # it contains answer_start, text
@@ -159,6 +161,7 @@ def read_write_dataset(dataset, tier, prefix):
                             question_file.write(' '.join(question_tokens) + '\n')
                             text_file.write(' '.join(text_tokens) + '\n')
                             span_file.write(' '.join([str(a_start_idx), str(a_end_idx)]) + '\n')
+                            uuid_file.write(question_uuid + '\n')
 
                         except Exception as e:
                             skipped += 1
