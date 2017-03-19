@@ -29,25 +29,36 @@ def load_glove_embeddings(glove_path):
     logger.info("glove is: " + str(glove) )
     return glove
 
-def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
+def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss, data_pfx_list=None):
 
     assert os.path.exists(source_dir)
 
     train_pfx = pjoin(source_dir, "train")
     valid_pfx = pjoin(source_dir, "val")
+    dev_pfx = pjoin(source_dir, "dev")
 
     if data_mode=="tiny":
         max_train = 100
         max_valid = 10
+        max_dev = 100
 
     train = []
     valid = []
     train_raw = []
     valid_raw = []
+    
+    dev = []
+    dev_raw = []
+
     max_c_len = 0
     max_q_len = 0
+    
+    if data_pfx_list == None:
+        data_pfx_list = [train_pfx, valid_pfx]
+    else:
+        data_pfx_list = [pjoin(source_dir, data_pfx) for data_pfx in data_pfx_list]
 
-    for data_pfx in train_pfx, valid_pfx:
+    for data_pfx in data_pfx_list:
         if data_pfx == train_pfx:
             data_list = train
             data_list_raw = train_raw
@@ -62,6 +73,13 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
                 max_entry = max_valid
             logger.info("")
             logger.info("Loading validation data")
+        if data_pfx == dev_pfx:
+            data_list = dev
+            data_list_raw = dev_raw
+            if data_mode=="tiny":
+                max_entry = max_dev
+            logger.info("")
+            logger.info("Loading as dev data")
 
         c_ids_path = data_pfx + ".ids.context"
         c_raw_path = data_pfx + ".context" 
@@ -71,6 +89,13 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
 
         counter = 0
         ignore_counter= 0
+
+        uuid_list = []
+        if data_pfx == dev_pfx:
+            uuid_path = data_pfx + ".uuid"       
+            with gfile.GFile(uuid_path, mode="rb") as uuid_file:
+                for line in uuid_file:
+                    uuid_list.append(line.strip())
 
         with gfile.GFile(q_raw_path, mode="rb") as r_q_file:
             with gfile.GFile(c_raw_path, mode="rb") as r_c_file:
@@ -87,12 +112,21 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
                                 c_len = len(context)
                                 q_len = len(question)
 
+                                # Do not toss out, only  truncate for dev set
                                 if q_len > max_q_toss:
-                                    ignore_counter += 1
-                                    continue
+                                    if data_pfx == dev_pfx:
+                                        q_len = max_q_toss
+                                        question = question[:max_q_toss]
+                                    else:
+                                        ignore_counter += 1
+                                        continue
                                 if c_len > max_c_toss:
-                                    ignore_counter += 1
-                                    continue
+                                    if data_pfx == dev_pfx:
+                                        c_len = max_c_toss
+                                        context = context[:max_c_toss]
+                                    else:
+                                        ignore_counter += 1
+                                        continue
 
                                 max_c_len = max(max_c_len, c_len)
                                 max_q_len = max(max_q_len, q_len)
@@ -117,7 +151,7 @@ def load_dataset(source_dir, data_mode, max_q_toss, max_c_toss):
         logger.info("maximum question length %d" % max_q_len)
         logger.info("maximum context length %d" % max_c_len)
 
-    dataset = {"training":train, "validation":valid, "training_raw":train_raw, "validation_raw":valid_raw}
+    dataset = {"training":train, "validation":valid, "training_raw":train_raw, "validation_raw":valid_raw, "dev":dev, "dev_raw":dev_raw, "dev_uuid":uuid_list}
     return dataset, max_q_len, max_c_len
 
 def summarize_dataset(source_dir, out_dir, data_type="train"):
