@@ -14,7 +14,7 @@ source .env/bin/activate
 # create folder for experiment
 mkdir -p ${MDIR} 
 
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 python code/train.py --log_dir=${LDIR} \
                      --train_dir=${TDIR} \
                      --data_size=full \
@@ -24,6 +24,6 @@ python code/train.py --log_dir=${LDIR} \
                      --batch_size=32 \
                      --learning_rate=0.03 \
                      --state_size=50 \
-                     --gpu_fraction=1.0 \
+                     --gpu_fraction=0.5 \
                      --num_epochs_per_decay=10
 
