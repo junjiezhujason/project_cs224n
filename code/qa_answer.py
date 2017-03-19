@@ -32,8 +32,10 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config flags")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
+
 tf.app.flags.DEFINE_bool("eval_on_train", False, "Run qa_answer to evaluate on train.")
 tf.app.flags.DEFINE_bool("load_from_json", True, "True for loading data straight from dev_path json file.")
+
 # tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
 # tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
@@ -420,7 +422,6 @@ def main(_):
     with open(os.path.join(FLAGS.log_dir, "flags.json"), 'w') as fout:
         json.dump(FLAGS.__flags, fout)
 
-
     # ========= Model-specific =========
     # You must change the following code to adjust to your model
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
@@ -504,8 +505,6 @@ def main(_):
             # write to json file to root dir
             with io.open('dev-prediction-model.json', 'w', encoding='utf-8') as f:
                 f.write(unicode(json.dumps(answers_model, ensure_ascii=False)))
-
-
 
 
 
