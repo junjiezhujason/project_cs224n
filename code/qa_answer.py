@@ -190,7 +190,7 @@ def generate_answers(sess, model, dataset, rev_vocab):
                  question_len_data_truncated[i], 
                  context_data_truncated[i],
                  context_len_data_truncated[i], 
-                 fake_label) for i in xrange(20)]
+                 fake_label) for i in xrange(data_size)]
     padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
     outputs = model.output(sess, padded_inputs)
     for i, output_res in enumerate(outputs):
@@ -202,7 +202,7 @@ def generate_answers(sess, model, dataset, rev_vocab):
         if (start_idx >= context_len):
             print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
             answer = '\<EXCEED\>'
-        elif (end_idx < start_idx):
+        elif (end_idx <= start_idx):
             answer = '\<REVERSED\>'
         else:
             # TOCHECK how are their golden answer generated?
