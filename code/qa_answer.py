@@ -32,7 +32,7 @@ FLAGS = tf.app.flags.FLAGS
 tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config flags")
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
-tf.app.flags.DEFINE_bool("eval_on_train", True, "Run qa_answer to evaluate on train.")
+tf.app.flags.DEFINE_bool("eval_on_train", False, "Run qa_answer to evaluate on train.")
 # tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
 # tf.app.flags.DEFINE_float("learning_rate", 0.003, "Learning rate.")
@@ -90,12 +90,16 @@ def read_dataset(dataset, tier, vocab):
     """Reads the dataset, extracts context, question, answer,
     and answer pointer in their own file. Returns the number
     of questions and answers processed for the dataset"""
+    context_word_cnt = 0
+    context_ukn_word_cnt = 0
 
     context_tokens_data = []
     context_data = []
     question_tokens_data = []
     query_data = []
     question_uuid_data = []
+    rand_max = len(vocab.values())
+    context_lengths = []
 
     if FLAGS.eval_on_train:
         s_labels = []
@@ -114,16 +118,31 @@ def read_dataset(dataset, tier, vocab):
             context_tokens = tokenize(context)
 
             qas = article_paragraphs[pid]['qas']
+            
             for qid in range(len(qas)):
+                context_lengths.append(len(context_tokens))
                 question = qas[qid]['question']
                 question_tokens = tokenize(question)
                 question_uuid = qas[qid]['id']
+                
+                
+                context_ids = [vocab.get(w, qa_data.UNK_ID) for w in context_tokens]
+                question_ids = [vocab.get(w, qa_data.UNK_ID) for w in question_tokens]
+                context_word_cnt += len(context_ids)
+                for i in xrange(len(context_ids)):
+                    if context_ids[i] == qa_data.UNK_ID:
+                        context_ids[i] = random.randint(0, rand_max-1)
+                        context_ukn_word_cnt += 1
+                        #print(context_tokens[i])
+                #print('Percentage of unknow is ' + str(context_ukn_word_cnt/context_word_cnt))
 
-                context_ids = [str(vocab.get(w, qa_data.UNK_ID)) for w in context_tokens]
-                qustion_ids = [str(vocab.get(w, qa_data.UNK_ID)) for w in question_tokens]
+                for i in xrange(len(question_ids)):
+                    if int(question_ids[i]) == qa_data.UNK_ID:
+                        question_ids[i] = str(random.randint(0, rand_max-1))
 
-                context_data.append(' '.join(context_ids))
-                query_data.append(' '.join(qustion_ids))
+
+                context_data.append(context_ids)
+                query_data.append(question_ids)
                 question_uuid_data.append(question_uuid)
                 context_tokens_data.append(context_tokens)
                 question_tokens_data.append(question_tokens)
@@ -134,6 +153,10 @@ def read_dataset(dataset, tier, vocab):
                     #s_labels.append(qas[qid]['answers'][0]['answer_start'])
                     #e_labels.append(qas[qid]['answers'][0]['answer_start'] + len(answer) - 1)
                     true_answers.append(answer)
+    print(sorted(context_lengths))
+    context_lengths_over = [context_length>300 for context_length in context_lengths]
+    print(sum(context_lengths_over)/len(context_lengths))
+
     if FLAGS.eval_on_train:
         return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data, s_labels, e_labels, true_answers
     return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data
@@ -147,7 +170,7 @@ def prepare_dev(prefix, dev_filename, vocab):
     dev_data = data_from_json(os.path.join(prefix, dev_filename))
 
     if FLAGS.eval_on_train:
-        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers= read_dataset(dev_data, 'train', vocab)
+        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = read_dataset(dev_data, 'train', vocab)
         return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers
     context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = read_dataset(dev_data, 'dev', vocab)
 
@@ -167,8 +190,6 @@ def evaluate_answers(sess, model, dataset):
     # Split the string of index in context_data nad question_data, and convert them to integer
     # create truncated version of context and question
     for i in range(data_size):
-        context_data[i] = context_data[i].split()
-        context_data[i] = [int(word_idx_as_str) for word_idx_as_str in context_data[i]]
         if len(context_data[i]) > FLAGS.max_context_length:
             context_data_truncated.append(context_data[i][:FLAGS.max_context_length])
             context_len_data_truncated.append(FLAGS.max_context_length)
@@ -176,8 +197,6 @@ def evaluate_answers(sess, model, dataset):
             context_data_truncated.append(context_data[i])
             context_len_data_truncated.append(len(context_data[i]))
 
-        question_data[i] = question_data[i].split()
-        question_data[i] = [int(word_idx_as_str) for word_idx_as_str in question_data[i]]
         if len(question_data[i]) > FLAGS.max_question_length:
             question_data_truncated.append(question_data[i][:FLAGS.max_question_length])
             question_len_data_truncated.append(FLAGS.max_question_length)
@@ -187,8 +206,8 @@ def evaluate_answers(sess, model, dataset):
 
 
     # Pad input data with model.preprocess_question_answer
-    data_start = 800
-    data_size_to_run = 300
+    data_start = 0
+    data_size_to_run = 500
     f1 = []
     em = []
     data_set = [(question_data_truncated[i], 
@@ -218,12 +237,14 @@ def evaluate_answers(sess, model, dataset):
             # Use original context
              answer = ' '.join(context_tokens_data[data_start + i][start_idx: end_idx+1])
         
-        print('='*100)
-        print(' '.join(question_tokens_data[data_start + i]))
-        print('Predicted answer is :%s' % answer)
-        print('Original True answer is :     %s' % ' '.join(true_answers[data_start + i]))
+
         f1_single = f1_score(answer, ' '.join(true_answers[data_start + i]))
         em_single = exact_match_score(answer, ' '.join(true_answers[data_start + i]))
+        if f1_single != 1:
+            print('='*100)
+            print(' '.join(question_tokens_data[data_start + i]))
+            print('Predicted answer is     : %s' % answer)
+            print('Original True answer is : %s' % ' '.join(true_answers[data_start + i]))
         f1.append(f1_single)
         em.append(em_single)
         print('f1 score on this data is ' + str(f1_single) + ', em score is ' + str(em_single))
@@ -267,8 +288,6 @@ def generate_answers(sess, model, dataset, rev_vocab):
     # Split the string of index in context_data nad question_data, and convert them to integer
     # create truncated version of context and question
     for i in range(data_size):
-        context_data[i] = context_data[i].split()
-        context_data[i] = [int(word_idx_as_str) for word_idx_as_str in context_data[i]]
         if len(context_data[i]) > FLAGS.max_context_length:
             context_data_truncated.append(context_data[i][:FLAGS.max_context_length])
             context_len_data_truncated.append(FLAGS.max_context_length)
@@ -276,8 +295,6 @@ def generate_answers(sess, model, dataset, rev_vocab):
             context_data_truncated.append(context_data[i])
             context_len_data_truncated.append(len(context_data[i]))
 
-        question_data[i] = question_data[i].split()
-        question_data[i] = [int(word_idx_as_str) for word_idx_as_str in question_data[i]]
         if len(question_data[i]) > FLAGS.max_question_length:
             question_data_truncated.append(question_data[i][:FLAGS.max_question_length])
             question_len_data_truncated.append(FLAGS.max_question_length)
@@ -316,7 +333,7 @@ def generate_answers(sess, model, dataset, rev_vocab):
             # Use rev_vocab to reverse look up vocab from index token
             # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
             # Use original context
-             answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
+            answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
         print('Answer is %s' % answer)
         answers[question_uuid_data[i]] = answer
     return answers
@@ -338,6 +355,28 @@ def get_normalized_train_dir(train_dir):
     return global_train_dir
 
 
+def process_dev_json_to_files():
+    # dev_path example data/squad/dev-v1.1.json
+    download_prefix = os.path.dirname(os.path.abspath(FLAGS.dev_path)) # data/squad/
+    dev_filename = os.path.basename(FLAGS.dev_path) # "dev-v1.1.json"
+    # relative path to save the data
+    data_prefix = os.path.join("data", "squad", "qa_answer")
+
+
+    print("Downloading datasets into {}".format(download_prefix))
+    print("Preprocessing datasets into {}".format(data_prefix))
+
+    if not os.path.exists(download_prefix):
+        os.makedirs(download_prefix)
+    if not os.path.exists(data_prefix):
+        os.makedirs(data_prefix)
+
+    maybe_download(squad_base_url, dev_filename, download_prefix, None)
+    # Read data from dev json file
+    dev_data = data_from_json(os.path.join(download_prefix, dev_filename))
+    # write data out to data_prefix location
+    dev_num_questions, dev_num_answers = read_write_dataset(dev_data, 'dev', data_prefix)
+
 def main(_):
 
     config_fname = FLAGS.config_path
@@ -356,6 +395,7 @@ def main(_):
     assert os.path.exists(FLAGS.train_dir), "train dir does not exist"
     # assert False
     
+    FLAGS.eval_on_train = True
 
     vocab, rev_vocab = initialize_vocab(FLAGS.vocab_path)
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
@@ -374,7 +414,7 @@ def main(_):
     # ============ EVAL_ON_TRAIN: START =============
     if FLAGS.eval_on_train:
         FLAGS.dev_path = "download/squad/dev-v1.1.json"
-        print('='*50 + '\nLoad train-v1.1.json for evalulating model.')
+        print('='*50 + '\nLoad dev-v1.1.json for evalulating model.')
 
     dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
     dev_filename = os.path.basename(FLAGS.dev_path)
@@ -424,6 +464,7 @@ def main(_):
         train_dir = FLAGS.train_dir 
         initialize_model(sess, qa, train_dir)
         print('About to start generate_answers')
+        print(FLAGS.eval_on_train)
         if FLAGS.eval_on_train:
             evaluate_answers(sess, qa, dataset)
             return
