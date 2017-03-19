@@ -211,9 +211,9 @@ def generate_answers(sess, model, dataset, rev_vocab):
         else:
             # TOCHECK how are their golden answer generated?
             # Use rev_vocab to reverse look up vocab from index token
-            answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
+            # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
             # Use original context
-            # answer = ' '.join(conext_tokens_data[i][start_idx: end_idx])
+             answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
         print('Answer is %s' % answer)
         answers[question_uuid_data[i]] = answer
     return answers
