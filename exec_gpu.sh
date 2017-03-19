@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=exp007
+NAME=exp008
 MDIR=run/${NAME}
 LDIR=${MDIR}/log
 TDIR=${MDIR}/train
@@ -21,9 +21,9 @@ python code/train.py --log_dir=${LDIR} \
                      --model=matchLSTM \
                      --decoder_type=pointer \
                      --epochs=15 \
-                     --batch_size=32 \
+                     --batch_size=64 \
                      --learning_rate=0.03 \
-                     --state_size=50 \
+                     --state_size=100 \
                      --gpu_fraction=0.5 \
                      --num_epochs_per_decay=10
 
