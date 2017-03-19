@@ -13,7 +13,7 @@ TDIR=${MDIR}/train
 # create folder for experiment
 mkdir -p ${MDIR} 
 
-export CUDA_VISIBLE_DEVICES=2
+export CUDA_VISIBLE_DEVICES=1
 python code/train.py --log_dir=${LDIR} \
                      --train_dir=${TDIR} \
                      --data_size=full \
