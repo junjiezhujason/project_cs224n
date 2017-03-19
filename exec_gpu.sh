@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=exp003
+NAME=exp007
 MDIR=run/${NAME}
 LDIR=${MDIR}/log
 TDIR=${MDIR}/train
@@ -18,11 +18,12 @@ export CUDA_VISIBLE_DEVICES=1
 python code/train.py --log_dir=${LDIR} \
                      --train_dir=${TDIR} \
                      --data_size=full \
-                     --model=baseline \
-                     --decoder_type=naive \
+                     --model=matchLSTM \
+                     --decoder_type=pointer \
                      --epochs=15 \
-                     --batch_size=64 \
-                     --learning_rate=0.0001 \
+                     --batch_size=32 \
+                     --learning_rate=0.03 \
                      --state_size=50 \
                      --gpu_fraction=1.0 \
+                     --num_epochs_per_decay=10
 
