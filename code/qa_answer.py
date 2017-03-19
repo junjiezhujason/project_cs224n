@@ -57,8 +57,10 @@ tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory wher
 # tf.app.flags.DEFINE_string("log_dir", "log", "Path to store log and flag files (default: ./log)")
 
 def initialize_model(session, model, train_dir):
+    print(train_dir)
     ckpt = tf.train.get_checkpoint_state(train_dir)
     v2_path = ckpt.model_checkpoint_path + ".index" if ckpt else ""
+    print(v2_path)
     if ckpt and (tf.gfile.Exists(ckpt.model_checkpoint_path) or tf.gfile.Exists(v2_path)):
         logging.info("Reading model parameters from %s" % ckpt.model_checkpoint_path)
         model.saver.restore(session, ckpt.model_checkpoint_path)
@@ -185,12 +187,12 @@ def generate_answers(sess, model, dataset, rev_vocab):
 
 
     # Pad input data with model.preprocess_question_answer
-    fake_label = [0, 0]
+    fake_label = [None, None]
     data_set = [(question_data_truncated[i], 
                  question_len_data_truncated[i], 
                  context_data_truncated[i],
                  context_len_data_truncated[i], 
-                 fake_label) for i in xrange(data_size)]
+                 fake_label) for i in xrange(data_size)] # TODO CHANGE ME
     padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
     outputs = model.output(sess, padded_inputs)
     for i, output_res in enumerate(outputs):
@@ -202,12 +204,14 @@ def generate_answers(sess, model, dataset, rev_vocab):
         if (start_idx >= context_len):
             print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
             answer = '\<EXCEED\>'
-        elif (end_idx <= start_idx):
+        elif (start_idx > end_idx):
+            # print(start_idx)
+            # print(end_idx)
             answer = '\<REVERSED\>'
         else:
             # TOCHECK how are their golden answer generated?
             # Use rev_vocab to reverse look up vocab from index token
-            answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx]])
+            answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
             # Use original context
             # answer = ' '.join(conext_tokens_data[i][start_idx: end_idx])
         print('Answer is %s' % answer)
@@ -305,7 +309,8 @@ def main(_):
 
 
     with tf.Session() as sess:
-        train_dir = get_normalized_train_dir(FLAGS.train_dir)
+        # train_dir = get_normalized_train_dir(FLAGS.train_dir)
+        train_dir = FLAGS.train_dir 
         initialize_model(sess, qa, train_dir)
         print('About to start generate_answers')
         answers = generate_answers(sess, qa, dataset, rev_vocab)
