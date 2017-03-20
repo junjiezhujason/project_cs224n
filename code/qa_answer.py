@@ -181,7 +181,7 @@ def prepare_dev(prefix, dev_filename, vocab):
     return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data
 
 
-def evaluate_answers(sess, model, dataset):
+def generate_answers(sess, model, dataset):
     answers = {}
 
     context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
@@ -211,7 +211,11 @@ def evaluate_answers(sess, model, dataset):
 
     # Pad input data with model.preprocess_question_answer
     data_start = 0
-    data_size_to_run = data_size
+    if FLAGS.data_size == 'tiny':
+        data_size_to_run = 100
+    else:
+        data_size_to_run = data_size
+        data_start = 0
     f1 = []
     em = []
     data_set = [(question_data_truncated[i], 
@@ -219,6 +223,7 @@ def evaluate_answers(sess, model, dataset):
                  context_data_truncated[i],
                  context_len_data_truncated[i], 
                  [None, None]) for i in xrange(data_start, data_start + data_size_to_run)] # TODO CHANGE ME
+    print('About to run %d data through model.' % data_size_to_run)
     padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
     outputs = model.output(sess, padded_inputs)
     for i, output_res in enumerate(outputs):
@@ -240,106 +245,27 @@ def evaluate_answers(sess, model, dataset):
             # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
             # Use original context
              answer = ' '.join(context_tokens_data[data_start + i][start_idx: end_idx+1])
+
+        answers[question_uuid_data[data_start + i]] = answer
+        
+        if FLAGS.eval_on_train:
+            f1_single = f1_score(answer, ' '.join(true_answers[data_start + i]))
+            em_single = exact_match_score(answer, ' '.join(true_answers[data_start + i]))
+            #if f1_single != 1:
+            print('='*100)
+            print(' '.join(question_tokens_data[data_start + i]))
+            print('Predicted answer is     : %s' % answer)
+            print('Original True answer is : %s' % ' '.join(true_answers[data_start + i]))
+            f1.append(f1_single)
+            em.append(em_single)
+            print('f1 score on this data is ' + str(f1_single) + ', em score is ' + str(em_single))
         
 
-        f1_single = f1_score(answer, ' '.join(true_answers[data_start + i]))
-        em_single = exact_match_score(answer, ' '.join(true_answers[data_start + i]))
-        #if f1_single != 1:
-        print('='*100)
-        print(' '.join(question_tokens_data[data_start + i]))
-        print('Predicted answer is     : %s' % answer)
-        print('Original True answer is : %s' % ' '.join(true_answers[data_start + i]))
-        f1.append(f1_single)
-        em.append(em_single)
-        print('f1 score on this data is ' + str(f1_single) + ', em score is ' + str(em_single))
+    if FLAGS.eval_on_train:
+        f1 = np.mean(f1)
+        em = np.mean(em)
+        print('final f1 score is ' + str(f1) + ', em score is ' + str(em))
 
-
-    f1 = np.mean(f1)
-    em = np.mean(em)
-    print('final f1 score is ' + str(f1) + ', em score is ' + str(em))
-    logging.info("F1: {}, EM: {}".format(f1, em))
-
-    
-
-def generate_answers(sess, model, dataset, rev_vocab):
-    """
-    Loop over the dev or test dataset and generate answer.
-
-    Note: output format must be answers[uuid] = "real answer"
-    You must provide a string of words instead of just a list, or start and end index
-
-    In main() function we are dumping onto a JSON file
-
-    evaluate.py will take the output JSON along with the original JSON file
-    and output a F1 and EM
-
-    You must implement this function in order to submit to Leaderboard.
-
-    :param sess: active TF session
-    :param model: a built QASystem model
-    :param rev_vocab: this is a list of vocabulary that maps index to actual words
-    :return:
-    """
-    answers = {}
-
-    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
-    
-    context_data_truncated = []
-    context_len_data_truncated = []
-    question_data_truncated = []
-    question_len_data_truncated = []
-    data_size = len(context_data)
-    # Split the string of index in context_data nad question_data, and convert them to integer
-    # create truncated version of context and question
-    for i in range(data_size):
-        if len(context_data[i]) > FLAGS.max_context_length:
-            context_data_truncated.append(context_data[i][:FLAGS.max_context_length])
-            context_len_data_truncated.append(FLAGS.max_context_length)
-        else:
-            context_data_truncated.append(context_data[i])
-            context_len_data_truncated.append(len(context_data[i]))
-
-        if len(question_data[i]) > FLAGS.max_question_length:
-            question_data_truncated.append(question_data[i][:FLAGS.max_question_length])
-            question_len_data_truncated.append(FLAGS.max_question_length)
-        else:
-            question_data_truncated.append(question_data[i])
-            question_len_data_truncated.append(len(question_data[i]))
-
-
-
-
-
-    # Pad input data with model.preprocess_question_answer
-    fake_label = [None, None]
-    data_set = [(question_data_truncated[i], 
-                 question_len_data_truncated[i], 
-                 context_data_truncated[i],
-                 context_len_data_truncated[i], 
-                 fake_label) for i in xrange(data_size)] # TODO CHANGE ME
-    padded_inputs = model.preprocess_question_answer(data_set) # 7 things per item
-    outputs = model.output(sess, padded_inputs)
-    for i, output_res in enumerate(outputs):
-        _, pred_labels = output_res
-        start_idx = pred_labels[0]
-        end_idx = pred_labels[1]
-        context_len = context_len_data_truncated[i]
-        
-        if (start_idx >= context_len):
-            print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
-            answer = '\<EXCEED\>'
-        elif (start_idx > end_idx):
-            # print(start_idx)
-            # print(end_idx)
-            answer = '\<REVERSED\>'
-        else:
-            # TOCHECK how are their golden answer generated?
-            # Use rev_vocab to reverse look up vocab from index token
-            # answer = ' '.join([rev_vocab[vocab_idx] for vocab_idx in context_data[i][start_idx: end_idx+1]])
-            # Use original context
-            answer = ' '.join(context_tokens_data[i][start_idx: end_idx+1])
-        print('Answer is %s' % answer)
-        answers[question_uuid_data[i]] = answer
     return answers
 
 
@@ -408,7 +334,7 @@ def main(_):
     
     FLAGS.eval_on_train = True 
     FLAGS.load_from_json = True
-    FLAGS.data_size = 'tiny'
+    FLAGS.data_size = 'full'
     FLAGS.dev_path = "data/squad/dev-v1.1.json"
 
     vocab, rev_vocab = initialize_vocab(FLAGS.vocab_path)
@@ -431,7 +357,7 @@ def main(_):
     # mixer = Mixer()
     # decoder = Decoder(FLAGS)
     if FLAGS.model == 'baseline':
-        qa = QASystem(encoder, None, None, FLAGS, embeddings, 1)
+        qa = QASystem(encoder, FLAGS, embeddings, 1)
     elif FLAGS.model == 'matchLSTM':
         qa = QASystemMatchLSTM(FLAGS, embeddings, 1)
 
@@ -440,10 +366,8 @@ def main(_):
         dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
         dev_filename = os.path.basename(FLAGS.dev_path)
         dataset = prepare_dev(dev_dirname, dev_filename, vocab)
-        if FLAGS.eval_on_train:
-            context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
-        else:
-            context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
+
+        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
 
         for i in range(1):
           logging.debug('context')
@@ -463,16 +387,12 @@ def main(_):
             initialize_model(sess, qa, train_dir)
             print('About to start generate_answers')
             print(FLAGS.eval_on_train)
-            
-            if FLAGS.eval_on_train:
-                evaluate_answers(sess, qa, dataset)
-                return
-            else:
-                answers = generate_answers(sess, qa, dataset, rev_vocab)
 
-                # write to json file to root dir
-                with io.open('dev-prediction.json', 'w', encoding='utf-8') as f:
-                    f.write(unicode(json.dumps(answers, ensure_ascii=False)))
+            answers = generate_answers(sess, qa, dataset)
+
+            # write to json file to root dir
+            with io.open('dev-prediction.json', 'w', encoding='utf-8') as f:
+                f.write(unicode(json.dumps(answers, ensure_ascii=False)))
 
 
     else:
