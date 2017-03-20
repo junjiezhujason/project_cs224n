@@ -420,7 +420,7 @@ class QASystem(object):
         return question_embeddings, context_embeddings
 
 
-    def evaluate_answer(self, session, dataset, sample=100, log=False):
+    def evaluate_answer(self, session, dataset, sample=100, return_answer_dict=False):
         """
         Evaluate the model's performance using the harmonic mean of F1 and Exact Match (EM)
         with the set of true answer labels
@@ -432,14 +432,19 @@ class QASystem(object):
         :param dataset: a representation of our data [data_tokenized, data_raw], in some implementations, you can
                         pass in multiple components (arguments) of one dataset to this function
         :param sample: how many examples in dataset we look at
-        :param log: whether we print to std out stream
+        :param return_answer_dict: whether we return predicted answer string as a dict of {uuid: answer } or not
         :return:
         """
         f1 = []
         em = []
         n_samples = 0
-        input_data = dataset[0] # 
+        input_data = dataset[0] #
         input_raw = dataset[1]
+
+        if return_answer_dict:
+            uuids = dataset[2]
+            answers = {}
+
         for i, output_res in enumerate(self.output(session, input_data)):
             # print(output_res)
             input_raw_i = input_raw[i][1]
@@ -474,12 +479,16 @@ class QASystem(object):
                     print("*** PRED ANSWER: "+pred_answer)
                     print("*** PRED INDEX:  "+str(pred_labels))
             """
+            if return_answer_dict:
+                answers[uuids[i]] = pred_answer
 
         f1 = np.mean(f1)
         em = np.mean(em)
 
-        logging.info("F1: {}, EM: {}, for {} samples".format(f1, em, n_samples))
+        print("F1: {}, EM: {}, for {} samples".format(f1, em, n_samples))
 
+        if return_answer_dict:
+            return answers
         return f1, em
 
     def pad_sequence(self, sentence, max_length):
