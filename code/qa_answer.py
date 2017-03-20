@@ -35,6 +35,8 @@ tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory wher
 
 tf.app.flags.DEFINE_bool("eval_on_train", False, "Run qa_answer to evaluate on train.")
 tf.app.flags.DEFINE_bool("load_from_json", True, "True for loading data straight from dev_path json file.")
+tf.app.flags.DEFINE_bool("rand_unknown", False, "True for randomizing unknown token in context and question.")
+
 
 # tf.app.flags.DEFINE_string("embed_path", "", "Path to the trimmed GLoVe embedding (default: ./data/squad/glove.trimmed.{embedding_size}.npz)")
 
@@ -132,15 +134,18 @@ def read_dataset(dataset, tier, vocab):
                 context_ids = [vocab.get(w, qa_data.UNK_ID) for w in context_tokens]
                 question_ids = [vocab.get(w, qa_data.UNK_ID) for w in question_tokens]
                 context_word_cnt += len(context_ids)
+                
                 for i in xrange(len(context_ids)):
                     if context_ids[i] == qa_data.UNK_ID:
-                        context_ids[i] = random.randint(0, rand_max-1)
+                        if FLAGS.rand_unknown:
+                            context_ids[i] = random.randint(0, rand_max-1)
                         context_ukn_word_cnt += 1
                         #print(context_tokens[i])
 
-                for i in xrange(len(question_ids)):
-                    if int(question_ids[i]) == qa_data.UNK_ID:
-                        question_ids[i] = str(random.randint(0, rand_max-1))
+                if FLAGS.rand_unknown:
+                    for i in xrange(len(question_ids)):           
+                        if int(question_ids[i]) == qa_data.UNK_ID:                   
+                            question_ids[i] = str(random.randint(0, rand_max-1))
 
 
                 context_data.append(context_ids)
@@ -360,7 +365,8 @@ def main(_):
         qa = QASystem(encoder, FLAGS, embeddings, 1)
     elif FLAGS.model == 'matchLSTM':
         qa = QASystemMatchLSTM(FLAGS, embeddings, 1)
-
+   
+    print('\n\nrand_unknown is set to be ' + str(FLAGS.rand_unknown))
 
     if FLAGS.load_from_json:
         dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
