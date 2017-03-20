@@ -112,6 +112,8 @@ class QASystem(object):
         # embedding_size = 50
         # label_size = 2
 
+        self.do_keep_prob_placeholder = tf.placeholder(tf.float32, name='dropout_keep_prob')
+
         # TMP TO REMOVE END
         self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features))
         print(self.question_placeholder)
@@ -159,8 +161,19 @@ class QASystem(object):
                          context_batch, 
                          context_length_batch,
                          mask_batch=None,
-                         labels_batch=None):
+                         labels_batch=None,
+                         is_training=False):
         feed_dict = {}
+        
+        if is_training:
+            dropout_keep_prob = self.dropout_keep_prob
+        else:
+            dropout_keep_prob = 1.0
+
+        print("Using dropout_keep_prob of {}".format(dropout_keep_prob))
+
+        feed_dict[self.do_keep_prob_placeholder] = dropout_keep_prob
+
         feed_dict[self.question_placeholder] = question_batch
         feed_dict[self.question_length_placeholder] = question_length_batch
         feed_dict[self.context_placeholder] = context_batch
@@ -246,6 +259,8 @@ class QASystem(object):
         :return:
         """
         question, context = self.setup_embeddings()
+        
+        do_prob_ph = self.do_keep_prob_placeholder
 
         # STEP1: Run a BiLSTM over the question, concatenate the two end hidden
         # vectors and call that the question representation.
@@ -253,7 +268,8 @@ class QASystem(object):
             question_length = self.question_length_placeholder  # TODO: name
             question_paragraph_repr, question_repr, q_state = self.encoder.encode(inputs=question,
                                                                     seq_len=question_length,
-                                                                    encoder_state_input=None)
+                                                                    encoder_state_input=None,
+                                                                    keep_prob=do_prob_ph)
 
         # STEP2: Run a BiLSTM over the context paragraph, conditioned on the
         # question representation.
@@ -261,7 +277,8 @@ class QASystem(object):
             context_length = self.context_length_placeholder  # TODO: name
             context_paragraph_repr, context_repr, c_state = self.encoder.encode(inputs=context,
                                                                   seq_len=context_length,
-                                                                  encoder_state_input=None)
+                                                                  encoder_state_input=None,
+                                                                  keep_prob=do_prob_ph)
         # STEP3: Calculate an attention vector over the context paragraph representation based on the question
         # representation.
         # STEP4: Compute a new vector for each context paragraph position that multiplies context-paragraph
@@ -338,6 +355,8 @@ class QASystem(object):
         logging.info("H_in:"+str(H_in))
         logging.info("d:"+str(d))
         logging.info("con_len:"+str(con_len))
+        
+        do_prob_ph = self.do_keep_prob_placeholder
 
         def lstm_decoder_cell(H_in, d, c_len):
             """Helper function to create a lstm decoder."""
@@ -346,6 +365,7 @@ class QASystem(object):
                                         inputs=H_in,
                                         sequence_length=self.context_length_placeholder,
                                         dtype=tf.float32)
+            H_out = tf.nn.dropout(H_out, do_prob_ph, name="H_out_dropout")
             y = self.simple_linear(H_out, d, c_len) 
             return y 
 
@@ -420,7 +440,8 @@ class QASystem(object):
         return question_embeddings, context_embeddings
 
 
-    def evaluate_answer(self, session, dataset, sample=100, return_answer_dict=False):
+    def evaluate_answer(self, session, dataset, sample=100, 
+                        return_answer_dict=False, is_training=False):
         """
         Evaluate the model's performance using the harmonic mean of F1 and Exact Match (EM)
         with the set of true answer labels
@@ -444,8 +465,10 @@ class QASystem(object):
         if return_answer_dict:
             uuids = dataset[2]
             answers = {}
+            
+        outputs = self.output(session, input_data, is_training=is_training)
 
-        for i, output_res in enumerate(self.output(session, input_data)):
+        for i, output_res in enumerate(outputs):
             # print(output_res)
             input_raw_i = input_raw[i][1]
             # print(input_raw_i)
@@ -574,7 +597,8 @@ class QASystem(object):
                                      c_batch, 
                                      c_len_batch, 
                                      mask_batch = mask_batch,
-                                     labels_batch=[start_labels_batch, end_labels_batch])
+                                     labels_batch=[start_labels_batch, end_labels_batch],
+                                     is_training=True)
        
         _, loss, global_step = sess.run([self.train_op, self.loss, self.global_step], feed_dict=feed)
 
@@ -584,7 +608,8 @@ class QASystem(object):
 
         return loss
 
-    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch):
+    def predict_on_batch(self, sess, q_batch, q_len_batch, c_batch, c_len_batch, mask_batch,
+                         is_training=False):
         """
         Return the predicted start index and end index (index NOT onehot).
         """
@@ -592,7 +617,8 @@ class QASystem(object):
                                      q_len_batch,
                                      c_batch,
                                      c_len_batch,
-                                     mask_batch=mask_batch)
+                                     mask_batch=mask_batch,
+                                     is_training=is_training)
         predictions = sess.run([tf.argmax(self.preds[0], axis=1),
                                 tf.argmax(self.preds[1], axis=1)], feed_dict=feed)
 
@@ -629,12 +655,12 @@ class QASystem(object):
         if self.config.data_size == "tiny":
             logging.info("*****Evaluating on training data*****")
             train_dataset = [train_examples, train_raw]
-            _, _ = self.evaluate_answer(sess, train_dataset)
+            _, _ = self.evaluate_answer(sess, train_dataset, is_training=False)
 
         logging.info("*****Evaluating on validation data*****")
         valid_examples = self.preprocess_question_answer(valid_set)
         valid_dataset = [valid_examples,valid_raw]
-        f1, em = self.evaluate_answer(sess, valid_dataset)
+        f1, em = self.evaluate_answer(sess, valid_dataset, is_training=False)
 
         # token_cm, entity_scores = self.evaluate_answer(sess, dev_set, dev_set_raw)
         # logging.debug("Token-level confusion matrix:\n" + token_cm.as_table())
@@ -673,6 +699,9 @@ class QASystem(object):
         # so that you can use your trained model to make predictions, or
         # even continue training
         
+        self.dropout_keep_prob = self.config.dropout_keep_prob
+        #print("dropout_keep_prob: {}".format(self.dropout_keep_prob))
+
         self.summary_writer = tf.summary.FileWriter(train_dir, session.graph)
 
         results_path = os.path.join(train_dir, "{:%Y%m%d_%H%M%S}".format(datetime.now()))
@@ -708,7 +737,7 @@ class QASystem(object):
         #       self.report.save()
         return best_score
 
-    def output(self, sess, inputs):
+    def output(self, sess, inputs, is_training=False):
         """
         Reports the output of the model on examples (uses helper to featurize each example).
         """
@@ -721,7 +750,7 @@ class QASystem(object):
         for i, batch in enumerate(minibatches(inputs, self.config.batch_size, shuffle=False)):
             # Ignore predict
             batch_input = batch[:-2]
-            preds_ = self.predict_on_batch(sess, *batch_input)
+            preds_ = self.predict_on_batch(sess, *batch_input, is_training=is_training)
             pred += list((np.transpose(preds_)))     # pred for this batch
             true += list(np.transpose(batch[-2:])) # true for this batch
             # prog.update(i + 1, ["\n"])
@@ -753,6 +782,8 @@ class QASystemMatchLSTM(QASystem):
         self.pretrained_embeddings = args[1] # embeddings
         self.num_per_epoch = args[2]
         
+        
+        self.do_keep_prob_placeholder = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
         # TMP TO REMOVE END
         self.question_placeholder = tf.placeholder(tf.int64, (None, self.config.max_question_length, self.config.n_features))
@@ -791,7 +822,7 @@ class QASystemMatchLSTM(QASystem):
         self.train_op = optfn(self.lr).minimize(self.loss, global_step=self.global_step)
         self.saver = tf.train.Saver()
 
-    def setup_LSTM_preprocessing_layer(self):
+    def setup_LSTM_preprocessing_layer(self, question, passage):
         """
         In a generalized encode function, you pass in your inputs, seq_len, and an initial hidden state input into this function.
 
@@ -803,8 +834,6 @@ class QASystemMatchLSTM(QASystem):
                  It can be context-level representation, word-level representation,
                  or both.
         """
-
-        question, passage = self.setup_embeddings()
 
         # LSTM Preprocessing Layer for passage
         q_len = self.question_length_placeholder
@@ -831,7 +860,7 @@ class QASystemMatchLSTM(QASystem):
         xavier_init = tf.contrib.layers.xavier_initializer()
         state_size = self.config.state_size
         max_question_length = self.config.max_question_length
-      
+              
         with tf.variable_scope('match_LSTM'):
             W_q = tf.get_variable('W_q', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
             W_p = tf.get_variable('W_p', shape=(self.config.state_size, self.config.state_size), initializer=xavier_init, dtype=tf.float32)
@@ -972,11 +1001,25 @@ class QASystemMatchLSTM(QASystem):
 
 
     def setup_system(self):
-        H_p, H_q = self.setup_LSTM_preprocessing_layer()
+        do_prob_ph = self.do_keep_prob_placeholder
+
+        question, passage = self.setup_embeddings()
+        
+        question = tf.nn.dropout(question, do_prob_ph, name="question_dropout")
+        passage = tf.nn.dropout(passage, do_prob_ph, name="passage_dropout")
+        
+        H_p, H_q = self.setup_LSTM_preprocessing_layer(question, passage)
+        
+        H_p = tf.nn.dropout(H_p, do_prob_ph, name="H_p_dropout")
+        H_q = tf.nn.dropout(H_q, do_prob_ph, name="H_q_dropout")
+        
         print('H_q is ' + str(H_q))
         print('H_p is ' + str(H_p))
-        H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)
+        
+        H_r_fw = self.setup_match_LSTM_layer(H_p, H_q)        
         H_r_fw_dim = self.config.state_size * 2
+        
+        H_r_fw = tf.nn.dropout(H_r_fw, do_prob_ph, name="H_r_fw_dropout")
 
 
         if self.config.decoder_type == "pointer":

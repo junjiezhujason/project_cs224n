@@ -22,7 +22,8 @@ tf.app.flags.DEFINE_float("learning_rate_decay_factor", 0.1, "Using step functio
                           """decayed_learning_rate = """
                           """learning_rate *decay_rate ^ (global_step // decay_steps)""")
 tf.app.flags.DEFINE_float("max_gradient_norm", 10.0, "Clip gradients to this norm.")
-tf.app.flags.DEFINE_float("dropout", 0.15, "Fraction of units randomly dropped on non-recurrent connections.")
+tf.app.flags.DEFINE_float("dropout_keep_prob", 0.95, """Fraction of units randomly kept """
+                                                     """on non-recurrent connections.""")
 tf.app.flags.DEFINE_integer("batch_size", 10, "Batch size to use during training.")
 tf.app.flags.DEFINE_integer("epochs", 10, "Number of epochs to train.")
 tf.app.flags.DEFINE_integer("state_size", 100, "Size of each model layer.")
