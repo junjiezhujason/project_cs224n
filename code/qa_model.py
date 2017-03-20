@@ -170,7 +170,7 @@ class QASystem(object):
         else:
             dropout_keep_prob = 1.0
 
-        print("Using dropout_keep_prob of {}".format(dropout_keep_prob))
+        # print("Using dropout_keep_prob of {}".format(dropout_keep_prob))
 
         feed_dict[self.do_keep_prob_placeholder] = dropout_keep_prob
 
