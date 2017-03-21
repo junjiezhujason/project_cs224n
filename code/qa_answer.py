@@ -107,7 +107,7 @@ def read_dataset(dataset, tier, vocab):
     if FLAGS.eval_on_train:
         s_labels = []
         e_labels = []
-        true_answers = []
+#        true_answers = []
 
     for articles_id in tqdm(range(len(dataset['data'])), desc="Preprocessing {}".format(tier)):
         article_paragraphs = dataset['data'][articles_id]['paragraphs']
@@ -149,20 +149,21 @@ def read_dataset(dataset, tier, vocab):
                 context_tokens_data.append(context_tokens)
                 question_tokens_data.append(question_tokens)
 
-                if FLAGS.eval_on_train:
-                    answer = qas[qid]['answers'][0]['text'].split()
+#                if FLAGS.eval_on_train:
+#                    answer = qas[qid]['answers'][0]['text'].split()
                     # Wrong because qas[qid]['answers'][0]['answer_start'] is the token, not index
                     #s_labels.append(qas[qid]['answers'][0]['answer_start'])
                     #e_labels.append(qas[qid]['answers'][0]['answer_start'] + len(answer) - 1)
-                    true_answers.append(answer)
+# remove answer
+#                    true_answers.append(answer)
     #print(sorted(context_lengths))
     context_lengths_over = [context_length>300 for context_length in context_lengths]
     print('+' * 100)
     print('Percentage of questions with context over context_max_length is: ' + str(sum(context_lengths_over)/len(context_lengths)))
     print('Percentage of unknow is ' + str(context_ukn_word_cnt/context_word_cnt))
-
-    if FLAGS.eval_on_train:
-        return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data, s_labels, e_labels, true_answers
+# remove answer
+#    if FLAGS.eval_on_train:
+#        return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data, s_labels, e_labels, true_answers
     return context_tokens_data, context_data, question_tokens_data, query_data, question_uuid_data
 
 
@@ -173,9 +174,11 @@ def prepare_dev(prefix, dev_filename, vocab):
 
     dev_data = data_from_json(os.path.join(prefix, dev_filename))
 
-    if FLAGS.eval_on_train:
-        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = read_dataset(dev_data, 'train', vocab)
-        return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers
+# remove answer
+#    if FLAGS.eval_on_train:
+#        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = read_dataset(dev_data, 'train', vocab)
+#        return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers
+
     context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = read_dataset(dev_data, 'dev', vocab)
 
     return context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data
@@ -184,7 +187,9 @@ def prepare_dev(prefix, dev_filename, vocab):
 def generate_answers(sess, model, dataset):
     answers = {}
 
-    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+    #context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+    # remove answer
+    context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
     
     context_data_truncated = []
     context_len_data_truncated = []
@@ -231,7 +236,6 @@ def generate_answers(sess, model, dataset):
         start_idx = pred_labels[0]
         end_idx = pred_labels[1]
         context_len = context_len_data_truncated[i]
-        
         if (start_idx >= context_len):
             print('ERROR: start_idx %d exceend context_len %d, this should not happen' % (start_idx, context_len)) 
             answer = '\<EXCEED\>'
@@ -247,7 +251,9 @@ def generate_answers(sess, model, dataset):
              answer = ' '.join(context_tokens_data[data_start + i][start_idx: end_idx+1])
 
         answers[question_uuid_data[data_start + i]] = answer
-        
+    return answers
+# remove answer
+"""
         if FLAGS.eval_on_train:
             f1_single = f1_score(answer, ' '.join(true_answers[data_start + i]))
             em_single = exact_match_score(answer, ' '.join(true_answers[data_start + i]))
@@ -259,14 +265,12 @@ def generate_answers(sess, model, dataset):
             f1.append(f1_single)
             em.append(em_single)
             print('f1 score on this data is ' + str(f1_single) + ', em score is ' + str(em_single))
-        
 
     if FLAGS.eval_on_train:
         f1 = np.mean(f1)
         em = np.mean(em)
         print('final f1 score is ' + str(f1) + ', em score is ' + str(em))
-
-    return answers
+"""
 
 
 def get_normalized_train_dir(train_dir):
@@ -324,6 +328,10 @@ def main(_):
     # print(json_flag)
     print(vars(FLAGS))
     for key, value in json_flag.iteritems():
+        if key=="eval_on_train":
+            continue
+        if key=="dev_path":
+            continue
         if key=="train_dir":
             continue
         FLAGS.__setattr__(key, value)
@@ -366,8 +374,9 @@ def main(_):
         dev_dirname = os.path.dirname(os.path.abspath(FLAGS.dev_path))
         dev_filename = os.path.basename(FLAGS.dev_path)
         dataset = prepare_dev(dev_dirname, dev_filename, vocab)
-
-        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+# remove answer
+#        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data, s_labels, e_labels, true_answers = dataset
+        context_tokens_data, context_data, question_tokens_data, question_data, question_uuid_data = dataset
 
         for i in range(1):
           logging.debug('context')
