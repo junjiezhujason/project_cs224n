@@ -33,7 +33,7 @@ tf.app.flags.DEFINE_string("config_path", "", "Path to the JSON to load config f
 tf.app.flags.DEFINE_string("dev_path", "data/squad/dev-v1.1.json", "Path to the JSON dev set to evaluate against (default: ./data/squad/dev-v1.1.json)")
 tf.app.flags.DEFINE_string("train_dir", "", "Path to the training directory where the checkpoint is saved")
 
-tf.app.flags.DEFINE_bool("eval_on_train", False, "Run qa_answer to evaluate on train.")
+tf.app.flags.DEFINE_bool("eval_on_train", True, "Run qa_answer to evaluate on train.")
 tf.app.flags.DEFINE_bool("load_from_json", True, "True for loading data straight from dev_path json file.")
 tf.app.flags.DEFINE_bool("rand_unknown", False, "True for randomizing unknown token in context and question.")
 
@@ -337,11 +337,6 @@ def main(_):
     assert os.path.exists(FLAGS.train_dir), "train dir does not exist"
     # assert False
     
-    FLAGS.eval_on_train = True 
-    FLAGS.load_from_json = True
-    FLAGS.data_size = 'full'
-    FLAGS.dev_path = "data/squad/dev-v1.1.json"
-
     vocab, rev_vocab = initialize_vocab(FLAGS.vocab_path)
     embed_path = FLAGS.embed_path or pjoin("data", "squad", "glove.trimmed.{}.npz".format(FLAGS.embedding_size))
 
